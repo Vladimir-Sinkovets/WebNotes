@@ -1,0 +1,9 @@
+﻿@model NoteCreateViewModel
+
+<form method="post" asp-action="Create" asp-controller="Notes">
+    <input type="text" asp-for="Title"/>
+    <input type="text" asp-for="Text"/>
+    <input type="submit"/>
+</form>
+
+

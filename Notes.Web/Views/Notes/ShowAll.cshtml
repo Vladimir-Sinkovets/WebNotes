@@ -1,0 +1,9 @@
+﻿@model IEnumerable<NoteViewModel>
+<ul>
+    @foreach (var note in Model)
+    {
+        <li>
+            <strong>@note.Title</strong>
+        </li>
+    }
+</ul>

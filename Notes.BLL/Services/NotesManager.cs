@@ -11,25 +11,27 @@ namespace Notes.BLL
 {
     public class NotesManager : INotesManager
     {
-        private ApplicationDbContext _dbContext;
+        private UnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public NotesManager(ApplicationDbContext dbContext, IMapper mapper)
+        public NotesManager(UnitOfWork unitOfWork, IMapper mapper)
         {
-            _dbContext = dbContext;
-            this._mapper = mapper;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public void CreateNote(Note note)
         {
             NoteEntry entry = _mapper.Map<Note, NoteEntry>(note);
 
-            _dbContext.Notes.Add(entry);
+            _unitOfWork.Notes.Create(entry);
+
+            _unitOfWork.SaveChanges();
         }
 
         public IEnumerable<Note> GetAllForCurrentUser()
         {
-            IEnumerable<NoteEntry> noteEntries = _dbContext.Notes;
+            IEnumerable<NoteEntry> noteEntries = _unitOfWork.Notes.GetAll().ToList(); // -------------------------
 
             IEnumerable<Note> notes = _mapper.Map<IEnumerable<NoteEntry>, List<Note>>(noteEntries);
 

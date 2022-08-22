@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,11 +34,17 @@ namespace Notes.Web
                 typeof(NoteMappingProfile),
                 typeof(NoteViewModelMappingProfile)
                 );
+
             services.AddTransient<INotesManager, NotesManager>();
 
-            services.AddSingleton<ApplicationDbContext>();
+            string connection = Configuration.GetConnectionString("DefaultConnection");
 
-            //services.AddDbContext<ApplicationDbContext>();
+            services.AddDbContext<ApplicationDbContext>(opt =>
+            {
+                opt.UseSqlServer(connection);
+            });
+
+            services.AddTransient<UnitOfWork>();
 
         }
 

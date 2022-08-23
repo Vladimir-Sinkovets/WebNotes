@@ -31,7 +31,7 @@ namespace Notes.BLL
 
         public IEnumerable<Note> GetAllForCurrentUser()
         {
-            IEnumerable<NoteEntry> noteEntries = _unitOfWork.Notes.GetAll().ToList(); // -------------------------
+            IEnumerable<NoteEntry> noteEntries = _unitOfWork.Notes.GetAll();
 
             IEnumerable<Note> notes = _mapper.Map<IEnumerable<NoteEntry>, List<Note>>(noteEntries);
 

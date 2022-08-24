@@ -2,7 +2,9 @@
 
 <form method="post" asp-action="Create" asp-controller="Notes">
     <input type="text" asp-for="Title"/>
-    <input type="text" asp-for="Text"/>
+    <br />
+    <textarea asp-for="Text"></textarea>
+    <br />
     <input type="submit"/>
 </form>
 

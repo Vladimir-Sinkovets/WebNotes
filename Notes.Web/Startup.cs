@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,21 +29,30 @@ namespace Notes.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            string connection = Configuration.GetConnectionString("DefaultConnection");
+
+            services.AddDbContext<ApplicationDbContext>(opt =>
+                opt.UseSqlServer(connection));
+
+            services.AddDefaultIdentity<IdentityUser>(opt =>
+            {
+                opt.Password.RequireDigit = true;
+                opt.Password.RequiredLength = 5;
+                opt.Password.RequireUppercase = true;
+                opt.User.RequireUniqueEmail = true;
+                opt.SignIn.RequireConfirmedEmail = true;
+            })
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddAutoMapper(
                 typeof(NoteMappingProfile),
                 typeof(NoteViewModelMappingProfile)
                 );
 
+            services.AddControllersWithViews();
+
             services.AddTransient<INotesManager, NotesManager>();
-
-            string connection = Configuration.GetConnectionString("DefaultConnection");
-
-            services.AddDbContext<ApplicationDbContext>(opt =>
-            {
-                opt.UseSqlServer(connection);
-            });
 
             services.AddTransient<UnitOfWork>();
 
@@ -64,6 +74,7 @@ namespace Notes.Web
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

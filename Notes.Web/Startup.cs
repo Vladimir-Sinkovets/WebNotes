@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Notes.BLL;
 using Notes.BLL.AutoMapperProfiles;
 using Notes.BLL.Interfaces;
+using Notes.DAL.Models;
 using Notes.DAL.Repositories;
 using Notes.Web.AutoMapperProfiles;
 using System;
@@ -28,15 +30,6 @@ namespace Notes.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
-
-            services.AddAutoMapper(
-                typeof(NoteMappingProfile),
-                typeof(NoteViewModelMappingProfile)
-                );
-
-            services.AddTransient<INotesManager, NotesManager>();
-
             string connection = Configuration.GetConnectionString("DefaultConnection");
 
             services.AddDbContext<ApplicationDbContext>(opt =>
@@ -44,8 +37,18 @@ namespace Notes.Web
                 opt.UseSqlServer(connection);
             });
 
-            services.AddTransient<UnitOfWork>();
+            services.AddIdentity<UserEntry, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            services.AddControllersWithViews();
+
+            services.AddAutoMapper(
+                typeof(NoteMappingProfile),
+                typeof(NoteViewModelMappingProfile)
+                );
+
+            services.AddTransient<UnitOfWork>();
+            services.AddTransient<INotesManager, NotesManager>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -64,6 +67,7 @@ namespace Notes.Web
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

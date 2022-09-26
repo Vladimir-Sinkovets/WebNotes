@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Notes.DAL.Models;
 using System;
 using System.Collections.Generic;
 
 namespace Notes.DAL.Repositories
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<UserEntry>
     {
         public DbSet<NoteEntry> Notes { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Notes.BLL.Interfaces;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace Notes.Web.Controllers
 {
+    [Authorize]
     public class NotesController : Controller
     {
         private readonly IMapper _mapper;
@@ -20,7 +22,7 @@ namespace Notes.Web.Controllers
         public NotesController(INotesManager notesManager, IMapper mapper)
         {
             _notesManager = notesManager;
-            this._mapper = mapper;
+            _mapper = mapper;
         }
 
         [HttpGet]

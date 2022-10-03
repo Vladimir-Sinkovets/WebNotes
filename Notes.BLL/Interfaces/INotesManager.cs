@@ -1,4 +1,5 @@
 ﻿using Notes.BLL.Models;
+using Notes.DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Notes.BLL.Interfaces
 {
     public interface INotesManager
     {
-        void CreateNote(Note note);
+        void CreateNote(Note note, UserEntry user);
         IEnumerable<Note> GetAllForCurrentUser();
     }
 }

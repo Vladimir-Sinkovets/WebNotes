@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Notes.BLL.Interfaces;
 using Notes.BLL.Models;
+using Notes.DAL.Models;
 using Notes.Web.Models;
 using System;
 using System.Collections.Generic;
@@ -15,13 +17,15 @@ namespace Notes.Web.Controllers
     [Authorize]
     public class NotesController : Controller
     {
+        private readonly UserManager<UserEntry> _userManager;
         private readonly IMapper _mapper;
 
         public INotesManager _notesManager { get; set; }
 
-        public NotesController(INotesManager notesManager, IMapper mapper)
+        public NotesController(INotesManager notesManager, UserManager<UserEntry> userManager, IMapper mapper)
         {
             _notesManager = notesManager;
+            _userManager = userManager;
             _mapper = mapper;
         }
 
@@ -46,7 +50,7 @@ namespace Notes.Web.Controllers
         {
             Note note = _mapper.Map<NoteCreateViewModel, Note>(model);
 
-            _notesManager.CreateNote(note);
+            _notesManager.CreateNote(note, _userManager.FindByNameAsync(User.Identity.Name).Result);
 
             return View();
         }

@@ -20,9 +20,11 @@ namespace Notes.BLL
             _mapper = mapper;
         }
 
-        public void CreateNote(Note note)
+        public void CreateNote(Note note, UserEntry user)
         {
             NoteEntry entry = _mapper.Map<Note, NoteEntry>(note);
+
+            entry.User = user;
 
             _unitOfWork.Notes.Create(entry);
 

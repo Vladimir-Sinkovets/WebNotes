@@ -17,15 +17,13 @@ namespace Notes.Web.Controllers
     [Authorize]
     public class NotesController : Controller
     {
-        private readonly UserManager<UserEntry> _userManager;
         private readonly IMapper _mapper;
 
         public INotesManager _notesManager { get; set; }
 
-        public NotesController(INotesManager notesManager, UserManager<UserEntry> userManager, IMapper mapper)
+        public NotesController(INotesManager notesManager, IMapper mapper)
         {
             _notesManager = notesManager;
-            _userManager = userManager;
             _mapper = mapper;
         }
 

@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Notes.BLL.Interfaces;
 using Notes.BLL.Models;
+using Notes.DAL.Models;
 using Notes.Web.Models;
 using System;
 using System.Collections.Generic;
@@ -42,11 +44,11 @@ namespace Notes.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create(NoteCreateViewModel model)
+        public async Task<ActionResult> Create(NoteCreateViewModel model)
         {
             Note note = _mapper.Map<NoteCreateViewModel, Note>(model);
 
-            _notesManager.CreateNote(note);
+            await _notesManager.AddNoteAsync(note, User.Identity.Name);
 
             return View();
         }

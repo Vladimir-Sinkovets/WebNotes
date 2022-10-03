@@ -46,11 +46,11 @@ namespace Notes.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create(NoteCreateViewModel model)
+        public async Task<ActionResult> Create(NoteCreateViewModel model)
         {
             Note note = _mapper.Map<NoteCreateViewModel, Note>(model);
 
-            _notesManager.CreateNote(note, _userManager.FindByNameAsync(User.Identity.Name).Result);
+            await _notesManager.AddNoteAsync(note, User.Identity.Name);
 
             return View();
         }

@@ -10,7 +10,7 @@ namespace Notes.BLL.Interfaces
 {
     public interface INotesManager
     {
-        void CreateNote(Note note, UserEntry user);
+        Task AddNoteAsync(Note note, string userName);
         IEnumerable<Note> GetAllForCurrentUser();
     }
 }

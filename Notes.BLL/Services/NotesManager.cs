@@ -45,12 +45,12 @@ namespace Notes.BLL
             return notes;
         }
 
-        public Note GetByTitle(string title, string userName)
+        public Note GetNoteById(int id, string userName)
         {
-            NoteEntry entry = _unitOfWork.Notes.GetAll()
-                .FirstOrDefault(n => n.User.UserName == userName && n.Title == title);
+            var entry = _unitOfWork.Notes.GetAll()
+                .FirstOrDefault(n => n.Id == id && n.User.UserName == userName);
 
-            Note note = _mapper.Map<Note>(entry);
+            var note = _mapper.Map<Note>(entry);
 
             return note;
         }

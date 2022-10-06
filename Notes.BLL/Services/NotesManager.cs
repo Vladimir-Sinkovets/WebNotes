@@ -43,5 +43,15 @@ namespace Notes.BLL
 
             return notes;
         }
+
+        public Note GetNoteById(int id, string userName)
+        {
+            var entry = _unitOfWork.Notes.GetAll()
+                .FirstOrDefault(n => n.Id == id && n.User.UserName == userName);
+
+            var note = _mapper.Map<Note>(entry);
+
+            return note;
+        }
     }
 }

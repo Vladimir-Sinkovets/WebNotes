@@ -8,7 +8,7 @@ namespace Notes.DAL.Repositories
 {
     public interface IRepository<T>
     {
-        IEnumerable<T> GetAll();
+        IQueryable<T> GetAll();
         void Create(T entity);
         void Update(T entity);
         void Delete(int id);

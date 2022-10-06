@@ -26,7 +26,7 @@ namespace Notes.DAL.Repositories
             _dbContext.Notes.FirstOrDefault(n => n.Id == id);
         }
 
-        public IEnumerable<NoteEntry> GetAll()
+        public IQueryable<NoteEntry> GetAll()
         {
             return _dbContext.Notes;
         }

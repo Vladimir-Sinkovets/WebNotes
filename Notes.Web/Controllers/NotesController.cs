@@ -52,5 +52,15 @@ namespace Notes.Web.Controllers
 
             return View();
         }
+
+        [HttpGet]
+        public IActionResult Read(int id)
+        {
+            var note = _notesManager.GetNoteById(id, User.Identity.Name);
+
+            var viewModel = _mapper.Map<NoteViewModel>(note);
+
+            return View(viewModel);
+        }
     }
 }

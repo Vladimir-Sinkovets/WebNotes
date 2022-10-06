@@ -12,6 +12,6 @@ namespace Notes.BLL.Interfaces
     {
         Task AddNoteAsync(Note note, string userName);
         Note GetNoteById(int id, string userName);
-        IEnumerable<Note> GetAllForCurrentUser();
+        IEnumerable<Note> GetAllFor(string userName);
     }
 }

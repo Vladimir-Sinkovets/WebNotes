@@ -35,11 +35,12 @@ namespace Notes.BLL
             _unitOfWork.SaveChanges();
         }
 
-        public IEnumerable<Note> GetAllForCurrentUser()
+        public IEnumerable<Note> GetAllFor(string userName)
         {
-            IEnumerable<NoteEntry> noteEntries = _unitOfWork.Notes.GetAll();
+            var noteEntries = _unitOfWork.Notes.GetAll()
+                .Where(n => n.User.UserName == userName);
 
-            IEnumerable<Note> notes = _mapper.Map<IEnumerable<NoteEntry>, List<Note>>(noteEntries);
+            var notes = _mapper.Map<IEnumerable<NoteEntry>, List<Note>>(noteEntries);
 
             return notes;
         }

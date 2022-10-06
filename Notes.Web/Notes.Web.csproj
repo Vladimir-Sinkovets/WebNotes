@@ -20,4 +20,8 @@
     <ProjectReference Include="..\Notes.BLL\Notes.BLL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Views\Notes\Display.cshtml" />
+  </ItemGroup>
+
 </Project>

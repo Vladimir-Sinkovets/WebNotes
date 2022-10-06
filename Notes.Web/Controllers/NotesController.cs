@@ -30,7 +30,7 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public ActionResult ShowAll()
         {
-            IEnumerable<Note> notes =_notesManager.GetAllForCurrentUser();
+            IEnumerable<Note> notes =_notesManager.GetAllFor(User.Identity.Name);
 
             IEnumerable<NoteViewModel> viewModel = _mapper.Map<IEnumerable<Note>, List<NoteViewModel>>(notes);
 

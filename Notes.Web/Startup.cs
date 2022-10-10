@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Notes.BLL;
 using Notes.BLL.AutoMapperProfiles;
 using Notes.BLL.Interfaces;
+using Notes.BLL.Services;
 using Notes.DAL.Models;
 using Notes.DAL.Repositories;
 using Notes.Web.AutoMapperProfiles;
@@ -49,6 +50,7 @@ namespace Notes.Web
 
             services.AddTransient<UnitOfWork>();
             services.AddTransient<INotesManager, NotesManager>();
+            services.AddTransient<IAccountInfoManager, AccountInfoManager>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

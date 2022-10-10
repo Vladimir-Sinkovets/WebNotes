@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Notes.BLL.Interfaces;
+using Notes.BLL.Models;
 using Notes.DAL.Models;
 using Notes.Web.Models;
 using System.Threading.Tasks;
@@ -10,11 +13,16 @@ namespace Notes.Web.Controllers
     {
         private readonly UserManager<UserEntry> _userManager;
         private readonly SignInManager<UserEntry> _signInManager;
+        private readonly IAccountInfoManager _accountInfoManager;
+        private readonly IMapper _mapper;
 
-        public AccountController(UserManager<UserEntry> userManager, SignInManager<UserEntry> signInManager)
+        public AccountController(UserManager<UserEntry> userManager, SignInManager<UserEntry> signInManager, IAccountInfoManager accountInfoManager,
+            IMapper mapper)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            this._accountInfoManager = accountInfoManager;
+            this._mapper = mapper;
         }
 
         [HttpGet]
@@ -79,6 +87,15 @@ namespace Notes.Web.Controllers
                 }
             }
             return View(model);
+        }
+
+        public IActionResult Info()
+        {
+            var accountInfo = _accountInfoManager.GetAccountInfo(User.Identity.Name);
+
+            var viewModel = _mapper.Map<AccountInfo, AccountInfoViewModel>(accountInfo);
+
+            return View(viewModel);
         }
 
         [HttpPost]

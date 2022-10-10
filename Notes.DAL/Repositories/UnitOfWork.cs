@@ -29,5 +29,10 @@ namespace Notes.DAL.Repositories
         {
             _dbContext.Dispose();
         }
+
+        public async Task SaveChangesAsync()
+        {
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

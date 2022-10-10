@@ -54,5 +54,14 @@ namespace Notes.BLL
 
             return note;
         }
+
+        public async Task UpdateAsync(Note note)
+        {
+            var entry = _mapper.Map<NoteEntry>(note);
+
+            _unitOfWork.Notes.Update(entry);
+
+            await _unitOfWork.SaveChangesAsync();
+        }
     }
 }

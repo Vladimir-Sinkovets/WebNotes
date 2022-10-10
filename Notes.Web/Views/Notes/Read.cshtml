@@ -13,5 +13,8 @@
     </div>
 </div>
 <div class="mt-2">
-    <button class="btn btn-primary">Edit</button>
+    <a class="btn btn-primary"
+            asp-controller="Notes" asp-action="Update" asp-route-id="@Model.Id">
+        Edit
+    </a>
 </div>

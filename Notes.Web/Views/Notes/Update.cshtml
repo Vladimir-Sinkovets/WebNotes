@@ -1,0 +1,19 @@
+﻿@model UpdateNoteViewModel
+
+<form asp-controller="Notes" asp-action="Update" method="post">
+    <div>
+        <label>Title</label>
+        <input type="text" asp-for="Title"/>
+    </div>
+
+    <div>
+        <label>Text</label>
+        <textarea asp-for="Text"></textarea>
+    </div>
+
+    <div>
+        <button class="btn btn-primary">Save</button>
+    </div>
+
+    <input type="hidden" asp-for="Id" value="@Model.Id"/>
+</form>

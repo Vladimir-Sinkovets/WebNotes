@@ -54,6 +54,31 @@ namespace Notes.Web.Controllers
         }
 
         [HttpGet]
+        public ActionResult Update(int id)
+        {
+            var note = _notesManager.GetNoteById(id, User.Identity.Name);
+
+            var viewModel = _mapper.Map<UpdateNoteViewModel>(note);
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Update(UpdateNoteViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var note = _mapper.Map<Note>(model);
+
+            await _notesManager.UpdateAsync(note);
+
+            return View(model);
+        }
+
+        [HttpGet]
         public IActionResult Read(int id)
         {
             var note = _notesManager.GetNoteById(id, User.Identity.Name);

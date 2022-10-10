@@ -1,0 +1,11 @@
+﻿@model AccountInfoViewModel
+
+<div>
+    <p>
+        Count of notes: @Model.NotesCount
+    </p>
+    <p>
+        @Model.Email
+    </p>
+    <button asp-controller="Account" asp-action="Logout">Logout</button>
+</div>

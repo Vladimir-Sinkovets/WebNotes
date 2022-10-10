@@ -7,6 +7,9 @@
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
 
+<h3>Welcome</h3>
+
+@*
 @if (User.Identity.IsAuthenticated)
 {
     <p>@User.Identity.Name</p>
@@ -20,3 +23,4 @@ else
     <a asp-controller="Account" asp-action="Login">Вход</a>
     <a asp-controller="Account" asp-action="Register">Регистрация</a>
 }
+*@

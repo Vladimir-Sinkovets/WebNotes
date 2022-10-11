@@ -10,6 +10,8 @@ namespace Notes.DAL.Repositories
     {
         public DbSet<NoteEntry> Notes { get; set; }
 
+        public DbSet<TagEntry> NoteTags { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
     }
 }

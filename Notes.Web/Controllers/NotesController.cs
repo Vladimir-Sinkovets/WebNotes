@@ -18,13 +18,15 @@ namespace Notes.Web.Controllers
     public class NotesController : Controller
     {
         private readonly IMapper _mapper;
+        private readonly ITagManager _tagManager;
 
         public INotesManager _notesManager { get; set; }
 
-        public NotesController(INotesManager notesManager, IMapper mapper)
+        public NotesController(INotesManager notesManager, IMapper mapper, ITagManager tagManager)
         {
             _notesManager = notesManager;
             _mapper = mapper;
+            _tagManager = tagManager;
         }
 
         [HttpGet]
@@ -91,7 +93,10 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public IActionResult AllTags()
         {
+            var tags = _tagManager.GetAllTagsFor(User.Identity.Name);
 
+            // To Do: add viewModel
+            //        create view with list of tags, "add" field and "save" button
 
             return View();
         }

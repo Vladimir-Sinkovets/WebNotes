@@ -11,7 +11,7 @@ namespace Notes.BLL.Interfaces
     public interface INotesManager
     {
         Task AddNoteAsync(Note note, string userName);
-        IEnumerable<Note> GetAllFor(string userName);
+        IEnumerable<Note> GetAllNotesFor(string userName);
         Note GetNoteById(int id, string userName);
         Task UpdateAsync(Note note);
     }

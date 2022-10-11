@@ -35,7 +35,7 @@ namespace Notes.BLL
             _unitOfWork.SaveChanges();
         }
 
-        public IEnumerable<Note> GetAllFor(string userName)
+        public IEnumerable<Note> GetAllNotesFor(string userName)
         {
             var noteEntries = _unitOfWork.Notes.GetAll()
                 .Where(n => n.User.UserName == userName);

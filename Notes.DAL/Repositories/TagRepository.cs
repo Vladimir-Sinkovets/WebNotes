@@ -7,23 +7,23 @@ using System.Threading.Tasks;
 
 namespace Notes.DAL.Repositories
 {
-    public class NoteRepository : IRepository<NoteEntry>
+    public class TagRepository : IRepository<TagEntry>
     {
-        private ApplicationDbContext _dbContext;
+        private readonly ApplicationDbContext _dbContext;
 
-        public NoteRepository(ApplicationDbContext dbContext)
+        public TagRepository(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public void Create(NoteEntry entity)
+        public void Create(TagEntry entity)
         {
             _dbContext.Add(entity);
         }
 
         public void Delete(int id)
         {
-            var entry = _dbContext.Notes.FirstOrDefault(n => n.Id == id);
+            var entry = _dbContext.Tags.FirstOrDefault(t => t.Id == id);
 
             if(entry != null)
             {
@@ -31,12 +31,12 @@ namespace Notes.DAL.Repositories
             }
         }
 
-        public IQueryable<NoteEntry> GetAll()
+        public IQueryable<TagEntry> GetAll()
         {
-            return _dbContext.Notes;
+            return _dbContext.Tags;
         }
 
-        public void Update(NoteEntry entity)
+        public void Update(TagEntry entity)
         {
             _dbContext.Update(entity);
         }

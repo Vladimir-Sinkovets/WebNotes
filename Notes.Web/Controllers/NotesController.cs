@@ -30,7 +30,7 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public ActionResult ShowAll()
         {
-            IEnumerable<Note> notes =_notesManager.GetAllFor(User.Identity.Name);
+            IEnumerable<Note> notes =_notesManager.GetAllNotesFor(User.Identity.Name);
 
             IEnumerable<NoteViewModel> viewModel = _mapper.Map<IEnumerable<Note>, List<NoteViewModel>>(notes);
 
@@ -86,6 +86,14 @@ namespace Notes.Web.Controllers
             var viewModel = _mapper.Map<NoteViewModel>(note);
 
             return View(viewModel);
+        }
+
+        [HttpGet]
+        public IActionResult AllTags()
+        {
+
+
+            return View();
         }
     }
 }

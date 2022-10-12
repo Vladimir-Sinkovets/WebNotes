@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
 using Notes.BLL.Interfaces;
 using Notes.BLL.Models;
 using Notes.DAL.Models;
@@ -91,14 +92,32 @@ namespace Notes.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult AllTags()
+        public IActionResult EditTags()
         {
             var tags = _tagManager.GetAllTagsFor(User.Identity.Name);
 
-            // To Do: add viewModel
-            //        create view with list of tags, "add" field and "save" button
+            var tagViewModels = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(tags); // might it be changed to automapper using?
 
-            return View();
+            var viewModel = new EditTagsViewModel() { Tags = tagViewModels };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddNewTag(string tagName)
+        {
+            var tag = new Tag() { Name = tagName };
+
+            await _tagManager.AddTagAsync(tag, User.Identity.Name);
+
+            return RedirectToActionPermanent("EditTags");
+        }
+
+        public IActionResult DeleteTag(int id)
+        {
+            _tagManager.DeleteTagById(id, User.Identity.Name);
+
+            return RedirectToActionPermanent("EditTags");
         }
     }
 }

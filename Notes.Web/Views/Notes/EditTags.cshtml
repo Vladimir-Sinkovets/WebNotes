@@ -1,0 +1,31 @@
+﻿@model EditTagsViewModel
+
+<div class="m-1">
+    <div class="flex-wrap row gy-5"> @*сделать меньше расстояние между строками*@
+    @foreach (var tag in Model.Tags)
+    {
+        <div class="m-3 d-inline card">
+            #@tag.Name
+            <a type="button" class="close"
+                asp-controller="Notes" asp-action="DeleteTag" asp-route-id="@tag.Id">
+                <span>&times;</span>
+            </a>
+        </div>
+    }
+    </div>
+
+
+    <form asp-controller="Notes" asp-action="AddNewTag" method="post">
+        <div class="m-1">
+            <label>Tag name:</label>
+        </div>
+
+        <div class="m-1">
+            <input name="tagName" type="text"/>
+        </div>
+        
+        <div class="m-1">
+            <button type="submit" class="btn-primary">Submit</button>
+        </div>
+    </form>
+</div>

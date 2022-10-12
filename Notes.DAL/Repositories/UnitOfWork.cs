@@ -18,6 +18,7 @@ namespace Notes.DAL.Repositories
         {
             _dbContext = dbContext;
 
+            Tags = new TagRepository(_dbContext);
             Notes = new NoteRepository(_dbContext);
         }
 

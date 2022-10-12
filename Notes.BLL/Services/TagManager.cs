@@ -4,10 +4,9 @@ using Notes.BLL.Interfaces;
 using Notes.BLL.Models;
 using Notes.DAL.Models;
 using Notes.DAL.Repositories;
-using System;
 using System.Collections.Generic;
+using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Notes.BLL.Services
@@ -32,12 +31,28 @@ namespace Notes.BLL.Services
             entry.User = await _userManager.FindByNameAsync(userName);
 
             _unitOfWork.Tags.Create(entry);
+
+            _unitOfWork.SaveChanges();
+        }
+
+        public void DeleteTagById(int id, string userName)
+        {
+            if(_unitOfWork.Tags
+                .GetAll()
+                .Any(tag => tag.Id == id && tag.User.UserName == userName) == false)
+            {
+                throw new ArgumentException("Tag does not exist");
+            }
+
+            _unitOfWork.Tags.Delete(id);
+
+            _unitOfWork.SaveChanges();
         }
 
         public IEnumerable<Tag> GetAllTagsFor(string userName)
         {
             var tagsEntry = _unitOfWork.Tags.GetAll()
-                .Where(t => t.Name == userName);
+                .Where(t => t.User.UserName == userName);
 
             var tags = _mapper.Map<IEnumerable<TagEntry>, List<Tag>>(tagsEntry);
 

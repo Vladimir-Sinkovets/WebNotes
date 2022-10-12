@@ -45,7 +45,9 @@ namespace Notes.Web
 
             services.AddAutoMapper(
                 typeof(NoteMappingProfile),
-                typeof(NoteViewModelMappingProfile)
+                typeof(NoteViewModelMappingProfile),
+                typeof(AccountInfoViewModelMappingProfile),
+                typeof(TagViewModelMappingProfile)
                 );
 
             services.AddTransient<UnitOfWork>();

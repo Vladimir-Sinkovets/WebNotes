@@ -10,6 +10,7 @@ namespace Notes.BLL.Interfaces
     public interface ITagManager
     {
         Task AddTagAsync(Tag tag, string userName);
+        void DeleteTagById(int id, string userName);
         IEnumerable<Tag> GetAllTagsFor(string user);
     }
 }

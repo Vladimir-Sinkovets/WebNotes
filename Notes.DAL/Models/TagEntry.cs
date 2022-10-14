@@ -12,5 +12,6 @@ namespace Notes.DAL.Models
         public string Name { get; set; }
         public UserEntry User { get; set; }
         public ICollection<UserEntry> Users { get; set; }
+        public ICollection<TagEntry> Tags { get; set; }
     }
 }

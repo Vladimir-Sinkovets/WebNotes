@@ -43,7 +43,16 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public ActionResult Create()
         {
-            return View();
+            var allTags = _tagManager.GetAllTagsFor(User.Identity.Name);
+
+            var allViewModelTags = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(allTags);
+
+            var viewModel = new NoteCreateViewModel() 
+            {
+                Tags = allViewModelTags,
+            };
+
+            return View(viewModel);
         }
 
         [HttpPost]

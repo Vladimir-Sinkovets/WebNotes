@@ -1,5 +1,45 @@
 ﻿@model UpdateNoteViewModel
 
+<form method="post" asp-controller="Notes" asp-action="AddTagToNote">
+    <div class="form-group">
+        <select class="form-select" name="tagId">
+            @foreach (var tag in Model.AllTags)
+            {
+                <option value="@tag.Id">
+                    @tag.Name
+                </option>
+            }
+        </select>
+        <a class="btn btn-success" asp-action="EditTags" asp-controller="Notes">Create more tags</a>
+
+    </div>
+
+    <input hidden name="noteId" type="number" value="@Model.Id"/>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">
+            Add tag
+        </button>
+    </div>
+</form>
+
+<div class="flex-wrap row gy-5">
+    @foreach (var tag in Model.Tags)
+    {
+        <form asp-controller="Notes" asp-action="RemoveTagFromNote" method="post">
+            <div class="m-3 d-inline card">
+                #@tag.Name
+                <button>
+                    <span>&times;</span>
+                </button>
+            </div>
+            
+            <input hidden value="@Model.Id" name="noteId">
+            <input hidden value="@tag.Id" name="tagId">
+        </form>
+    }
+</div>
+
 <form asp-controller="Notes" asp-action="Update" method="post">
     <div class="form-group">
         <label>Title</label>

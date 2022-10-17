@@ -1,20 +1,20 @@
 ﻿@model NoteCreateViewModel
-
+@*
 <select class="form-control" id="select">
     @foreach (var tag in Model.Tags)
     {
         <option value="@tag.Name">@tag.Name</option>
     }
 </select>
-<button id="addTagButton">Add tag</button>
+<button id="addTagButton">Add tag</button>*@
 <form method="post" asp-action="Create" asp-controller="Notes">
-
+@*
     <div id="tags">
     </div>
 
     <div id="hiddenTags">
 
-    </div>
+    </div>*@
 
     <div class="form-group">
         <label>Title</label>
@@ -31,7 +31,7 @@
     </div>
 </form>
 
-
+@*
 <script>
     let tagsCount = 0;
     let btn = document.getElementById("addTagButton");
@@ -76,4 +76,4 @@
         tagsDiv.appendChild(div);
     }
 
-</script>
+</script>*@

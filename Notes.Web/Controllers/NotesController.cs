@@ -21,6 +21,8 @@ namespace Notes.Web.Controllers
         private readonly IMapper _mapper;
         private readonly ITagManager _tagManager;
 
+        private string CurrentUserName { get => User.Identity.Name; } 
+
         public INotesManager _notesManager { get; set; }
 
         public NotesController(INotesManager notesManager, IMapper mapper, ITagManager tagManager)
@@ -33,7 +35,7 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public ActionResult ShowAll()
         {
-            IEnumerable<Note> notes =_notesManager.GetAllNotesFor(User.Identity.Name);
+            IEnumerable<Note> notes =_notesManager.GetAllNotesFor(CurrentUserName);
 
             IEnumerable<NoteViewModel> viewModel = _mapper.Map<IEnumerable<Note>, List<NoteViewModel>>(notes);
 
@@ -43,16 +45,7 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public ActionResult Create()
         {
-            var allTags = _tagManager.GetAllTagsFor(User.Identity.Name);
-
-            var allViewModelTags = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(allTags);
-
-            var viewModel = new NoteCreateViewModel() 
-            {
-                Tags = allViewModelTags,
-            };
-
-            return View(viewModel);
+            return View();
         }
 
         [HttpPost]
@@ -60,7 +53,7 @@ namespace Notes.Web.Controllers
         {
             Note note = _mapper.Map<NoteCreateViewModel, Note>(model);
 
-            await _notesManager.AddNoteAsync(note, User.Identity.Name);
+            await _notesManager.AddNoteAsync(note, CurrentUserName);
 
             return View();
         }
@@ -68,45 +61,82 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public ActionResult Update(int id)
         {
-            var note = _notesManager.GetNoteById(id, User.Identity.Name);
+            var note = _notesManager.GetNoteById(id, CurrentUserName);
 
             var viewModel = _mapper.Map<UpdateNoteViewModel>(note);
 
+            AddAllTagsToUpdateNoteViewModel(viewModel);
+            
             return View(viewModel);
         }
 
         [HttpPost]
-        public async Task<ActionResult> Update(UpdateNoteViewModel model)
+        public async Task<ActionResult> Update(UpdateNoteViewModel viewModel)
         {
+
             if (!ModelState.IsValid)
             {
-                return View(model);
+                AddAllTagsToUpdateNoteViewModel(viewModel);
+                return View(viewModel);
             }
 
-            var note = _mapper.Map<Note>(model);
+            var note = _mapper.Map<Note>(viewModel);
 
             await _notesManager.UpdateAsync(note);
 
-            return View(model);
+
+            note = _notesManager.GetNoteById(viewModel.Id, CurrentUserName);
+
+            viewModel = _mapper.Map<UpdateNoteViewModel>(note);
+            
+            AddAllTagsToUpdateNoteViewModel(viewModel);
+
+            return View(viewModel);
+        }
+
+        private void AddAllTagsToUpdateNoteViewModel(UpdateNoteViewModel viewModel)
+        {
+            var allTags = _tagManager.GetAllTagsFor(CurrentUserName);
+
+            var allViewModelTags = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(allTags);
+
+            viewModel.AllTags = allViewModelTags;
         }
 
         [HttpGet]
         public IActionResult Read(int id)
         {
-            var note = _notesManager.GetNoteById(id, User.Identity.Name);
+            var note = _notesManager.GetNoteById(id, CurrentUserName);
 
             var viewModel = _mapper.Map<NoteViewModel>(note);
 
             return View(viewModel);
         }
 
+        [HttpPost]
+        public IActionResult AddTagToNote(int noteId, int tagId)
+        {
+            _notesManager.AddTagToNote(noteId, tagId, CurrentUserName);
+
+            return RedirectToActionPermanent("Update", new { id = noteId });
+        }
+        
+        [HttpPost]
+        public IActionResult RemoveTagFromNote(int noteId, int tagId)
+        {
+            _notesManager.RemoveTagFromNote(noteId, tagId, CurrentUserName);
+
+            return RedirectToActionPermanent("Update", new { id = noteId });
+        }
+
+
         [HttpGet]
         public IActionResult EditTags()
         {
-            var tags = _tagManager.GetAllTagsFor(User.Identity.Name);
+            var tags = _tagManager.GetAllTagsFor(CurrentUserName);
 
-            var tagViewModels = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(tags); // might it be changed to automapper using?
-
+            var tagViewModels = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(tags); 
+                
             var viewModel = new EditTagsViewModel() { Tags = tagViewModels };
 
             return View(viewModel);
@@ -117,14 +147,15 @@ namespace Notes.Web.Controllers
         {
             var tag = new Tag() { Name = tagName };
 
-            await _tagManager.AddTagAsync(tag, User.Identity.Name);
+            await _tagManager.AddTagAsync(tag, CurrentUserName);
 
             return RedirectToActionPermanent("EditTags");
         }
 
+        [HttpPost]
         public IActionResult DeleteTag(int id)
         {
-            _tagManager.DeleteTagById(id, User.Identity.Name);
+            _tagManager.DeleteTagById(id, CurrentUserName);
 
             return RedirectToActionPermanent("EditTags");
         }

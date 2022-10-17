@@ -26,6 +26,10 @@ namespace Notes.BLL.Services
 
         public async Task AddTagAsync(Tag tag, string userName)
         {
+            if (_unitOfWork.Tags.GetAll()
+                    .Any(t => t.Name == tag.Name))
+                return;
+
             var entry = _mapper.Map<TagEntry>(tag);
 
             entry.User = await _userManager.FindByNameAsync(userName);
@@ -57,6 +61,16 @@ namespace Notes.BLL.Services
             var tags = _mapper.Map<IEnumerable<TagEntry>, List<Tag>>(tagsEntry);
 
             return tags;
+        }
+
+        public Tag GetTagById(int id, string userName)
+        {
+            var entry = _unitOfWork.Tags.GetAll()
+                .FirstOrDefault(t => t.Id == id && t.User.UserName == userName);
+
+            var tag = _mapper.Map<Tag>(entry);
+
+            return tag;
         }
     }
 }

@@ -12,5 +12,6 @@ namespace Notes.BLL.Interfaces
         Task AddTagAsync(Tag tag, string userName);
         void DeleteTagById(int id, string userName);
         IEnumerable<Tag> GetAllTagsFor(string user);
+        Tag GetTagById(int id, string userName);
     }
 }

@@ -63,5 +63,38 @@ namespace Notes.BLL
 
             await _unitOfWork.SaveChangesAsync();
         }
+
+        public void AddTagToNote(int noteId, int tagId, string userName)
+        {
+            var tagEntry = _unitOfWork.Tags.GetAll()
+                .FirstOrDefault(t => t.Id == tagId && t.User.UserName == userName);
+
+            _unitOfWork.Notes.GetAll()
+                .FirstOrDefault(n => n.Id == noteId && n.User.UserName == userName)
+                .Tags
+                .Add(tagEntry);
+
+            _unitOfWork.SaveChanges();
+        }
+
+        public IEnumerable<Tag> GetNoteTags(int noteId, string userName)
+        {
+            var note = GetNoteById(noteId, userName);
+
+            return note.Tags;
+        }
+
+        public void RemoveTagFromNote(int noteId, int tagId, string userName)
+        {
+            var tagEntity = _unitOfWork.Tags.GetAll()
+                .FirstOrDefault(t => t.Id == tagId && t.User.UserName == userName);
+
+            var noteEntity = _unitOfWork.Notes.GetAll()
+                .FirstOrDefault(n => n.Id == noteId && n.User.UserName == userName);
+
+            noteEntity.Tags.Remove(tagEntity);
+
+            _unitOfWork.SaveChanges();
+        }
     }
 }

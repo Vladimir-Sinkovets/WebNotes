@@ -13,6 +13,9 @@ namespace Notes.BLL.Interfaces
         Task AddNoteAsync(Note note, string userName);
         IEnumerable<Note> GetAllNotesFor(string userName);
         Note GetNoteById(int id, string userName);
+        IEnumerable<Tag> GetNoteTags(int noteId, string userName);
         Task UpdateAsync(Note note);
+        void AddTagToNote(int noteId, int tagId, string userName);
+        void RemoveTagFromNote(int noteId, int tagId, string userName);
     }
 }

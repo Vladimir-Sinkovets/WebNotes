@@ -2,16 +2,19 @@
 
 <div class="m-1">
     <div class="flex-wrap row gy-5"> @*сделать меньше расстояние между строками*@
-    @foreach (var tag in Model.Tags)
-    {
-        <div class="m-3 d-inline card">
-            #@tag.Name
-            <a type="button" class="close"
-                asp-controller="Notes" asp-action="DeleteTag" asp-route-id="@tag.Id">
-                <span>&times;</span>
-            </a>
-        </div>
-    }
+        <form asp-controller="Notes" asp-action="DeleteTag" method="post">
+            @foreach (var tag in Model.Tags)
+            {
+                <div class="p-1 m-2 d-inline card">
+                    #@tag.Name
+                    <span class="badge bg-primary rounded-pill">@tag.NotesCount</span>
+                    <button onClick="return confirm('This tag has been using in @tag.NotesCount notes');"
+                        class="btn btn-danger rounded-pill btn-sm" value="@tag.Id" name="id">
+                        <span>&times;</span>
+                    </button>
+                </div>
+            }
+        </form>
     </div>
 
 

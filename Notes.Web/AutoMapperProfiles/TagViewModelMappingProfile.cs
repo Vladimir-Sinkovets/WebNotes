@@ -9,7 +9,8 @@ namespace Notes.Web.AutoMapperProfiles
         public TagViewModelMappingProfile()
         {
             CreateMap<TagViewModel, Tag>();
-            CreateMap<Tag, TagViewModel>();
+            CreateMap<Tag, TagViewModel>()
+                .ForMember(dest => dest.NotesCount, opt => opt.MapFrom(src => src.Notes.Count));
         }
     }
 }

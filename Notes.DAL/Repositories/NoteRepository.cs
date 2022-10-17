@@ -1,4 +1,5 @@
-﻿using Notes.DAL.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Notes.DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace Notes.DAL.Repositories
 
         public IQueryable<NoteEntry> GetAll()
         {
-            return _dbContext.Notes;
+            return _dbContext.Notes.Include(n => n.Tags);
         }
 
         public void Update(NoteEntry entity)

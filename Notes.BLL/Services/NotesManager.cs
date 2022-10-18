@@ -77,7 +77,7 @@ namespace Notes.BLL
             _unitOfWork.SaveChanges();
         }
 
-        public IEnumerable<Tag> GetNoteTags(int noteId, string userName)
+        public IEnumerable<Tag> GetNoteTagsById(int noteId, string userName)
         {
             var note = GetNoteById(noteId, userName);
 

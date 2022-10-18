@@ -39,16 +39,16 @@ namespace Notes.BLL.Services
             _unitOfWork.SaveChanges();
         }
 
-        public void DeleteTagById(int id, string userName)
+        public void DeleteTagById(int tagId, string userName)
         {
             if(_unitOfWork.Tags
                 .GetAll()
-                .Any(tag => tag.Id == id && tag.User.UserName == userName) == false)
+                .Any(tag => tag.Id == tagId && tag.User.UserName == userName) == false)
             {
                 throw new ArgumentException("Tag does not exist");
             }
 
-            _unitOfWork.Tags.Delete(id);
+            _unitOfWork.Tags.Delete(tagId);
 
             _unitOfWork.SaveChanges();
         }

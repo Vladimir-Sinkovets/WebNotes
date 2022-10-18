@@ -65,7 +65,7 @@ namespace Notes.Web.Controllers
 
             var viewModel = _mapper.Map<UpdateNoteViewModel>(note);
 
-            AddAllTagsToUpdateNoteViewModel(viewModel);
+            viewModel.AllTags = GetAllTagsForCurrentUser();
             
             return View(viewModel);
         }
@@ -73,34 +73,29 @@ namespace Notes.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> Update(UpdateNoteViewModel viewModel)
         {
-
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid == true)
             {
-                AddAllTagsToUpdateNoteViewModel(viewModel);
-                return View(viewModel);
+                var note = _mapper.Map<Note>(viewModel);
+
+                await _notesManager.UpdateAsync(note);
             }
 
-            var note = _mapper.Map<Note>(viewModel);
+            var model = _notesManager.GetNoteById(viewModel.Id, CurrentUserName);
 
-            await _notesManager.UpdateAsync(note);
-
-
-            note = _notesManager.GetNoteById(viewModel.Id, CurrentUserName);
-
-            viewModel = _mapper.Map<UpdateNoteViewModel>(note);
+            viewModel = _mapper.Map<UpdateNoteViewModel>(model);
             
-            AddAllTagsToUpdateNoteViewModel(viewModel);
+            viewModel.AllTags = GetAllTagsForCurrentUser();
 
             return View(viewModel);
         }
 
-        private void AddAllTagsToUpdateNoteViewModel(UpdateNoteViewModel viewModel)
+        private IEnumerable<TagViewModel> GetAllTagsForCurrentUser()
         {
             var allTags = _tagManager.GetAllTagsFor(CurrentUserName);
 
             var allViewModelTags = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(allTags);
 
-            viewModel.AllTags = allViewModelTags;
+            return allViewModelTags;
         }
 
         [HttpGet]
@@ -137,7 +132,7 @@ namespace Notes.Web.Controllers
 
             var tagViewModels = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(tags); 
                 
-            var viewModel = new EditTagsViewModel() { Tags = tagViewModels };
+            var viewModel = new EditTagsViewModel() { AllTags = tagViewModels };
 
             return View(viewModel);
         }

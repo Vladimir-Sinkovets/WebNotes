@@ -2,7 +2,7 @@
 
 namespace Notes.Web.Models
 {
-    public class EditTagsViewModel
+    public class TagListViewModel
     {
         public IEnumerable<TagViewModel> AllTags { get; set; }
     }

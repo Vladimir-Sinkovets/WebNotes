@@ -2,7 +2,7 @@
 
 namespace Notes.Web.Models
 {
-    public class UpdateNoteViewModel
+    public class EditNoteViewModel
     {
         public int Id { get; set; }
         public string Title { get; set; }

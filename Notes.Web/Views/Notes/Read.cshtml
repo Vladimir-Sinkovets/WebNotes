@@ -1,5 +1,14 @@
 ﻿@model NoteViewModel
 
+<div class="flex-wrap row gy-5">
+    @foreach (var tag in Model.Tags)
+    {
+        <div class="m-3 d-inline card">
+            #@tag.Name
+        </div>
+    }
+</div>
+    
 <div class="modal-content rounded-4 shadow">
     <div class="modal-header border-bottom-0">
         <h3>

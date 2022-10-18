@@ -1,0 +1,34 @@
+﻿@model EditTagsViewModel
+
+<div class="m-1">
+    <div class="flex-wrap row gy-5">
+        <form asp-controller="Notes" asp-action="DeleteTag" method="post">
+            @foreach (var tag in Model.AllTags)
+            {
+                <div class="p-1 m-2 d-inline card">
+                    #@tag.Name
+                    <span class="badge bg-primary rounded-pill">@tag.NotesCount</span>
+                    <button onClick="return confirm('This tag has been using in @tag.NotesCount notes');"
+                        class="btn btn-danger rounded-pill btn-sm" value="@tag.Id" name="id">
+                        <span>&times;</span>
+                    </button>
+                </div>
+            }
+        </form>
+    </div>
+
+
+    <form asp-controller="Notes" asp-action="AddNewTag" method="post">
+        <div class="m-1">
+            <label>Tag name:</label>
+        </div>
+
+        <div class="m-1">
+            <input class="form-control" name="tagName" type="text"/>
+        </div>
+        
+        <div class="m-1">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+</div>

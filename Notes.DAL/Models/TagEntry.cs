@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace Notes.DAL.Models
 {
-    public class NoteEntry
+    public class TagEntry
     {
         public int Id { get; set; }
-        public string Title { get; set; }
-        public string Text { get; set; }
+        public string Name { get; set; }
         public UserEntry User { get; set; }
-        public ICollection<TagEntry> Tags { get; set; }
+        public ICollection<NoteEntry> Notes { get; set; }
     }
 }

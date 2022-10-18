@@ -12,11 +12,13 @@ namespace Notes.DAL.Repositories
         private ApplicationDbContext _dbContext;
 
         public IRepository<NoteEntry> Notes { get; }
+        public IRepository<TagEntry> Tags { get; }
 
         public UnitOfWork(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
 
+            Tags = new TagRepository(_dbContext);
             Notes = new NoteRepository(_dbContext);
         }
 

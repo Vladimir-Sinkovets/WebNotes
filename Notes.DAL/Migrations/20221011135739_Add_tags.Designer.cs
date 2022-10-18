@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Notes.DAL.Repositories;
 
 namespace Notes.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221011135739_Add_tags")]
+    partial class Add_tags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -150,21 +152,6 @@ namespace Notes.DAL.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("NoteEntryTagEntry", b =>
-                {
-                    b.Property<int>("NotesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TagsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("NotesId", "TagsId");
-
-                    b.HasIndex("TagsId");
-
-                    b.ToTable("NoteEntryTagEntry");
-                });
-
             modelBuilder.Entity("Notes.DAL.Models.NoteEntry", b =>
                 {
                     b.Property<int>("Id")
@@ -198,12 +185,12 @@ namespace Notes.DAL.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("NoteEntryId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("NoteEntryId");
 
                     b.ToTable("Tags");
                 });
@@ -256,6 +243,9 @@ namespace Notes.DAL.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("TagEntryId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -272,6 +262,8 @@ namespace Notes.DAL.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("TagEntryId");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -327,21 +319,6 @@ namespace Notes.DAL.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("NoteEntryTagEntry", b =>
-                {
-                    b.HasOne("Notes.DAL.Models.NoteEntry", null)
-                        .WithMany()
-                        .HasForeignKey("NotesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Notes.DAL.Models.TagEntry", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Notes.DAL.Models.NoteEntry", b =>
                 {
                     b.HasOne("Notes.DAL.Models.UserEntry", "User")
@@ -353,11 +330,26 @@ namespace Notes.DAL.Migrations
 
             modelBuilder.Entity("Notes.DAL.Models.TagEntry", b =>
                 {
-                    b.HasOne("Notes.DAL.Models.UserEntry", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                    b.HasOne("Notes.DAL.Models.NoteEntry", null)
+                        .WithMany("Tags")
+                        .HasForeignKey("NoteEntryId");
+                });
 
-                    b.Navigation("User");
+            modelBuilder.Entity("Notes.DAL.Models.UserEntry", b =>
+                {
+                    b.HasOne("Notes.DAL.Models.TagEntry", null)
+                        .WithMany("Users")
+                        .HasForeignKey("TagEntryId");
+                });
+
+            modelBuilder.Entity("Notes.DAL.Models.NoteEntry", b =>
+                {
+                    b.Navigation("Tags");
+                });
+
+            modelBuilder.Entity("Notes.DAL.Models.TagEntry", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

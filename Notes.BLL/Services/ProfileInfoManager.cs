@@ -26,7 +26,7 @@ namespace Notes.BLL.Services
             var accountInfo = new AccountInfo()
             {
                 Email = _userManager.Users.FirstOrDefault(u => u.UserName == UserName).Email,
-                NotesCount = _notesManager.GetAllFor(UserName).Count(),
+                NotesCount = _notesManager.GetAllNotesFor(UserName).Count(),
             };
 
             return accountInfo;

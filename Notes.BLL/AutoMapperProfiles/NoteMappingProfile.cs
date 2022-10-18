@@ -15,6 +15,9 @@ namespace Notes.BLL.AutoMapperProfiles
         {
             CreateMap<Note, NoteEntry>();
             CreateMap<NoteEntry, Note>();
+
+            CreateMap<Tag, TagEntry>();
+            CreateMap<TagEntry, Tag>();
         }
     }
 }

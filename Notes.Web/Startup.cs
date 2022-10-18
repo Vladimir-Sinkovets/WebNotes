@@ -45,12 +45,15 @@ namespace Notes.Web
 
             services.AddAutoMapper(
                 typeof(NoteMappingProfile),
-                typeof(NoteViewModelMappingProfile)
+                typeof(NoteViewModelMappingProfile),
+                typeof(AccountInfoViewModelMappingProfile),
+                typeof(TagViewModelMappingProfile)
                 );
 
             services.AddTransient<UnitOfWork>();
             services.AddTransient<INotesManager, NotesManager>();
             services.AddTransient<IAccountInfoManager, AccountInfoManager>();
+            services.AddTransient<ITagManager, TagManager>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

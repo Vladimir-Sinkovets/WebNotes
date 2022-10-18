@@ -35,7 +35,7 @@ namespace Notes.BLL
             _unitOfWork.SaveChanges();
         }
 
-        public IEnumerable<Note> GetAllFor(string userName)
+        public IEnumerable<Note> GetAllNotesFor(string userName)
         {
             var noteEntries = _unitOfWork.Notes.GetAll()
                 .Where(n => n.User.UserName == userName);
@@ -62,6 +62,39 @@ namespace Notes.BLL
             _unitOfWork.Notes.Update(entry);
 
             await _unitOfWork.SaveChangesAsync();
+        }
+
+        public void AddTagToNote(int noteId, int tagId, string userName)
+        {
+            var tagEntry = _unitOfWork.Tags.GetAll()
+                .FirstOrDefault(t => t.Id == tagId && t.User.UserName == userName);
+
+            _unitOfWork.Notes.GetAll()
+                .FirstOrDefault(n => n.Id == noteId && n.User.UserName == userName)
+                .Tags
+                .Add(tagEntry);
+
+            _unitOfWork.SaveChanges();
+        }
+
+        public IEnumerable<Tag> GetNoteTagsById(int noteId, string userName)
+        {
+            var note = GetNoteById(noteId, userName);
+
+            return note.Tags;
+        }
+
+        public void RemoveTagFromNote(int noteId, int tagId, string userName)
+        {
+            var tagEntity = _unitOfWork.Tags.GetAll()
+                .FirstOrDefault(t => t.Id == tagId && t.User.UserName == userName);
+
+            var noteEntity = _unitOfWork.Notes.GetAll()
+                .FirstOrDefault(n => n.Id == noteId && n.User.UserName == userName);
+
+            noteEntity.Tags.Remove(tagEntity);
+
+            _unitOfWork.SaveChanges();
         }
     }
 }

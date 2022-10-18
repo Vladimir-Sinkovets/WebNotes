@@ -33,7 +33,7 @@ namespace Notes.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult ShowAll()
+        public ActionResult NoteList()
         {
             IEnumerable<Note> notes =_notesManager.GetAllNotesFor(CurrentUserName);
 
@@ -59,11 +59,11 @@ namespace Notes.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult Update(int id)
+        public ActionResult EditNote(int id)
         {
             var note = _notesManager.GetNoteById(id, CurrentUserName);
 
-            var viewModel = _mapper.Map<UpdateNoteViewModel>(note);
+            var viewModel = _mapper.Map<EditNoteViewModel>(note);
 
             viewModel.AllTags = GetAllTagsForCurrentUser();
             
@@ -71,7 +71,7 @@ namespace Notes.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Update(UpdateNoteViewModel viewModel)
+        public async Task<ActionResult> EditNote(EditNoteViewModel viewModel)
         {
             if (ModelState.IsValid == true)
             {
@@ -82,7 +82,7 @@ namespace Notes.Web.Controllers
 
             var model = _notesManager.GetNoteById(viewModel.Id, CurrentUserName);
 
-            viewModel = _mapper.Map<UpdateNoteViewModel>(model);
+            viewModel = _mapper.Map<EditNoteViewModel>(model);
             
             viewModel.AllTags = GetAllTagsForCurrentUser();
 
@@ -113,7 +113,7 @@ namespace Notes.Web.Controllers
         {
             _notesManager.AddTagToNote(noteId, tagId, CurrentUserName);
 
-            return RedirectToActionPermanent("Update", new { id = noteId });
+            return RedirectToActionPermanent("EditNote", new { id = noteId });
         }
         
         [HttpPost]
@@ -121,18 +121,18 @@ namespace Notes.Web.Controllers
         {
             _notesManager.RemoveTagFromNote(noteId, tagId, CurrentUserName);
 
-            return RedirectToActionPermanent("Update", new { id = noteId });
+            return RedirectToActionPermanent("EditNote", new { id = noteId });
         }
 
 
         [HttpGet]
-        public IActionResult EditTags()
+        public IActionResult TagList()
         {
             var tags = _tagManager.GetAllTagsFor(CurrentUserName);
 
             var tagViewModels = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(tags); 
                 
-            var viewModel = new EditTagsViewModel() { AllTags = tagViewModels };
+            var viewModel = new TagListViewModel() { AllTags = tagViewModels };
 
             return View(viewModel);
         }
@@ -144,7 +144,7 @@ namespace Notes.Web.Controllers
 
             await _tagManager.AddTagAsync(tag, CurrentUserName);
 
-            return RedirectToActionPermanent("EditTags");
+            return RedirectToActionPermanent("TagList");
         }
 
         [HttpPost]
@@ -152,7 +152,7 @@ namespace Notes.Web.Controllers
         {
             _tagManager.DeleteTagById(id, CurrentUserName);
 
-            return RedirectToActionPermanent("EditTags");
+            return RedirectToActionPermanent("TagList");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@model UpdateNoteViewModel
+﻿@model EditNoteViewModel
 
 <form method="post" asp-controller="Notes" asp-action="AddTagToNote">
     <div class="form-group">
@@ -10,7 +10,7 @@
                 </option>
             }
         </select>
-        <a class="btn btn-success" asp-action="EditTags" asp-controller="Notes">Create more tags</a>
+        <a class="btn btn-success" asp-action="TagList" asp-controller="Notes">Create more tags</a>
 
     </div>
 
@@ -40,7 +40,7 @@
     }
 </div>
 
-<form asp-controller="Notes" asp-action="Update" method="post">
+<form asp-controller="Notes" asp-action="EditNote" method="post">
     <div class="form-group">
         <label>Title</label>
         <input class="form-control" type="text" asp-for="Title"/>

@@ -12,6 +12,7 @@ using Notes.BLL.Interfaces;
 using Notes.BLL.Services;
 using Notes.DAL.Models;
 using Notes.DAL.Repositories;
+using Notes.DAL.Repositories.Interfaces;
 using Notes.Web.AutoMapperProfiles;
 using System;
 using System.Collections.Generic;
@@ -50,7 +51,7 @@ namespace Notes.Web
                 typeof(TagViewModelMappingProfile)
                 );
 
-            services.AddTransient<UnitOfWork>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<INotesManager, NotesManager>();
             services.AddTransient<IAccountInfoManager, AccountInfoManager>();
             services.AddTransient<ITagManager, TagManager>();

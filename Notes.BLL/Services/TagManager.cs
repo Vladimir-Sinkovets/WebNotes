@@ -8,16 +8,17 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Notes.DAL.Repositories.Interfaces;
 
 namespace Notes.BLL.Services
 {
     public class TagManager : ITagManager
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<UserEntry> _userManager;
 
-        public TagManager(UnitOfWork unitOfWork, IMapper mapper, UserManager<UserEntry> userManager)
+        public TagManager(IUnitOfWork unitOfWork, IMapper mapper, UserManager<UserEntry> userManager)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -48,7 +49,7 @@ namespace Notes.BLL.Services
                 throw new ArgumentException("Tag does not exist");
             }
 
-            _unitOfWork.Tags.Delete(tagId);
+            _unitOfWork.Tags.DeleteById(tagId);
 
             _unitOfWork.SaveChanges();
         }

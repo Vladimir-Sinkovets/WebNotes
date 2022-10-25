@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Notes.DAL.Repositories.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Notes.DAL.Models
 {
-    public class NoteEntry
+    public class NoteEntry : IEntity
     {
         public int Id { get; set; }
         public string Title { get; set; }

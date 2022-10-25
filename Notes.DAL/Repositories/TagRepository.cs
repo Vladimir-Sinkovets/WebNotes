@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Notes.DAL.Models;
+using Notes.DAL.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,38 +9,13 @@ using System.Threading.Tasks;
 
 namespace Notes.DAL.Repositories
 {
-    public class TagRepository : IRepository<TagEntry>
+    public class TagRepository : BaseRepository<TagEntry>, ITagRepository
     {
-        private readonly ApplicationDbContext _dbContext;
+        public TagRepository(ApplicationDbContext dbContext) : base(dbContext) { }
 
-        public TagRepository(ApplicationDbContext dbContext)
+        public override IQueryable<TagEntry> GetAll()
         {
-            _dbContext = dbContext;
-        }
-
-        public void Create(TagEntry entity)
-        {
-            _dbContext.Add(entity);
-        }
-
-        public void Delete(int id)
-        {
-            var entry = _dbContext.Tags.FirstOrDefault(t => t.Id == id);
-
-            if(entry != null)
-            {
-                _dbContext.Remove(entry);
-            }
-        }
-
-        public IQueryable<TagEntry> GetAll()
-        {
-            return _dbContext.Tags.Include(t => t.Notes);
-        }
-
-        public void Update(TagEntry entity)
-        {
-            _dbContext.Update(entity);
+            return _table.Include(t => t.Notes);
         }
     }
 }

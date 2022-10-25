@@ -4,6 +4,7 @@ using Notes.BLL.Interfaces;
 using Notes.BLL.Models;
 using Notes.DAL.Models;
 using Notes.DAL.Repositories;
+using Notes.DAL.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +14,11 @@ namespace Notes.BLL
 {
     public class NotesManager : INotesManager
     {
-        private UnitOfWork _unitOfWork;
+        private IUnitOfWork _unitOfWork;
         private readonly UserManager<UserEntry> _userManager;
         private readonly IMapper _mapper;
 
-        public NotesManager(UnitOfWork unitOfWork, UserManager<UserEntry> userManager, IMapper mapper)
+        public NotesManager(IUnitOfWork unitOfWork, UserManager<UserEntry> userManager, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;

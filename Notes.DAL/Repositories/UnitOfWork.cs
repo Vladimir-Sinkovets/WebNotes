@@ -1,4 +1,5 @@
 ﻿using Notes.DAL.Models;
+using Notes.DAL.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace Notes.DAL.Repositories
 {
-    public class UnitOfWork : IDisposable
+    public class UnitOfWork : IUnitOfWork
     {
         private ApplicationDbContext _dbContext;
 
-        public IRepository<NoteEntry> Notes { get; }
-        public IRepository<TagEntry> Tags { get; }
+        public INoteRepository Notes { get; }
+        public ITagRepository Tags { get; }
 
         public UnitOfWork(ApplicationDbContext dbContext)
         {

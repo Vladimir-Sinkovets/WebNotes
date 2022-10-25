@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Notes.BLL.Interfaces;
@@ -89,6 +90,7 @@ namespace Notes.Web.Controllers
             return View(model);
         }
 
+        [Authorize]
         public IActionResult Info()
         {
             var accountInfo = _accountInfoManager.GetAccountInfo(User.Identity.Name);

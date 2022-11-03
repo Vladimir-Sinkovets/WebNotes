@@ -61,7 +61,7 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public ActionResult EditNote(int id)
         {
-            var note = _notesManager.GetNoteById(id, CurrentUserName);
+            var note = _notesManager.GetNoteByIdForUser(id, CurrentUserName);
 
             var viewModel = _mapper.Map<EditNoteViewModel>(note);
 
@@ -80,7 +80,7 @@ namespace Notes.Web.Controllers
                 await _notesManager.UpdateAsync(note);
             }
 
-            var model = _notesManager.GetNoteById(viewModel.Id, CurrentUserName);
+            var model = _notesManager.GetNoteByIdForUser(viewModel.Id, CurrentUserName);
 
             viewModel = _mapper.Map<EditNoteViewModel>(model);
             
@@ -101,7 +101,7 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public IActionResult Read(int id)
         {
-            var note = _notesManager.GetNoteById(id, CurrentUserName);
+            var note = _notesManager.GetNoteByIdForUser(id, CurrentUserName);
 
             var viewModel = _mapper.Map<NoteViewModel>(note);
 

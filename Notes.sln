@@ -1,15 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32802.440
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notes.Web", "Notes.Web\Notes.Web.csproj", "{A09BA74A-6594-4958-990B-CFBCE456C373}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notes.Web", "Notes.Web\Notes.Web.csproj", "{A09BA74A-6594-4958-990B-CFBCE456C373}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notes.DAL", "Notes.DAL\Notes.DAL.csproj", "{2750A023-6286-4DA6-B078-83B44B3D15EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notes.DAL", "Notes.DAL\Notes.DAL.csproj", "{2750A023-6286-4DA6-B078-83B44B3D15EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notes.BLL", "Notes.BLL\Notes.BLL.csproj", "{7E6851DD-8B99-4F1B-B45C-CF2900E2F865}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notes.BLL", "Notes.BLL\Notes.BLL.csproj", "{7E6851DD-8B99-4F1B-B45C-CF2900E2F865}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2750A023-6286-4DA6-B078-83B44B3D15EC} = {2750A023-6286-4DA6-B078-83B44B3D15EC}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notes.BLL.Tests", "Notes.BLL.Tests\Notes.BLL.Tests.csproj", "{08F577E1-ED5B-459B-8D49-DD8E903B58E5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7E6851DD-8B99-4F1B-B45C-CF2900E2F865} = {7E6851DD-8B99-4F1B-B45C-CF2900E2F865}
 	EndProjectSection
 EndProject
 Global
@@ -30,6 +35,10 @@ Global
 		{7E6851DD-8B99-4F1B-B45C-CF2900E2F865}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E6851DD-8B99-4F1B-B45C-CF2900E2F865}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E6851DD-8B99-4F1B-B45C-CF2900E2F865}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08F577E1-ED5B-459B-8D49-DD8E903B58E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08F577E1-ED5B-459B-8D49-DD8E903B58E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08F577E1-ED5B-459B-8D49-DD8E903B58E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08F577E1-ED5B-459B-8D49-DD8E903B58E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

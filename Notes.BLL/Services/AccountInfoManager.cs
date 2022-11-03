@@ -23,9 +23,12 @@ namespace Notes.BLL.Services
 
         public AccountInfo GetAccountInfo(string UserName)
         {
+            UserEntry user = _userManager.Users.FirstOrDefault(u => u.UserName == UserName) 
+                ?? throw new NotFoundException("User with this name does not exist");
+
             var accountInfo = new AccountInfo()
             {
-                Email = _userManager.Users.FirstOrDefault(u => u.UserName == UserName).Email,
+                Email = user.Email,
                 NotesCount = _notesManager.GetAllNotesFor(UserName).Count(),
             };
 

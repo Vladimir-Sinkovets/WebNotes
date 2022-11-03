@@ -27,13 +27,16 @@ namespace Notes.BLL.Services
 
         public async Task AddTagAsync(Tag tag, string userName)
         {
-            if (_unitOfWork.Tags.GetAll()
-                    .Any(t => t.Name == tag.Name))
-                return;
+            if (_unitOfWork.Tags.GetAll().Any(t => t.Name == tag.Name))
+            {
+                throw new ArgumentException("Tag with this name already exists");
+            }
 
+            var user = await _userManager.FindByNameAsync(userName);
+          
             var entry = _mapper.Map<TagEntry>(tag);
 
-            entry.User = await _userManager.FindByNameAsync(userName);
+            entry.User = user ?? throw new ArgumentException("Wrong user name");
 
             _unitOfWork.Tags.Create(entry);
 
@@ -42,11 +45,21 @@ namespace Notes.BLL.Services
 
         public void DeleteTagById(int tagId, string userName)
         {
-            if(_unitOfWork.Tags
-                .GetAll()
-                .Any(tag => tag.Id == tagId && tag.User.UserName == userName) == false)
+            IQueryable<TagEntry> tagEntries = _unitOfWork.Tags.GetAll();
+
+            if (tagEntries.Any(tag => tag.Id == tagId) == false)
             {
-                throw new ArgumentException("Tag does not exist");
+                throw new ArgumentException("This tag does not exist");
+            }
+
+            if (_userManager.FindByNameAsync(userName).Result == null)
+            {
+                throw new ArgumentException("User with this name doen't exist");
+            }
+
+            if (tagEntries.Any(tag => tag.Id == tagId && tag.User.UserName == userName) == false)
+            {
+                throw new ArgumentException("This user doesn't have access to this tag");
             }
 
             _unitOfWork.Tags.DeleteById(tagId);
@@ -56,6 +69,11 @@ namespace Notes.BLL.Services
 
         public IEnumerable<Tag> GetAllTagsFor(string userName)
         {
+            if (_userManager.FindByNameAsync(userName).Result == null) 
+            {
+                throw new ArgumentException("User with this name doen't exist");
+            }
+
             var tagsEntry = _unitOfWork.Tags.GetAll()
                 .Where(t => t.User.UserName == userName);
 
@@ -64,10 +82,22 @@ namespace Notes.BLL.Services
             return tags;
         }
 
-        public Tag GetTagById(int id, string userName)
+        public Tag GetTagById(int tagId, string userName)
         {
+            IQueryable<TagEntry> tagEntries = _unitOfWork.Tags.GetAll();
+
+            if (tagEntries.Any(tag => tag.Id == tagId) == false)
+            {
+                throw new ArgumentException("This tag does not exist");
+            }
+
+            if (_userManager.FindByNameAsync(userName).Result == null)
+            {
+                throw new ArgumentException("User with this name doen't exist");
+            }
+
             var entry = _unitOfWork.Tags.GetAll()
-                .FirstOrDefault(t => t.Id == id && t.User.UserName == userName);
+                .FirstOrDefault(t => t.Id == tagId && t.User.UserName == userName);
 
             var tag = _mapper.Map<Tag>(entry);
 

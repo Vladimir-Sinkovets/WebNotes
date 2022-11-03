@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Notes.BLL.Interfaces;
 using Notes.BLL.Models;
 using Notes.DAL.Models;
-using Notes.DAL.Repositories;
 using Notes.DAL.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -25,11 +24,14 @@ namespace Notes.BLL
             _mapper = mapper;
         }
 
+
         public async Task AddNoteAsync(Note note, string userName)
         {
-            NoteEntry entry = _mapper.Map<Note, NoteEntry>(note);
+            var entry = _mapper.Map<Note, NoteEntry>(note);
 
-            entry.User = await _userManager.FindByNameAsync(userName);
+            var user = await _userManager.FindByNameAsync(userName);
+
+            entry.User = user ?? throw new NotFoundException("User with this name oes not exist");
 
             _unitOfWork.Notes.Create(entry);
 
@@ -46,10 +48,11 @@ namespace Notes.BLL
             return notes;
         }
 
-        public Note GetNoteById(int id, string userName)
+        public Note GetNoteByIdForUser(int id, string userName)
         {
             var entry = _unitOfWork.Notes.GetAll()
-                .FirstOrDefault(n => n.Id == id && n.User.UserName == userName);
+                .FirstOrDefault(n => n.Id == id && n.User.UserName == userName)
+                ?? throw new NotFoundException("There is no such tag");
 
             var note = _mapper.Map<Note>(entry);
 
@@ -58,6 +61,9 @@ namespace Notes.BLL
 
         public async Task UpdateAsync(Note note)
         {
+            if (note == null)
+                throw new ArgumentNullException(nameof(note));
+
             var entry = _mapper.Map<NoteEntry>(note);
 
             _unitOfWork.Notes.Update(entry);
@@ -68,19 +74,22 @@ namespace Notes.BLL
         public void AddTagToNote(int noteId, int tagId, string userName)
         {
             var tagEntry = _unitOfWork.Tags.GetAll()
-                .FirstOrDefault(t => t.Id == tagId && t.User.UserName == userName);
+                .FirstOrDefault(t => t.Id == tagId && t.User.UserName == userName)
+                ?? throw new NotFoundException("There is no such tag");
 
-            _unitOfWork.Notes.GetAll()
+            var noteEntry = _unitOfWork.Notes.GetAll()
                 .FirstOrDefault(n => n.Id == noteId && n.User.UserName == userName)
-                .Tags
+                ?? throw new NotFoundException("There is no such note");
+
+            noteEntry.Tags
                 .Add(tagEntry);
 
             _unitOfWork.SaveChanges();
         }
 
-        public IEnumerable<Tag> GetNoteTagsById(int noteId, string userName)
+        public IEnumerable<Tag> GetNoteTagsByIdForUser(int noteId, string userName)
         {
-            var note = GetNoteById(noteId, userName);
+            var note = GetNoteByIdForUser(noteId, userName);
 
             return note.Tags;
         }
@@ -88,10 +97,12 @@ namespace Notes.BLL
         public void RemoveTagFromNote(int noteId, int tagId, string userName)
         {
             var tagEntity = _unitOfWork.Tags.GetAll()
-                .FirstOrDefault(t => t.Id == tagId && t.User.UserName == userName);
+                .FirstOrDefault(t => t.Id == tagId && t.User.UserName == userName)
+                ?? throw new NotFoundException("There is no such tag");
 
             var noteEntity = _unitOfWork.Notes.GetAll()
-                .FirstOrDefault(n => n.Id == noteId && n.User.UserName == userName);
+                .FirstOrDefault(n => n.Id == noteId && n.User.UserName == userName)
+                ?? throw new NotFoundException("There is no such note");
 
             noteEntity.Tags.Remove(tagEntity);
 

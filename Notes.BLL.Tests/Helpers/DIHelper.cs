@@ -27,7 +27,7 @@ namespace Notes.BLL.Tests.Helpers
             var mapper = new Mapper(conf);
 
             return mapper;
-        } // remove to another class
+        }
 
         public static UserManager<TUser> CreateUserManager<TUser>(List<TUser> users) where TUser : IdentityUser
         {

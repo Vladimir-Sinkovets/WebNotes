@@ -13,9 +13,9 @@ namespace Notes.BLL.Services
     public class AccountInfoManager : IAccountInfoManager
     {
         private readonly UserManager<UserEntry> _userManager;
-        private readonly INotesManager _notesManager;
+        private readonly INoteManager _notesManager;
 
-        public AccountInfoManager(UserManager<UserEntry> userManager, INotesManager notesManager)
+        public AccountInfoManager(UserManager<UserEntry> userManager, INoteManager notesManager)
         {
             _userManager = userManager;
             _notesManager = notesManager;
@@ -29,7 +29,7 @@ namespace Notes.BLL.Services
             var accountInfo = new AccountInfo()
             {
                 Email = user.Email,
-                NotesCount = _notesManager.GetAllNotesFor(UserName).Count(),
+                NotesCount = _notesManager.GetAllNotesForUser(UserName).Count(),
             };
 
             return accountInfo;

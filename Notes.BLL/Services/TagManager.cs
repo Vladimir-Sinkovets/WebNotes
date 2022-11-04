@@ -27,16 +27,11 @@ namespace Notes.BLL.Services
 
         public async Task AddTagAsync(Tag tag, string userName)
         {
-            if (_unitOfWork.Tags.GetAll().Any(t => t.Name == tag.Name))
-            {
-                throw new ArgumentException("Tag with this name already exists");
-            }
-
             var user = await _userManager.FindByNameAsync(userName);
           
             var entry = _mapper.Map<TagEntry>(tag);
 
-            entry.User = user ?? throw new ArgumentException("Wrong user name");
+            entry.User = user ?? throw new NotFoundException("User with this name does not exist");
 
             _unitOfWork.Tags.Create(entry);
 
@@ -49,17 +44,17 @@ namespace Notes.BLL.Services
 
             if (tagEntries.Any(tag => tag.Id == tagId) == false)
             {
-                throw new ArgumentException("This tag does not exist");
+                throw new NotFoundException("This tag does not exist");
             }
 
             if (_userManager.FindByNameAsync(userName).Result == null)
             {
-                throw new ArgumentException("User with this name doen't exist");
+                throw new NotFoundException("User with this name does not exist");
             }
 
             if (tagEntries.Any(tag => tag.Id == tagId && tag.User.UserName == userName) == false)
             {
-                throw new ArgumentException("This user doesn't have access to this tag");
+                throw new UserAccessException("This user does not have access to this tag");
             }
 
             _unitOfWork.Tags.DeleteById(tagId);
@@ -71,7 +66,7 @@ namespace Notes.BLL.Services
         {
             if (_userManager.FindByNameAsync(userName).Result == null) 
             {
-                throw new ArgumentException("User with this name doen't exist");
+                throw new NotFoundException("User with this name does not exist");
             }
 
             var tagsEntry = _unitOfWork.Tags.GetAll()
@@ -88,12 +83,12 @@ namespace Notes.BLL.Services
 
             if (tagEntries.Any(tag => tag.Id == tagId) == false)
             {
-                throw new ArgumentException("This tag does not exist");
+                throw new NotFoundException("This tag does not exist");
             }
 
             if (_userManager.FindByNameAsync(userName).Result == null)
             {
-                throw new ArgumentException("User with this name doen't exist");
+                throw new NotFoundException("User with this name does not exist");
             }
 
             var entry = _unitOfWork.Tags.GetAll()

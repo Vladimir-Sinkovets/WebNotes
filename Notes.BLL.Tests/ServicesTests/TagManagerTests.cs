@@ -16,11 +16,6 @@ namespace Notes.BLL.Tests.ServicesTests
 {
     public class TagManagerTests
     {
-        public TagManagerTests()
-        {
-
-        }
-
         [Fact]
         public void Should_AddTag()
         {
@@ -173,14 +168,14 @@ namespace Notes.BLL.Tests.ServicesTests
             ITagManager tagManager = new TagManager(unitOfWork, mapper, userManager);
 
             // Act
-            Func<Task> act = async () => 
+            Action act = () => 
             { 
-                await tagManager.AddTagAsync(new Tag() { Name = "testName" }, "wrongUserName");
+                tagManager.AddTagAsync(new Tag() { Name = "testName" }, "wrongUserName").Wait();
             };
 
             // Assert
 
-            act.Should().ThrowAsync<ArgumentException>().WithMessage("Tag with this name already exists");
+            act.Should().Throw<NotFoundException> ().WithMessage("User with this name does not exist");
         }
 
         [Fact]
@@ -251,7 +246,7 @@ namespace Notes.BLL.Tests.ServicesTests
 
             // Assert
 
-            act.Should().Throw<ArgumentException>().WithMessage("This tag does not exist");
+            act.Should().Throw<NotFoundException>().WithMessage("This tag does not exist");
         }
 
         [Fact]
@@ -286,7 +281,7 @@ namespace Notes.BLL.Tests.ServicesTests
 
             // Assert
 
-            act.Should().Throw<ArgumentException>().WithMessage("This user doesn't have access to this tag");
+            act.Should().Throw<UserAccessException>().WithMessage("This user does not have access to this tag");
         }
 
         [Fact]
@@ -322,8 +317,8 @@ namespace Notes.BLL.Tests.ServicesTests
             // Assert
 
             act.Should()
-               .Throw<ArgumentException>()
-               .WithMessage("User with this name doen't exist");
+               .Throw<NotFoundException>()
+               .WithMessage("User with this name does not exist");
         }
 
 
@@ -360,8 +355,8 @@ namespace Notes.BLL.Tests.ServicesTests
             // Assert
 
             act.Should()
-               .ThrowExactly<ArgumentException>()
-               .WithMessage("User with this name doen't exist");
+               .ThrowExactly<NotFoundException>()
+               .WithMessage("User with this name does not exist");
         }
 
 
@@ -398,8 +393,8 @@ namespace Notes.BLL.Tests.ServicesTests
             // Assert
 
             act.Should()
-               .Throw<ArgumentException>()
-               .WithMessage("User with this name doen't exist");
+               .Throw<NotFoundException>()
+               .WithMessage("User with this name does not exist");
         }
 
         [Fact]
@@ -435,7 +430,7 @@ namespace Notes.BLL.Tests.ServicesTests
 
             // Assert
 
-            act.Should().Throw<ArgumentException>().WithMessage("This tag does not exist");
+            act.Should().Throw<NotFoundException>().WithMessage("This tag does not exist");
         }
     }
 }

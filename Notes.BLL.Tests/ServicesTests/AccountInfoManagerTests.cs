@@ -21,12 +21,12 @@ namespace Notes.BLL.Tests.ServicesTests
             // Arrange
             var users = new List<UserEntry>() { new UserEntry() { UserName = "userName", Email = "userEmail@mail.com" } };
 
-            var notesManagerMock = new Mock<INotesManager>();
+            var notesManagerMock = new Mock<INoteManager>();
             
-            notesManagerMock.Setup(x => x.GetAllNotesFor(It.IsAny<string>()))
+            notesManagerMock.Setup(x => x.GetAllNotesForUser(It.IsAny<string>()))
                 .Returns(new List<Note>() { new Note(), new Note(), new Note(), new Note(), new Note(), new Note(), new Note(), });
 
-            INotesManager notesManager = notesManagerMock.Object;
+            INoteManager notesManager = notesManagerMock.Object;
 
             var userManager = DIHelper.CreateUserManager(users);
 
@@ -48,12 +48,12 @@ namespace Notes.BLL.Tests.ServicesTests
             // Arrange
             var users = new List<UserEntry>() { new UserEntry() { UserName = "userName", Email = "userEmail@mail.com" } };
 
-            var notesManagerMock = new Mock<INotesManager>();
+            var notesManagerMock = new Mock<INoteManager>();
 
-            notesManagerMock.Setup(x => x.GetAllNotesFor(It.IsAny<string>()))
+            notesManagerMock.Setup(x => x.GetAllNotesForUser(It.IsAny<string>()))
                 .Returns(new List<Note>() { new Note(), new Note() });
 
-            INotesManager notesManager = notesManagerMock.Object;
+            INoteManager notesManager = notesManagerMock.Object;
 
             var userManager = DIHelper.CreateUserManager(users);
 

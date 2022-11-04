@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace Notes.BLL
 {
-    public class NotesManager : INotesManager
+    public class NoteManager : INoteManager
     {
         private IUnitOfWork _unitOfWork;
         private readonly UserManager<UserEntry> _userManager;
         private readonly IMapper _mapper;
 
-        public NotesManager(IUnitOfWork unitOfWork, UserManager<UserEntry> userManager, IMapper mapper)
+        public NoteManager(IUnitOfWork unitOfWork, UserManager<UserEntry> userManager, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
@@ -25,20 +25,20 @@ namespace Notes.BLL
         }
 
 
-        public async Task AddNoteAsync(Note note, string userName)
+        public async Task AddNoteForUserAsync(Note note, string userName)
         {
             var entry = _mapper.Map<Note, NoteEntry>(note);
 
             var user = await _userManager.FindByNameAsync(userName);
 
-            entry.User = user ?? throw new NotFoundException("User with this name oes not exist");
+            entry.User = user ?? throw new NotFoundException("User with this name does not exist");
 
             _unitOfWork.Notes.Create(entry);
 
             _unitOfWork.SaveChanges();
         }
 
-        public IEnumerable<Note> GetAllNotesFor(string userName)
+        public IEnumerable<Note> GetAllNotesForUser(string userName)
         {
             var noteEntries = _unitOfWork.Notes.GetAll()
                 .Where(n => n.User.UserName == userName);
@@ -71,7 +71,7 @@ namespace Notes.BLL
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public void AddTagToNote(int noteId, int tagId, string userName)
+        public void AddTagToNoteForUser(int noteId, int tagId, string userName)
         {
             var tagEntry = _unitOfWork.Tags.GetAll()
                 .FirstOrDefault(t => t.Id == tagId && t.User.UserName == userName)
@@ -94,7 +94,7 @@ namespace Notes.BLL
             return note.Tags;
         }
 
-        public void RemoveTagFromNote(int noteId, int tagId, string userName)
+        public void RemoveTagFromNoteForUser(int noteId, int tagId, string userName)
         {
             var tagEntity = _unitOfWork.Tags.GetAll()
                 .FirstOrDefault(t => t.Id == tagId && t.User.UserName == userName)

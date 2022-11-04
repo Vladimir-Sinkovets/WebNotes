@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace Notes.BLL.Interfaces
 {
-    public interface INotesManager
+    public interface INoteManager
     {
-        Task AddNoteAsync(Note note, string userName);
-        IEnumerable<Note> GetAllNotesFor(string userName);
+        Task AddNoteForUserAsync(Note note, string userName);
+        IEnumerable<Note> GetAllNotesForUser(string userName);
         Note GetNoteByIdForUser(int id, string userName);
         IEnumerable<Tag> GetNoteTagsByIdForUser(int noteId, string userName);
         Task UpdateAsync(Note note);
-        void AddTagToNote(int noteId, int tagId, string userName);
-        void RemoveTagFromNote(int noteId, int tagId, string userName);
+        void AddTagToNoteForUser(int noteId, int tagId, string userName);
+        void RemoveTagFromNoteForUser(int noteId, int tagId, string userName);
     }
 }

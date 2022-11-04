@@ -29,11 +29,13 @@ namespace Notes.BLL.Services
         {
             if (_unitOfWork.Tags.GetAll()
                     .Any(t => t.Name == tag.Name))
-                return;
+                throw new ExistedTagNameException("Cannot add tag with already existing name");
 
             var entry = _mapper.Map<TagEntry>(tag);
+          
+            var user = await _userManager.FindByNameAsync(userName);
 
-            entry.User = await _userManager.FindByNameAsync(userName);
+            entry.User = user ?? throw new NotFoundException("User with this name does not exist");
 
             _unitOfWork.Tags.Create(entry);
 
@@ -42,13 +44,6 @@ namespace Notes.BLL.Services
 
         public void DeleteTagById(int tagId, string userName)
         {
-            if(_unitOfWork.Tags
-                .GetAll()
-                .Any(tag => tag.Id == tagId && tag.User.UserName == userName) == false)
-            {
-                throw new ArgumentException("Tag does not exist");
-            }
-
             _unitOfWork.Tags.DeleteById(tagId);
 
             _unitOfWork.SaveChanges();
@@ -56,6 +51,11 @@ namespace Notes.BLL.Services
 
         public IEnumerable<Tag> GetAllTagsFor(string userName)
         {
+            if (_userManager.FindByNameAsync(userName).Result == null) 
+            {
+                throw new NotFoundException("User with this name does not exist");
+            }
+
             var tagsEntry = _unitOfWork.Tags.GetAll()
                 .Where(t => t.User.UserName == userName);
 
@@ -64,10 +64,22 @@ namespace Notes.BLL.Services
             return tags;
         }
 
-        public Tag GetTagById(int id, string userName)
+        public Tag GetTagById(int tagId, string userName)
         {
+            IQueryable<TagEntry> tagEntries = _unitOfWork.Tags.GetAll();
+
+            if (tagEntries.Any(tag => tag.Id == tagId) == false)
+            {
+                throw new NotFoundException("This tag does not exist");
+            }
+
+            if (_userManager.FindByNameAsync(userName).Result == null)
+            {
+                throw new NotFoundException("User with this name does not exist");
+            }
+
             var entry = _unitOfWork.Tags.GetAll()
-                .FirstOrDefault(t => t.Id == id && t.User.UserName == userName);
+                .FirstOrDefault(t => t.Id == tagId && t.User.UserName == userName);
 
             var tag = _mapper.Map<Tag>(entry);
 

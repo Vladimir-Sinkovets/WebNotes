@@ -52,7 +52,7 @@ namespace Notes.Web
                 );
 
             services.AddTransient<IUnitOfWork, UnitOfWork>();
-            services.AddTransient<INotesManager, NotesManager>();
+            services.AddTransient<INoteManager, NoteManager>();
             services.AddTransient<IAccountInfoManager, AccountInfoManager>();
             services.AddTransient<ITagManager, TagManager>();
         }

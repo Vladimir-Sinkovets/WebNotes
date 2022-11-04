@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Notes.BLL.Exceptions;
 using Notes.BLL.Interfaces;
 using Notes.BLL.Models;
 using Notes.DAL.Models;

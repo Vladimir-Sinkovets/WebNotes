@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Notes.DAL.Repositories.Interfaces;
+using Notes.BLL.Exceptions;
 
 namespace Notes.BLL.Services
 {

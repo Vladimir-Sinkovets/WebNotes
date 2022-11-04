@@ -13,9 +13,9 @@ namespace Notes.BLL.Services
     public class AccountInfoManager : IAccountInfoManager
     {
         private readonly UserManager<UserEntry> _userManager;
-        private readonly INoteManager _notesManager;
+        private readonly INotesManager _notesManager;
 
-        public AccountInfoManager(UserManager<UserEntry> userManager, INoteManager notesManager)
+        public AccountInfoManager(UserManager<UserEntry> userManager, INotesManager notesManager)
         {
             _userManager = userManager;
             _notesManager = notesManager;
@@ -23,13 +23,10 @@ namespace Notes.BLL.Services
 
         public AccountInfo GetAccountInfo(string UserName)
         {
-            UserEntry user = _userManager.Users.FirstOrDefault(u => u.UserName == UserName) 
-                ?? throw new NotFoundException("User with this name does not exist");
-
             var accountInfo = new AccountInfo()
             {
-                Email = user.Email,
-                NotesCount = _notesManager.GetAllNotesForUser(UserName).Count(),
+                Email = _userManager.Users.FirstOrDefault(u => u.UserName == UserName).Email,
+                NotesCount = _notesManager.GetAllNotesFor(UserName).Count(),
             };
 
             return accountInfo;

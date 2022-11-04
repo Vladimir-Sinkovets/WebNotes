@@ -23,9 +23,9 @@ namespace Notes.Web.Controllers
 
         private string CurrentUserName { get => User.Identity.Name; } 
 
-        public INoteManager _notesManager { get; set; }
+        public INotesManager _notesManager { get; set; }
 
-        public NotesController(INoteManager notesManager, IMapper mapper, ITagManager tagManager)
+        public NotesController(INotesManager notesManager, IMapper mapper, ITagManager tagManager)
         {
             _notesManager = notesManager;
             _mapper = mapper;
@@ -35,7 +35,7 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public ActionResult NoteList()
         {
-            IEnumerable<Note> notes =_notesManager.GetAllNotesForUser(CurrentUserName);
+            IEnumerable<Note> notes =_notesManager.GetAllNotesFor(CurrentUserName);
 
             IEnumerable<NoteViewModel> viewModel = _mapper.Map<IEnumerable<Note>, List<NoteViewModel>>(notes);
 
@@ -53,7 +53,7 @@ namespace Notes.Web.Controllers
         {
             Note note = _mapper.Map<NoteCreateViewModel, Note>(model);
 
-            await _notesManager.AddNoteForUserAsync(note, CurrentUserName);
+            await _notesManager.AddNoteAsync(note, CurrentUserName);
 
             return View();
         }
@@ -61,7 +61,7 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public ActionResult EditNote(int id)
         {
-            var note = _notesManager.GetNoteByIdForUser(id, CurrentUserName);
+            var note = _notesManager.GetNoteById(id, CurrentUserName);
 
             var viewModel = _mapper.Map<EditNoteViewModel>(note);
 
@@ -80,7 +80,7 @@ namespace Notes.Web.Controllers
                 await _notesManager.UpdateAsync(note);
             }
 
-            var model = _notesManager.GetNoteByIdForUser(viewModel.Id, CurrentUserName);
+            var model = _notesManager.GetNoteById(viewModel.Id, CurrentUserName);
 
             viewModel = _mapper.Map<EditNoteViewModel>(model);
             
@@ -101,7 +101,7 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public IActionResult Read(int id)
         {
-            var note = _notesManager.GetNoteByIdForUser(id, CurrentUserName);
+            var note = _notesManager.GetNoteById(id, CurrentUserName);
 
             var viewModel = _mapper.Map<NoteViewModel>(note);
 
@@ -111,7 +111,7 @@ namespace Notes.Web.Controllers
         [HttpPost]
         public IActionResult AddTagToNote(int noteId, int tagId)
         {
-            _notesManager.AddTagToNoteForUser(noteId, tagId, CurrentUserName);
+            _notesManager.AddTagToNote(noteId, tagId, CurrentUserName);
 
             return RedirectToActionPermanent("EditNote", new { id = noteId });
         }
@@ -119,7 +119,7 @@ namespace Notes.Web.Controllers
         [HttpPost]
         public IActionResult RemoveTagFromNote(int noteId, int tagId)
         {
-            _notesManager.RemoveTagFromNoteForUser(noteId, tagId, CurrentUserName);
+            _notesManager.RemoveTagFromNote(noteId, tagId, CurrentUserName);
 
             return RedirectToActionPermanent("EditNote", new { id = noteId });
         }

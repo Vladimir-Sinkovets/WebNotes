@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Notes.BLL
-{ 
+namespace Notes.BLL.Exceptions
+{
     public class NotFoundException : Exception
     {
-        public NotFoundException(string message) : base(message) { } 
+        public NotFoundException(string message) : base(message) { }
     }
 }

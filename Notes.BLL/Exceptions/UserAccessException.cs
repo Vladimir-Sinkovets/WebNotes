@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Notes.BLL
+namespace Notes.BLL.Exceptions
 {
     [Serializable]
     public class UserAccessException : Exception

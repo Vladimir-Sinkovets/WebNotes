@@ -52,7 +52,7 @@ namespace Notes.BLL
         {
             var entry = _unitOfWork.Notes.GetAll()
                 .FirstOrDefault(n => n.Id == id && n.User.UserName == userName)
-                ?? throw new NotFoundException("There is no such tag");
+                ?? throw new NotFoundException("There is no such note");
 
             var note = _mapper.Map<Note>(entry);
 

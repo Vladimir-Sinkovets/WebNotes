@@ -11,6 +11,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Notes.BLL.Tests.Helpers;
+using Notes.BLL.Exceptions;
 
 namespace Notes.BLL.Tests.ServicesTests
 {
@@ -202,125 +203,15 @@ namespace Notes.BLL.Tests.ServicesTests
             ITagManager tagManager = new TagManager(unitOfWork, mapper, userManager);
 
             // Act
-            Func<Task> act = async () =>
-            {
-                await tagManager.AddTagAsync(new Tag() { Name = "tag13231" }, "userName");
-            };
-
-            // Assert
-
-            act.Should().ThrowAsync<ArgumentException>().WithMessage("Wrong user name");
-        }
-
-
-        [Fact]
-        public void Should_ThrowException_When_TagIdIsWrong_DeleteTagById()
-        {
-
-            // Arrange
-            var users = new List<UserEntry>()
-            {
-                new UserEntry() { Email = "test@mail.com", UserName = "userName" },
-                new UserEntry() { Email = "test1@mail.com", UserName = "userName1" },
-            };
-            var tags = new List<TagEntry>()
-            {
-                new TagEntry() { Name = "testTag", User = users[0], Id = 4 },
-                new TagEntry() { Name = "testTag1", User = users[0], Id = 5 },
-                new TagEntry() { Name = "testTag2", User = users[1], Id = 6 },
-            };
-
-            var unitOfWork = DIHelper.CreateUnitOfWork(tags, null);
-
-            var mapper = DIHelper.InitializeMapper(typeof(NoteMappingProfile));
-
-            var userManager = DIHelper.CreateUserManager(users);
-
-            var tagManager = new TagManager(unitOfWork, mapper, userManager);
-            
-            // Act
             Action act = () =>
             {
-                tagManager.DeleteTagById(7, "userName");
+                tagManager.AddTagAsync(new Tag() { Name = "tag13231" }, "userName").Wait();
             };
 
             // Assert
 
-            act.Should().Throw<NotFoundException>().WithMessage("This tag does not exist");
+            act.Should().Throw<ExistedTagNameException>().WithMessage("Cannot add tag with already existing name");
         }
-
-        [Fact]
-        public void Should_ThrowException_When_UserHaveNoAccessToTag_DeleteTagById()
-        {
-            // Arrange
-            var users = new List<UserEntry>()
-            {
-                new UserEntry() { Email = "test@mail.com", UserName = "userName" },
-                new UserEntry() { Email = "test1@mail.com", UserName = "userName1" },
-            };
-            var tags = new List<TagEntry>()
-            {
-                new TagEntry() { Name = "testTag", User = users[0], Id = 4 },
-                new TagEntry() { Name = "testTag1", User = users[0], Id = 5 },
-                new TagEntry() { Name = "testTag2", User = users[1], Id = 6 },
-            };
-
-            var unitOfWork = DIHelper.CreateUnitOfWork(tags, null);
-
-            var mapper = DIHelper.InitializeMapper(typeof(NoteMappingProfile));
-
-            var userManager = DIHelper.CreateUserManager(users);
-
-            var tagManager = new TagManager(unitOfWork, mapper, userManager);
-
-            // Act
-            Action act = () =>
-            {
-                tagManager.DeleteTagById(4, "userName1");
-            };
-
-            // Assert
-
-            act.Should().Throw<UserAccessException>().WithMessage("This user does not have access to this tag");
-        }
-
-        [Fact]
-        public void Should_ThrowException_When_UserNameDoesNotExist_DeleteTagById()
-        {
-            // Arrange
-            var users = new List<UserEntry>()
-            {
-                new UserEntry() { Email = "test@mail.com", UserName = "userName" },
-                new UserEntry() { Email = "test1@mail.com", UserName = "userName1" },
-            };
-            var tags = new List<TagEntry>()
-            {
-                new TagEntry() { Name = "testTag", User = users[0], Id = 4 },
-                new TagEntry() { Name = "testTag1", User = users[0], Id = 5 },
-                new TagEntry() { Name = "testTag2", User = users[1], Id = 6 },
-            };
-
-            var unitOfWork = DIHelper.CreateUnitOfWork(tags, null);
-
-            var mapper = DIHelper.InitializeMapper(typeof(NoteMappingProfile));
-
-            var userManager = DIHelper.CreateUserManager(users);
-
-            var tagManager = new TagManager(unitOfWork, mapper, userManager);
-
-            // Act
-            Action act = () =>
-            {
-                tagManager.DeleteTagById(4, "userName3333333");
-            };
-
-            // Assert
-
-            act.Should()
-               .Throw<NotFoundException>()
-               .WithMessage("User with this name does not exist");
-        }
-
 
         [Fact]
         public void Should_ThrowException_When_UserNameIsWrong_GetAllTagsFor()
@@ -358,7 +249,6 @@ namespace Notes.BLL.Tests.ServicesTests
                .ThrowExactly<NotFoundException>()
                .WithMessage("User with this name does not exist");
         }
-
 
         [Fact]
         public void Should_ThrowException_When_UserNameDoesNotExist_GetTagById()

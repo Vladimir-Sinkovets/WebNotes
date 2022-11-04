@@ -10,6 +10,7 @@ using Notes.DAL.Models;
 using Moq;
 using FluentAssertions;
 using Notes.BLL.Models;
+using Notes.BLL.Exceptions;
 
 namespace Notes.BLL.Tests.ServicesTests
 {

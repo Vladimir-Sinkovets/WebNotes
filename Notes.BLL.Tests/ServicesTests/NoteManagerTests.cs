@@ -1,5 +1,4 @@
 ﻿using Notes.BLL.Interfaces;
-using Notes.BLL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +11,7 @@ using Notes.DAL.Models;
 using Notes.BLL.Models;
 using FluentAssertions;
 using static System.Net.Mime.MediaTypeNames;
+using Notes.BLL.Exceptions;
 
 namespace Notes.BLL.Tests.ServicesTests
 {
@@ -209,7 +209,7 @@ namespace Notes.BLL.Tests.ServicesTests
 
             // Assert
 
-            act.Should().Throw<NotFoundException>().WithMessage("There is no such tag");
+            act.Should().Throw<NotFoundException>().WithMessage("There is no such note");
         }
 
         [Fact]

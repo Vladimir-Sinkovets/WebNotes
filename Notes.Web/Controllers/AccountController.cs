@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Notes.BLL.Interfaces;
-using Notes.BLL.Models;
+using Notes.BLL.Services.AccountInfoManagers;
+using Notes.BLL.Services.AccountInfoManagers.Models;
 using Notes.DAL.Models;
 using Notes.Web.Models;
 using System.Threading.Tasks;

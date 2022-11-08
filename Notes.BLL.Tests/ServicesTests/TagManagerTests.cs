@@ -2,8 +2,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using Notes.BLL.AutoMapperProfiles;
-using Notes.BLL.Interfaces;
-using Notes.BLL.Models;
 using Notes.BLL.Services;
 using Notes.DAL.Models;
 using Notes.DAL.Repositories.Interfaces;
@@ -12,6 +10,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Notes.BLL.Tests.Helpers;
 using Notes.BLL.Exceptions;
+using Notes.BLL.Services.TagManagers;
+using Notes.BLL.Services.TagManagers.Models;
+using Notes.BLL.Services.NoteManagers.Exceptions;
 
 namespace Notes.BLL.Tests.ServicesTests
 {

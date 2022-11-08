@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Notes.BLL.Exceptions;
-using Notes.BLL.Interfaces;
-using Notes.BLL.Models;
+using Notes.BLL.Services.AccountInfoManagers.Models;
+using Notes.BLL.Services.NoteManagers;
 using Notes.DAL.Models;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Notes.BLL.Services
+namespace Notes.BLL.Services.AccountInfoManagers
 {
     public class AccountInfoManager : IAccountInfoManager
     {
@@ -24,8 +24,8 @@ namespace Notes.BLL.Services
 
         public AccountInfo GetAccountInfo(string UserName)
         {
-            UserEntry user = _userManager.Users.FirstOrDefault(u => u.UserName == UserName) 
-                ?? throw new NotFoundException("User with this name does not exist");
+            UserEntry user = _userManager.Users.FirstOrDefault(u => u.UserName == UserName)
+                ?? throw new ArgumentException("User with this name does not exist");
 
             var accountInfo = new AccountInfo()
             {

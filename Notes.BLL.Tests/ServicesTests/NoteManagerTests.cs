@@ -1,5 +1,4 @@
-﻿using Notes.BLL.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +7,11 @@ using Notes.BLL.AutoMapperProfiles;
 using Notes.BLL.Services;
 using Notes.BLL.Tests.Helpers;
 using Notes.DAL.Models;
-using Notes.BLL.Models;
 using FluentAssertions;
 using static System.Net.Mime.MediaTypeNames;
 using Notes.BLL.Exceptions;
+using Notes.BLL.Services.NoteManagers;
+using Notes.BLL.Services.NoteManagers.Models;
 
 namespace Notes.BLL.Tests.ServicesTests
 {

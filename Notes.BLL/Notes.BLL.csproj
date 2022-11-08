@@ -16,4 +16,10 @@
     <ProjectReference Include="..\Notes.DAL\Notes.DAL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\AccountInfoManagers\Exceptions\" />
+    <Folder Include="Services\TagManagers\Exceptions\" />
+    <Folder Include="Services\TagManagers\Models\" />
+  </ItemGroup>
+
 </Project>

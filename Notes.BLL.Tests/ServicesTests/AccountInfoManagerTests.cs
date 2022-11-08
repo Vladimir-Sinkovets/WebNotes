@@ -1,5 +1,4 @@
-﻿using Notes.BLL.Interfaces;
-using Notes.BLL.Services;
+﻿using Notes.BLL.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +8,10 @@ using Notes.BLL.Tests.Helpers;
 using Notes.DAL.Models;
 using Moq;
 using FluentAssertions;
-using Notes.BLL.Models;
 using Notes.BLL.Exceptions;
+using Notes.BLL.Services.NoteManagers;
+using Notes.BLL.Services.NoteManagers.Models;
+using Notes.BLL.Services.AccountInfoManagers;
 
 namespace Notes.BLL.Tests.ServicesTests
 {

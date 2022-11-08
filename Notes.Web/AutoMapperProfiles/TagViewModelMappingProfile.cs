@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Notes.BLL.Models;
+using Notes.BLL.Services.NoteManagers.Models;
 using Notes.Web.Models;
 
 namespace Notes.Web.AutoMapperProfiles

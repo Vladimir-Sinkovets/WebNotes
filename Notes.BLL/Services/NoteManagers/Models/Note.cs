@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Notes.BLL.Models
+namespace Notes.BLL.Services.NoteManagers.Models
 {
     public class Note
     {

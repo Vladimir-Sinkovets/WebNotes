@@ -1,4 +1,4 @@
-﻿using Notes.BLL.Models;
+﻿using Notes.BLL.Services.NoteManagers.Models;
 using Notes.DAL.Models;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Notes.BLL.Interfaces
+namespace Notes.BLL.Services.NoteManagers
 {
     public interface INoteManager
     {

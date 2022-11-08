@@ -1,11 +1,11 @@
-﻿using Notes.BLL.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Notes.BLL.Services.AccountInfoManagers.Models;
 
-namespace Notes.BLL.Interfaces
+namespace Notes.BLL.Services.AccountInfoManagers
 {
     public interface IAccountInfoManager
     {

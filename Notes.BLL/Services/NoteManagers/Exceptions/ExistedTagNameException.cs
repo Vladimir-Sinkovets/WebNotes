@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Notes.BLL.Exceptions
+namespace Notes.BLL.Services.NoteManagers.Exceptions
 {
     [Serializable]
     public class ExistedTagNameException : Exception

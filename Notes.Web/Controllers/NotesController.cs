@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
 using Notes.BLL.Services.NoteManagers;
 using Notes.BLL.Services.NoteManagers.Models;
-using Notes.BLL.Services.TagManagers;
 using Notes.DAL.Models;
 using Notes.Web.Models;
 using System;
@@ -20,23 +19,21 @@ namespace Notes.Web.Controllers
     public class NotesController : Controller
     {
         private readonly IMapper _mapper;
-        private readonly ITagManager _tagManager;
+        public INoteManager _noteManager;
 
         private string CurrentUserName { get => User.Identity.Name; } 
 
-        public INoteManager _notesManager { get; set; }
 
-        public NotesController(INoteManager notesManager, IMapper mapper, ITagManager tagManager)
+        public NotesController(INoteManager notesManager, IMapper mapper)
         {
-            _notesManager = notesManager;
+            _noteManager = notesManager;
             _mapper = mapper;
-            _tagManager = tagManager;
         }
 
         [HttpGet]
         public ActionResult NoteList()
         {
-            IEnumerable<Note> notes =_notesManager.GetAllNotesForUser(CurrentUserName);
+            IEnumerable<Note> notes = _noteManager.GetAllNotes();
 
             IEnumerable<NoteViewModel> viewModel = _mapper.Map<IEnumerable<Note>, List<NoteViewModel>>(notes);
 
@@ -52,9 +49,9 @@ namespace Notes.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(NoteCreateViewModel model)
         {
-            Note note = _mapper.Map<NoteCreateViewModel, Note>(model);
+            var note = _mapper.Map<NoteCreateData>(model);
 
-            await _notesManager.AddNoteForUserAsync(note, CurrentUserName);
+            await _noteManager.CreateNewNoteAsync(note);
 
             return View();
         }
@@ -62,7 +59,7 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public ActionResult EditNote(int id)
         {
-            var note = _notesManager.GetNoteByIdForUser(id, CurrentUserName);
+            var note = _noteManager.GetNoteById(id);
 
             var viewModel = _mapper.Map<EditNoteViewModel>(note);
 
@@ -76,12 +73,12 @@ namespace Notes.Web.Controllers
         {
             if (ModelState.IsValid == true)
             {
-                var note = _mapper.Map<Note>(viewModel);
+                var note = _mapper.Map<NoteUpdateData>(viewModel);
 
-                await _notesManager.UpdateAsync(note);
+                await _noteManager.UpdateNoteAsync(note);
             }
 
-            var model = _notesManager.GetNoteByIdForUser(viewModel.Id, CurrentUserName);
+            var model = _noteManager.GetNoteById(viewModel.Id);
 
             viewModel = _mapper.Map<EditNoteViewModel>(model);
             
@@ -92,7 +89,7 @@ namespace Notes.Web.Controllers
 
         private IEnumerable<TagViewModel> GetAllTagsForCurrentUser()
         {
-            var allTags = _tagManager.GetAllTagsFor(CurrentUserName);
+            var allTags = _noteManager.GetAllTagsFor();
 
             var allViewModelTags = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(allTags);
 
@@ -102,7 +99,7 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public IActionResult Read(int id)
         {
-            var note = _notesManager.GetNoteByIdForUser(id, CurrentUserName);
+            var note = _noteManager.GetNoteById(id);
 
             var viewModel = _mapper.Map<NoteViewModel>(note);
 
@@ -112,7 +109,7 @@ namespace Notes.Web.Controllers
         [HttpPost]
         public IActionResult AddTagToNote(int noteId, int tagId)
         {
-            _notesManager.AddTagToNoteForUser(noteId, tagId, CurrentUserName);
+            _noteManager.AddTagToNote(noteId, tagId);
 
             return RedirectToActionPermanent("EditNote", new { id = noteId });
         }
@@ -120,7 +117,7 @@ namespace Notes.Web.Controllers
         [HttpPost]
         public IActionResult RemoveTagFromNote(int noteId, int tagId)
         {
-            _notesManager.RemoveTagFromNoteForUser(noteId, tagId, CurrentUserName);
+            _noteManager.RemoveTagFromNote(noteId, tagId);
 
             return RedirectToActionPermanent("EditNote", new { id = noteId });
         }
@@ -129,7 +126,7 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public IActionResult TagList()
         {
-            var tags = _tagManager.GetAllTagsFor(CurrentUserName);
+            var tags = _noteManager.GetAllTagsFor();
 
             var tagViewModels = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(tags); 
                 
@@ -141,9 +138,9 @@ namespace Notes.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddNewTag(string tagName)
         {
-            var tag = new Tag() { Name = tagName };
+            var tag = new TagCreateData() { Name = tagName };
 
-            await _tagManager.AddTagAsync(tag, CurrentUserName);
+            await _noteManager.AddTagAsync(tag);
 
             return RedirectToActionPermanent("TagList");
         }
@@ -151,7 +148,7 @@ namespace Notes.Web.Controllers
         [HttpPost]
         public IActionResult DeleteTag(int id)
         {
-            _tagManager.DeleteTagById(id, CurrentUserName);
+            _noteManager.DeleteTagById(id);
 
             return RedirectToActionPermanent("TagList");
         }

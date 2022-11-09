@@ -9,9 +9,9 @@ using Notes.BLL.Tests.Helpers;
 using Notes.DAL.Models;
 using FluentAssertions;
 using static System.Net.Mime.MediaTypeNames;
-using Notes.BLL.Exceptions;
 using Notes.BLL.Services.NoteManagers;
 using Notes.BLL.Services.NoteManagers.Models;
+using Notes.BLL.Services.NoteManagers.Exceptions;
 
 namespace Notes.BLL.Tests.ServicesTests
 {
@@ -25,18 +25,18 @@ namespace Notes.BLL.Tests.ServicesTests
             List<TagEntry> tags = CreateTagList(users);
             List<NoteEntry> notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
 
             // Act
 
-            noteManager.AddNoteForUserAsync(new Note() { Text = "new text", Title = "new title" }, "userName").Wait();
+            noteManager.CreateNewNoteAsync(new NoteCreateData() { Text = "new text", Title = "new title"}).Wait();
 
             // Assert
 
             notes.Should().Contain(n => n.Text == "new text" && n.Title == "new title");
         }
 
-        private static INoteManager InitializeNoteManager(List<UserEntry> users, List<TagEntry> tags, List<NoteEntry> notes)
+        private static INoteManager InitializeNoteManager(List<UserEntry> users, List<TagEntry> tags, List<NoteEntry> notes, UserEntry currentUser)
         {
             var unitOfWork = DIHelper.CreateUnitOfWork(tags, notes);
 
@@ -44,7 +44,9 @@ namespace Notes.BLL.Tests.ServicesTests
 
             var userManager = DIHelper.CreateUserManager(users);
 
-            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper);
+            var userAccessor = DIHelper.CreateCurrentUserAccessor(currentUser);
+
+            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
             return noteManager;
         }
 
@@ -56,11 +58,11 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
 
             // Act
 
-            var allNotes = noteManager.GetAllNotesForUser("userName");
+            var allNotes = noteManager.GetAllNotes();
 
             // Assert
 
@@ -80,12 +82,14 @@ namespace Notes.BLL.Tests.ServicesTests
             var mapper = DIHelper.InitializeMapper(typeof(NoteMappingProfile));
 
             var userManager = DIHelper.CreateUserManager(users);
+            
+            var userAccessor = DIHelper.CreateCurrentUserAccessor(new UserEntry() { UserName = "userName" });
 
-            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper);
+            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
 
             // Act
 
-            var note = noteManager.GetNoteByIdForUser(2, "userName");
+            var note = noteManager.GetNoteById(2);
 
             // Assert
 
@@ -107,12 +111,12 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
 
 
             // Act
 
-            noteManager.UpdateAsync(new Note() { Id = 1, Text = "updated text", Title = "1" }).Wait();
+            noteManager.UpdateNoteAsync(new NoteUpdateData() { Id = 1, Text = "updated text", Title = "1"}).Wait();
 
             // Assert
             var note = notes.FirstOrDefault(n => n.Id == 1);
@@ -130,10 +134,10 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
 
             // Act
-            noteManager.AddTagToNoteForUser(1, 4, "userName");
+            noteManager.AddTagToNote(1, 4);
 
             // Assert
             notes.FirstOrDefault(n => n.Id == 1).Tags.Should().HaveCount(2);
@@ -147,10 +151,10 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
 
             // Act
-            var noteTags = noteManager.GetNoteTagsByIdForUser(2, "userName");
+            var noteTags = noteManager.GetNoteTagsById(2);
 
             // Assert
             noteTags.Should().HaveCount(2);
@@ -164,11 +168,11 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
 
             // Act
 
-            noteManager.RemoveTagFromNoteForUser(2, 4, "userName");
+            noteManager.RemoveTagFromNote(2, 4);
 
             // Assert
 
@@ -184,10 +188,11 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "wrongUserName" });
 
             // Act
-            Action act = () => noteManager.AddNoteForUserAsync(new Note() { Text = "new text", Title = "new title" }, "wrongUserName").Wait();
+            Action act = () => noteManager.CreateNewNoteAsync(
+                new NoteCreateData() { Text = "new text", Title = "new title" }).Wait();
 
             // Assert
 
@@ -202,10 +207,10 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
 
             // Act
-            Action act = () => noteManager.GetNoteByIdForUser(2222, "userName");
+            Action act = () => noteManager.GetNoteById(2222);
 
             // Assert
 
@@ -220,11 +225,11 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
 
             // Act
 
-            Action act = () => noteManager.UpdateAsync(null).Wait();
+            Action act = () => noteManager.UpdateNoteAsync(null).Wait();
 
             // Assert
 
@@ -239,10 +244,10 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
 
             // Act
-            Action act = () => noteManager.AddTagToNoteForUser(1111, 4, "userName");
+            Action act = () => noteManager.AddTagToNote(1111, 4);
 
             // Assert
 
@@ -257,10 +262,10 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
 
             // Act
-            Action act = () => noteManager.AddTagToNoteForUser(1, 1234, "userName");
+            Action act = () => noteManager.AddTagToNote(1, 1234);
 
             // Assert
 
@@ -275,11 +280,11 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
 
             // Act
 
-            Action act = () => noteManager.GetNoteTagsByIdForUser(22312, "userName");
+            Action act = () => noteManager.GetNoteTagsById(22312);
 
             // Assert
 
@@ -294,11 +299,11 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
 
             // Act
 
-            Action act = () => noteManager.GetNoteTagsByIdForUser(2, "wrongUserName");
+            Action act = () => noteManager.GetNoteTagsById(2);
 
             // Assert
 
@@ -313,11 +318,11 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
 
             // Act
 
-            Action act = () => noteManager.RemoveTagFromNoteForUser(22212, 4, "userName");
+            Action act = () => noteManager.RemoveTagFromNote(22212, 4);
 
             // Assert
 
@@ -332,11 +337,11 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
 
             // Act
 
-            Action act = () => noteManager.RemoveTagFromNoteForUser(2, 4213123, "userName");
+            Action act = () => noteManager.RemoveTagFromNote(2, 4213123);
 
             // Assert
 

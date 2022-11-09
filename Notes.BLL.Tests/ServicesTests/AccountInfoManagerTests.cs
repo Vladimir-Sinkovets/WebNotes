@@ -8,10 +8,11 @@ using Notes.BLL.Tests.Helpers;
 using Notes.DAL.Models;
 using Moq;
 using FluentAssertions;
-using Notes.BLL.Exceptions;
 using Notes.BLL.Services.NoteManagers;
 using Notes.BLL.Services.NoteManagers.Models;
 using Notes.BLL.Services.AccountInfoManagers;
+using Notes.BLL.Services.NoteManagers.Exceptions;
+using Notes.BLL.Services.CurrentUserAccessor.Exceptions;
 
 namespace Notes.BLL.Tests.ServicesTests
 {
@@ -25,18 +26,20 @@ namespace Notes.BLL.Tests.ServicesTests
 
             var notesManagerMock = new Mock<INoteManager>();
             
-            notesManagerMock.Setup(x => x.GetAllNotesForUser(It.IsAny<string>()))
+            notesManagerMock.Setup(x => x.GetAllNotes())
                 .Returns(new List<Note>() { new Note(), new Note(), new Note(), new Note(), new Note(), new Note(), new Note(), });
 
             INoteManager notesManager = notesManagerMock.Object;
 
+            var userAccessor = DIHelper.CreateCurrentUserAccessor(users[0]);
+
             var userManager = DIHelper.CreateUserManager(users);
 
-            IAccountInfoManager manager = new AccountInfoManager(userManager, notesManager);
+            IAccountInfoManager manager = new AccountInfoManager(userManager, notesManager, userAccessor);
 
             // Act
 
-            var model = manager.GetAccountInfo("userName");
+            var model = manager.GetAccountInfo();
 
             // Assert
 
@@ -52,22 +55,24 @@ namespace Notes.BLL.Tests.ServicesTests
 
             var notesManagerMock = new Mock<INoteManager>();
 
-            notesManagerMock.Setup(x => x.GetAllNotesForUser(It.IsAny<string>()))
+            notesManagerMock.Setup(x => x.GetAllNotes())
                 .Returns(new List<Note>() { new Note(), new Note() });
 
             INoteManager notesManager = notesManagerMock.Object;
 
             var userManager = DIHelper.CreateUserManager(users);
 
-            IAccountInfoManager manager = new AccountInfoManager(userManager, notesManager);
+            var userAccessor = DIHelper.CreateCurrentUserAccessor(new UserEntry() { UserName = "userName_sadmaslmd,;asmdlk" });
+
+            IAccountInfoManager manager = new AccountInfoManager(userManager, notesManager, userAccessor);
 
             // Act
 
-            Action act = () => manager.GetAccountInfo("userName_sadmaslmd,;asmdlk");
+            Action act = () => manager.GetAccountInfo();
 
             // Assert
 
-            act.Should().Throw<NotFoundException>().WithMessage("User with this name does not exist");
+            act.Should().Throw<NotAuthorizedException>();
         }
     }
 }

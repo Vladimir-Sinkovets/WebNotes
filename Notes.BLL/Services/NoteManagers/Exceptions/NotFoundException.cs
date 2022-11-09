@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Notes.BLL.Exceptions
+namespace Notes.BLL.Services.NoteManagers.Exceptions
 {
     public class NotFoundException : Exception
     {

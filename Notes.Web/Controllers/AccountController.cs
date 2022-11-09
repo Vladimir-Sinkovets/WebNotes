@@ -93,7 +93,7 @@ namespace Notes.Web.Controllers
         [Authorize]
         public IActionResult Info()
         {
-            var accountInfo = _accountInfoManager.GetAccountInfo(User.Identity.Name);
+            var accountInfo = _accountInfoManager.GetAccountInfo();
 
             var viewModel = _mapper.Map<AccountInfo, AccountInfoViewModel>(accountInfo);
 

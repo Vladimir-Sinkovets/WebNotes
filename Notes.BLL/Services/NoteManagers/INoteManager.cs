@@ -10,12 +10,17 @@ namespace Notes.BLL.Services.NoteManagers
 {
     public interface INoteManager
     {
-        Task AddNoteForUserAsync(Note note, string userName);
-        IEnumerable<Note> GetAllNotesForUser(string userName);
-        Note GetNoteByIdForUser(int id, string userName);
-        IEnumerable<Tag> GetNoteTagsByIdForUser(int noteId, string userName);
-        Task UpdateAsync(Note note);
-        void AddTagToNoteForUser(int noteId, int tagId, string userName);
-        void RemoveTagFromNoteForUser(int noteId, int tagId, string userName);
+        Task UpdateNoteAsync(NoteUpdateData note);
+        Note GetNoteById(int id);
+        Task CreateNewNoteAsync(NoteCreateData note);
+        IEnumerable<Note> GetAllNotes();
+        void AddTagToNote(int noteId, int tagId);
+        IEnumerable<Tag> GetNoteTagsById(int noteId);
+        void RemoveTagFromNote(int noteId, int tagId);
+
+        Task AddTagAsync(TagCreateData data);
+        Tag GetTagById(int tagId);
+        void DeleteTagById(int tagId);
+        IEnumerable<Tag> GetAllTagsFor();
     }
 }

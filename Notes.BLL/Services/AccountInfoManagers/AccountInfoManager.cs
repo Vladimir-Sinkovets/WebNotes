@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Notes.BLL.Exceptions;
 using Notes.BLL.Services.AccountInfoManagers.Models;
+using Notes.BLL.Services.CurrentUserAccessor;
 using Notes.BLL.Services.NoteManagers;
 using Notes.DAL.Models;
 using System;
@@ -15,22 +15,23 @@ namespace Notes.BLL.Services.AccountInfoManagers
     {
         private readonly UserManager<UserEntry> _userManager;
         private readonly INoteManager _notesManager;
+        private readonly ICurrentUserAccessor _userService;
 
-        public AccountInfoManager(UserManager<UserEntry> userManager, INoteManager notesManager)
+        public AccountInfoManager(UserManager<UserEntry> userManager, INoteManager notesManager, ICurrentUserAccessor userService)
         {
             _userManager = userManager;
             _notesManager = notesManager;
+            this._userService = userService;
         }
 
-        public AccountInfo GetAccountInfo(string UserName)
+        public AccountInfo GetAccountInfo()
         {
-            UserEntry user = _userManager.Users.FirstOrDefault(u => u.UserName == UserName)
-                ?? throw new ArgumentException("User with this name does not exist");
+            UserEntry user = _userService.Current;
 
             var accountInfo = new AccountInfo()
             {
                 Email = user.Email,
-                NotesCount = _notesManager.GetAllNotesForUser(UserName).Count(),
+                NotesCount = _notesManager.GetAllNotes().Count(),
             };
 
             return accountInfo;

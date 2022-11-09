@@ -9,9 +9,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Notes.BLL.Tests.Helpers;
-using Notes.BLL.Exceptions;
-using Notes.BLL.Services.TagManagers;
-using Notes.BLL.Services.TagManagers.Models;
+using Notes.BLL.Services.NoteManagers;
+using Notes.BLL.Services.NoteManagers.Models;
 using Notes.BLL.Services.NoteManagers.Exceptions;
 
 namespace Notes.BLL.Tests.ServicesTests
@@ -39,11 +38,13 @@ namespace Notes.BLL.Tests.ServicesTests
 
             var userManager = DIHelper.CreateUserManager(users);
 
-            ITagManager tagManager = new TagManager(unitOfWork, mapper, userManager);
+            var userAccessor = DIHelper.CreateCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+
+            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
 
             // Act
 
-            tagManager.AddTagAsync(new Tag() { Name = "testName" }, "userName").Wait();
+            noteManager.AddTagAsync(new TagCreateData() { Name = "testName" }).Wait();
 
             // Assert
 
@@ -72,11 +73,13 @@ namespace Notes.BLL.Tests.ServicesTests
 
             var userManager = DIHelper.CreateUserManager(users);
 
-            var tagManager = new TagManager(unitOfWork, mapper, userManager);
+            var userAccessor = DIHelper.CreateCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+
+            var noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
 
             // Act
 
-            tagManager.DeleteTagById(4, "userName");
+            noteManager.DeleteTagById(4);
 
             // Assert
 
@@ -103,11 +106,13 @@ namespace Notes.BLL.Tests.ServicesTests
             var userManager = DIHelper.CreateUserManager(users);
             var mapper = DIHelper.InitializeMapper(typeof(NoteMappingProfile));
 
-            var tagManager = new TagManager(unitOfWork, mapper, userManager);
+            var userAccessor = DIHelper.CreateCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+
+            var noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
 
             // Act
 
-            var allTags = tagManager.GetAllTagsFor("userName");
+            var allTags = noteManager.GetAllTagsFor();
 
             // Assert
 
@@ -134,11 +139,13 @@ namespace Notes.BLL.Tests.ServicesTests
             var userManager = DIHelper.CreateUserManager(users);
             var mapper = DIHelper.InitializeMapper(typeof(NoteMappingProfile));
 
-            var tagManager = new TagManager(unitOfWork, mapper, userManager);
+            var userAccessor = DIHelper.CreateCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+
+            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
 
             // Act
 
-            var tag = tagManager.GetTagById(5, "userName");
+            var tag = noteManager.GetTagById(5);
 
             // Assert
 
@@ -167,12 +174,14 @@ namespace Notes.BLL.Tests.ServicesTests
 
             var userManager = DIHelper.CreateUserManager(users);
 
-            ITagManager tagManager = new TagManager(unitOfWork, mapper, userManager);
+            var userAccessor = DIHelper.CreateCurrentUserAccessor(new UserEntry() { UserName = "wrongUserName"});
+
+            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
 
             // Act
             Action act = () => 
             { 
-                tagManager.AddTagAsync(new Tag() { Name = "testName" }, "wrongUserName").Wait();
+                noteManager.AddTagAsync(new TagCreateData() { Name = "testName" }).Wait();
             };
 
             // Assert
@@ -201,12 +210,14 @@ namespace Notes.BLL.Tests.ServicesTests
 
             var userManager = DIHelper.CreateUserManager(users);
 
-            ITagManager tagManager = new TagManager(unitOfWork, mapper, userManager);
+            var userAccessor = DIHelper.CreateCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+
+            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
 
             // Act
             Action act = () =>
             {
-                tagManager.AddTagAsync(new Tag() { Name = "tag13231" }, "userName").Wait();
+                noteManager.AddTagAsync(new TagCreateData() { Name = "tag13231" }).Wait();
             };
 
             // Assert
@@ -236,12 +247,14 @@ namespace Notes.BLL.Tests.ServicesTests
 
             var userManager = DIHelper.CreateUserManager(users);
 
-            var tagManager = new TagManager(unitOfWork, mapper, userManager);
+            var userAccessor = DIHelper.CreateCurrentUserAccessor(new UserEntry() { UserName = "userName21312" });
+
+            var noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
 
             // Act
             Action act = () =>
             {
-                var allTags = tagManager.GetAllTagsFor("userName21312");
+                var allTags = noteManager.GetAllTagsFor();
             };
 
             // Assert
@@ -273,12 +286,14 @@ namespace Notes.BLL.Tests.ServicesTests
 
             var userManager = DIHelper.CreateUserManager(users);
 
-            var tagManager = new TagManager(unitOfWork, mapper, userManager);
+            var userAccessor = DIHelper.CreateCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+
+            var noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
 
             // Act
             Action act = () =>
             {
-                tagManager.GetTagById(4, "userName3333333");
+                noteManager.GetTagById(4);
             };
 
             // Assert
@@ -311,12 +326,14 @@ namespace Notes.BLL.Tests.ServicesTests
 
             var userManager = DIHelper.CreateUserManager(users);
 
-            var tagManager = new TagManager(unitOfWork, mapper, userManager);
+            var userAccessor = DIHelper.CreateCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+
+            var noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
 
             // Act
             Action act = () =>
             {
-                tagManager.GetTagById(7, "userName");
+                noteManager.GetTagById(7);
             };
 
             // Assert

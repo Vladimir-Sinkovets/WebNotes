@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using Notes.BLL.AutoMapperProfiles;
+using Notes.BLL.Services.CurrentUserAccessor;
 using Notes.DAL.Models;
 using Notes.DAL.Repositories.Interfaces;
 using System;
@@ -84,6 +85,16 @@ namespace Notes.BLL.Tests.Helpers
 
             var unitOfWork = unitOfWorkMock.Object;
             return unitOfWork;
+        }
+
+        public static ICurrentUserAccessor CreateCurrentUserAccessor(UserEntry userEntry)
+        {
+            var userServiceMock = new Mock<ICurrentUserAccessor>();
+
+            userServiceMock.Setup(x => x.Current)
+                .Returns(userEntry);
+
+            return userServiceMock.Object;
         }
     }
 }

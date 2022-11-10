@@ -9,6 +9,6 @@ namespace Notes.DAL.Repositories.Interfaces
 {
     public interface ITagRepository : IRepository<TagEntry>
     {
-
+        IQueryable<TagEntry> GetAllWithoutTracking();
     }
 }

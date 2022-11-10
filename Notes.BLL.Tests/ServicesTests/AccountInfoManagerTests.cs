@@ -1,5 +1,4 @@
-﻿using Notes.BLL.Interfaces;
-using Notes.BLL.Services;
+﻿using Notes.BLL.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +8,11 @@ using Notes.BLL.Tests.Helpers;
 using Notes.DAL.Models;
 using Moq;
 using FluentAssertions;
-using Notes.BLL.Models;
-using Notes.BLL.Exceptions;
+using Notes.BLL.Services.NoteManagers;
+using Notes.BLL.Services.NoteManagers.Models;
+using Notes.BLL.Services.AccountInfoManagers;
+using Notes.BLL.Services.NoteManagers.Exceptions;
+using Notes.BLL.Services.CurrentUserAccessor.Exceptions;
 
 namespace Notes.BLL.Tests.ServicesTests
 {
@@ -24,49 +26,45 @@ namespace Notes.BLL.Tests.ServicesTests
 
             var notesManagerMock = new Mock<INoteManager>();
             
-            notesManagerMock.Setup(x => x.GetAllNotesForUser(It.IsAny<string>()))
+            notesManagerMock.Setup(x => x.GetAllNotes())
                 .Returns(new List<Note>() { new Note(), new Note(), new Note(), new Note(), new Note(), new Note(), new Note(), });
 
-            INoteManager notesManager = notesManagerMock.Object;
+            var notesManager = notesManagerMock.Object;
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
+            var userManager = MockHelper.SetupUserManager(users);
 
-            var userManager = DIHelper.CreateUserManager(users);
-
-            IAccountInfoManager manager = new AccountInfoManager(userManager, notesManager);
+            IAccountInfoManager manager = new AccountInfoManager(userManager, notesManager, userAccessor);
 
             // Act
-
-            var model = manager.GetAccountInfo("userName");
+            var model = manager.GetAccountInfo();
 
             // Assert
-
             model.NotesCount.Should().Be(7);
             model.Email.Should().Be("userEmail@mail.com");
         }
 
-        [Fact]
-        public void Should_ThrowException_WhenUserNameIsWrong_GetAccountInfo()
-        {
-            // Arrange
-            var users = new List<UserEntry>() { new UserEntry() { UserName = "userName", Email = "userEmail@mail.com" } };
+        //[Fact]
+        //public void Should_ThrowException_WhenUserNameIsWrong_GetAccountInfo()
+        //{
+        //    // Arrange
+        //    var users = new List<UserEntry>() { new UserEntry() { UserName = "userName", Email = "userEmail@mail.com" } };
 
-            var notesManagerMock = new Mock<INoteManager>();
+        //    var notesManagerMock = new Mock<INoteManager>();
 
-            notesManagerMock.Setup(x => x.GetAllNotesForUser(It.IsAny<string>()))
-                .Returns(new List<Note>() { new Note(), new Note() });
+        //    notesManagerMock.Setup(x => x.GetAllNotes())
+        //        .Returns(new List<Note>() { new Note(), new Note() });
 
-            INoteManager notesManager = notesManagerMock.Object;
+        //    var notesManager = notesManagerMock.Object;
+        //    var userManager = MockHelper.SetupUserManager(users);
+        //    var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName_sadmaslmd,;asmdlk" });
 
-            var userManager = DIHelper.CreateUserManager(users);
+        //    IAccountInfoManager manager = new AccountInfoManager(userManager, notesManager, userAccessor);
 
-            IAccountInfoManager manager = new AccountInfoManager(userManager, notesManager);
+        //    // Act
+        //    Action act = () => manager.GetAccountInfo();
 
-            // Act
-
-            Action act = () => manager.GetAccountInfo("userName_sadmaslmd,;asmdlk");
-
-            // Assert
-
-            act.Should().Throw<NotFoundException>().WithMessage("User with this name does not exist");
-        }
+        //    // Assert
+        //    act.Should().Throw<NotAuthorizedException>();
+        //}
     }
 }

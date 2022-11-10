@@ -17,5 +17,10 @@ namespace Notes.DAL.Repositories
         {
             return _table.Include(t => t.Notes);
         }
+
+        public IQueryable<TagEntry> GetAllWithoutTracking()
+        {
+            return _table.Include(t => t.Notes).AsNoTracking();
+        }
     }
 }

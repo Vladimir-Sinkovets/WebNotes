@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Notes.BLL.Models;
+using Notes.BLL.Services.NoteManagers.Models;
 using Notes.Web.Models;
 using System;
 using System.Collections.Generic;
@@ -18,8 +18,13 @@ namespace Notes.Web.AutoMapperProfiles
             CreateMap<Note, NoteCreateViewModel>();
             CreateMap<NoteCreateViewModel, Note>();
 
+            CreateMap<NoteCreateViewModel, NoteCreateData>();
+
+            CreateMap<NoteUpdateData, EditNoteViewModel>();
+            CreateMap<EditNoteViewModel, NoteUpdateData>();
+
             CreateMap<Note, EditNoteViewModel>();
-            CreateMap<EditNoteViewModel, Note>();
+
         }
     }
 }

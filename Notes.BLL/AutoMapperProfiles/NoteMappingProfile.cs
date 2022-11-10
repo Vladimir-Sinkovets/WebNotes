@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Notes.BLL.Models;
+using Notes.BLL.Services.NoteManagers.Models;
 using Notes.DAL.Models;
 using System;
 using System.Collections.Generic;
@@ -16,8 +16,17 @@ namespace Notes.BLL.AutoMapperProfiles
             CreateMap<Note, NoteEntry>();
             CreateMap<NoteEntry, Note>();
 
+            CreateMap<NoteCreateData, NoteEntry>();
+            CreateMap<NoteEntry, NoteCreateData>();
+
+            CreateMap<NoteUpdateData, NoteEntry>();
+            CreateMap<NoteEntry, NoteUpdateData>();
+
             CreateMap<Tag, TagEntry>();
             CreateMap<TagEntry, Tag>();
+
+            CreateMap<TagCreateData, TagEntry>();
+            CreateMap<TagEntry, TagCreateData>();
         }
     }
 }

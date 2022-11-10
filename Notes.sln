@@ -12,9 +12,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notes.BLL", "Notes.BLL\Note
 		{2750A023-6286-4DA6-B078-83B44B3D15EC} = {2750A023-6286-4DA6-B078-83B44B3D15EC}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notes.BLL.Tests", "Notes.BLL.Tests\Notes.BLL.Tests.csproj", "{08F577E1-ED5B-459B-8D49-DD8E903B58E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notes.BLL.Tests", "Notes.BLL.Tests\Notes.BLL.Tests.csproj", "{08F577E1-ED5B-459B-8D49-DD8E903B58E5}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7E6851DD-8B99-4F1B-B45C-CF2900E2F865} = {7E6851DD-8B99-4F1B-B45C-CF2900E2F865}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notes.Web.Tests", "Notes.Web.Tests\Notes.Web.Tests.csproj", "{DFC9846B-C0B8-4E53-8254-A492B38547C8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7E6851DD-8B99-4F1B-B45C-CF2900E2F865} = {7E6851DD-8B99-4F1B-B45C-CF2900E2F865}
+		{A09BA74A-6594-4958-990B-CFBCE456C373} = {A09BA74A-6594-4958-990B-CFBCE456C373}
 	EndProjectSection
 EndProject
 Global
@@ -39,6 +45,10 @@ Global
 		{08F577E1-ED5B-459B-8D49-DD8E903B58E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08F577E1-ED5B-459B-8D49-DD8E903B58E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08F577E1-ED5B-459B-8D49-DD8E903B58E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFC9846B-C0B8-4E53-8254-A492B38547C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFC9846B-C0B8-4E53-8254-A492B38547C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFC9846B-C0B8-4E53-8254-A492B38547C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFC9846B-C0B8-4E53-8254-A492B38547C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

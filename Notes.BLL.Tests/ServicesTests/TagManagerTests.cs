@@ -2,8 +2,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using Notes.BLL.AutoMapperProfiles;
-using Notes.BLL.Interfaces;
-using Notes.BLL.Models;
 using Notes.BLL.Services;
 using Notes.DAL.Models;
 using Notes.DAL.Repositories.Interfaces;
@@ -11,41 +9,32 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Notes.BLL.Tests.Helpers;
-using Notes.BLL.Exceptions;
+using Notes.BLL.Services.NoteManagers;
+using Notes.BLL.Services.NoteManagers.Models;
+using Notes.BLL.Services.NoteManagers.Exceptions;
 
 namespace Notes.BLL.Tests.ServicesTests
 {
     public class TagManagerTests
     {
         [Fact]
-        public void Should_AddTag()
+        public async void Should_AddTag()
         {
             // Arrange
-            var users = new List<UserEntry>()
-            { 
-                new UserEntry() { Email = "test@mail.com", UserName = "userName" }, 
-                new UserEntry() { Email = "test1@mail.com", UserName = "userName1" }, 
-                new UserEntry() { Email = "test2@mail.com", UserName = "userName2" }, 
-            };
-            var tags = new List<TagEntry>()
-            {
-                new TagEntry() { Name = "tag13231", User = users[1], Id = 0 },
-            };
+            List<UserEntry> users = CreateUserEntryList();
+            List<TagEntry> tags = CreateTagEntryList(users);
 
-            var unitOfWork = DIHelper.CreateUnitOfWork(tags, null);
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userManager = MockHelper.SetupUserManager(users);
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
 
-            var mapper = DIHelper.InitializeMapper(typeof(NoteMappingProfile));
-
-            var userManager = DIHelper.CreateUserManager(users);
-
-            ITagManager tagManager = new TagManager(unitOfWork, mapper, userManager);
+            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
 
             // Act
-
-            tagManager.AddTagAsync(new Tag() { Name = "testName" }, "userName").Wait();
+            await noteManager.AddTagAsync(new TagCreateData() { Name = "testName" });
 
             // Assert
-
             tags.Should().Contain(tag => tag.Name == "testName" && tag.User.UserName == "userName");
         }
 
@@ -53,63 +42,41 @@ namespace Notes.BLL.Tests.ServicesTests
         public void Should_DeleteTagById()
         {
             // Arrange
-            var users = new List<UserEntry>()
-            {
-                new UserEntry() { Email = "test@mail.com", UserName = "userName" },
-                new UserEntry() { Email = "test1@mail.com", UserName = "userName1" },
-            };
-            var tags = new List<TagEntry>()
-            {
-                new TagEntry() { Name = "testTag", User = users[0], Id = 4 },
-                new TagEntry() { Name = "testTag1", User = users[0], Id = 5 },
-                new TagEntry() { Name = "testTag2", User = users[1], Id = 6 },
-            };
+            List<UserEntry> users = CreateUserEntryList();
+            List<TagEntry> tags = CreateTagEntryList(users);
 
-            var unitOfWork = DIHelper.CreateUnitOfWork(tags, null);
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userManager = MockHelper.SetupUserManager(users);
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
 
-            var mapper = DIHelper.InitializeMapper(typeof(NoteMappingProfile));
-
-            var userManager = DIHelper.CreateUserManager(users);
-
-            var tagManager = new TagManager(unitOfWork, mapper, userManager);
+            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
 
             // Act
-
-            tagManager.DeleteTagById(4, "userName");
+            noteManager.DeleteTagById(tagId: 4);
 
             // Assert
-
             tags.Should().NotContain(tag => tag.Name == "testTag" && tag.User.UserName == "userName");
         }
 
         [Fact]
-        public void Should_ReturnAllTagsForUser()
+        public void Should_ReturnAllTags()
         {
             // Arrange
-            var users = new List<UserEntry>() 
-            {
-                new UserEntry() { Email = "test@mail.com", UserName = "userName" },
-                new UserEntry() { Email = "test1@mail.com", UserName = "userName1" },
-            };
-            var tags = new List<TagEntry>() 
-            {
-                new TagEntry() { Name = "testTag", User = users[0], Id = 4 },
-                new TagEntry() { Name = "testTag1", User = users[0], Id = 5 },
-                new TagEntry() { Name = "testTag2", User = users[1], Id = 6 },
-            };
+            List<UserEntry> users = CreateUserEntryList();
+            List<TagEntry> tags = CreateTagEntryList(users);
 
-            var unitOfWork = DIHelper.CreateUnitOfWork(tags, null);
-            var userManager = DIHelper.CreateUserManager(users);
-            var mapper = DIHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var userManager = MockHelper.SetupUserManager(users);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
 
-            var tagManager = new TagManager(unitOfWork, mapper, userManager);
+            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
 
             // Act
-
-            var allTags = tagManager.GetAllTagsFor("userName");
+            var allTags = noteManager.GetAllTags();
 
             // Assert
-
             allTags.Count().Should().Be(2);
         }
 
@@ -117,174 +84,46 @@ namespace Notes.BLL.Tests.ServicesTests
         public void Should_ReturnTagById()
         {
             // Arrange
-            var users = new List<UserEntry>()
-            {
-                new UserEntry() { Email = "test@mail.com", UserName = "userName" },
-                new UserEntry() { Email = "test1@mail.com", UserName = "userName1" },
-            };
-            var tags = new List<TagEntry>()
-            {
-                new TagEntry() { Name = "testTag", User = users[0], Id = 4 },
-                new TagEntry() { Name = "testTag1", User = users[0], Id = 5 },
-                new TagEntry() { Name = "testTag2", User = users[1], Id = 6 },
-            };
+            List<UserEntry> users = CreateUserEntryList();
+            List<TagEntry> tags = CreateTagEntryList(users);
 
-            var unitOfWork = DIHelper.CreateUnitOfWork(tags, null);
-            var userManager = DIHelper.CreateUserManager(users);
-            var mapper = DIHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var userManager = MockHelper.SetupUserManager(users);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
 
-            var tagManager = new TagManager(unitOfWork, mapper, userManager);
+            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
 
             // Act
-
-            var tag = tagManager.GetTagById(5, "userName");
+            var tag = noteManager.GetTagById(tagId: 5);
 
             // Assert
-
             tag.Name.Should().Be("testTag1");
         }
 
-        
-        [Fact]
-        public void Should_ThrowException_When_UserNameIsWrong_AddTagAsync()
-        {
-            // Arrange
-            var users = new List<UserEntry>()
-            {
-                new UserEntry() { Email = "test@mail.com", UserName = "userName" },
-                new UserEntry() { Email = "test1@mail.com", UserName = "userName1" },
-                new UserEntry() { Email = "test2@mail.com", UserName = "userName2" },
-            };
-            var tags = new List<TagEntry>()
-            {
-                new TagEntry() { Name = "tag13231", User = users[1], Id = 0 },
-            };
-
-            var unitOfWork = DIHelper.CreateUnitOfWork(tags, null);
-
-            var mapper = DIHelper.InitializeMapper(typeof(NoteMappingProfile));
-
-            var userManager = DIHelper.CreateUserManager(users);
-
-            ITagManager tagManager = new TagManager(unitOfWork, mapper, userManager);
-
-            // Act
-            Action act = () => 
-            { 
-                tagManager.AddTagAsync(new Tag() { Name = "testName" }, "wrongUserName").Wait();
-            };
-
-            // Assert
-
-            act.Should().Throw<NotFoundException> ().WithMessage("User with this name does not exist");
-        }
 
         [Fact]
         public void Should_ThrowException_When_TagAlreadyExists_AddTagAsync()
         {
             // Arrange
-            var users = new List<UserEntry>()
-            {
-                new UserEntry() { Email = "test@mail.com", UserName = "userName" },
-                new UserEntry() { Email = "test1@mail.com", UserName = "userName1" },
-                new UserEntry() { Email = "test2@mail.com", UserName = "userName2" },
-            };
+            List<UserEntry> users = CreateUserEntryList();
             var tags = new List<TagEntry>()
             {
                 new TagEntry() { Name = "tag13231", User = users[1], Id = 0 },
             };
 
-            var unitOfWork = DIHelper.CreateUnitOfWork(tags, null);
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userManager = MockHelper.SetupUserManager(users);
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
 
-            var mapper = DIHelper.InitializeMapper(typeof(NoteMappingProfile));
-
-            var userManager = DIHelper.CreateUserManager(users);
-
-            ITagManager tagManager = new TagManager(unitOfWork, mapper, userManager);
-
-            // Act
-            Action act = () =>
-            {
-                tagManager.AddTagAsync(new Tag() { Name = "tag13231" }, "userName").Wait();
-            };
-
-            // Assert
-
-            act.Should().Throw<ExistedTagNameException>().WithMessage("Cannot add tag with already existing name");
-        }
-
-        [Fact]
-        public void Should_ThrowException_When_UserNameIsWrong_GetAllTagsFor()
-        {
-            // Arrange
-            var users = new List<UserEntry>()
-            {
-                new UserEntry() { Email = "test@mail.com", UserName = "userName" },
-                new UserEntry() { Email = "test1@mail.com", UserName = "userName1" },
-            };
-            var tags = new List<TagEntry>()
-            {
-                new TagEntry() { Name = "testTag", User = users[0], Id = 4 },
-                new TagEntry() { Name = "testTag1", User = users[0], Id = 5 },
-                new TagEntry() { Name = "testTag2", User = users[1], Id = 6 },
-            };
-
-            var unitOfWork = DIHelper.CreateUnitOfWork(tags, null);
-
-            var mapper = DIHelper.InitializeMapper(typeof(NoteMappingProfile));
-
-            var userManager = DIHelper.CreateUserManager(users);
-
-            var tagManager = new TagManager(unitOfWork, mapper, userManager);
+            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
 
             // Act
-            Action act = () =>
-            {
-                var allTags = tagManager.GetAllTagsFor("userName21312");
-            };
+            Func<Task> act = () => noteManager.AddTagAsync(new TagCreateData() { Name = "tag13231" });
 
             // Assert
-
-            act.Should()
-               .ThrowExactly<NotFoundException>()
-               .WithMessage("User with this name does not exist");
-        }
-
-        [Fact]
-        public void Should_ThrowException_When_UserNameDoesNotExist_GetTagById()
-        {
-            // Arrange
-            var users = new List<UserEntry>()
-            {
-                new UserEntry() { Email = "test@mail.com", UserName = "userName" },
-                new UserEntry() { Email = "test1@mail.com", UserName = "userName1" },
-            };
-            var tags = new List<TagEntry>()
-            {
-                new TagEntry() { Name = "testTag", User = users[0], Id = 4 },
-                new TagEntry() { Name = "testTag1", User = users[0], Id = 5 },
-                new TagEntry() { Name = "testTag2", User = users[1], Id = 6 },
-            };
-
-            var unitOfWork = DIHelper.CreateUnitOfWork(tags, null);
-
-            var mapper = DIHelper.InitializeMapper(typeof(NoteMappingProfile));
-
-            var userManager = DIHelper.CreateUserManager(users);
-
-            var tagManager = new TagManager(unitOfWork, mapper, userManager);
-
-            // Act
-            Action act = () =>
-            {
-                tagManager.GetTagById(4, "userName3333333");
-            };
-
-            // Assert
-
-            act.Should()
-               .Throw<NotFoundException>()
-               .WithMessage("User with this name does not exist");
+            act.Should().ThrowAsync<ExistedTagNameException>().WithMessage("Cannot add tag with already existing name");
         }
 
         [Fact]
@@ -292,35 +131,147 @@ namespace Notes.BLL.Tests.ServicesTests
         {
 
             // Arrange
-            var users = new List<UserEntry>()
+            List<UserEntry> users = CreateUserEntryList();
+            List<TagEntry> tags = CreateTagEntryList(users);
+
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userManager = MockHelper.SetupUserManager(users);
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+
+            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
+
+            // Act
+            Action act = () => noteManager.GetTagById(tagId: 7);
+
+            // Assert
+            act.Should().Throw<NotFoundException>().WithMessage("This tag does not exist");
+        }
+
+
+        private static List<UserEntry> CreateUserEntryList()
+        {
+            return new List<UserEntry>()
             {
                 new UserEntry() { Email = "test@mail.com", UserName = "userName" },
                 new UserEntry() { Email = "test1@mail.com", UserName = "userName1" },
             };
-            var tags = new List<TagEntry>()
+        }
+
+        private static List<TagEntry> CreateTagEntryList(List<UserEntry> users)
+        {
+            return new List<TagEntry>()
             {
                 new TagEntry() { Name = "testTag", User = users[0], Id = 4 },
                 new TagEntry() { Name = "testTag1", User = users[0], Id = 5 },
                 new TagEntry() { Name = "testTag2", User = users[1], Id = 6 },
             };
-
-            var unitOfWork = DIHelper.CreateUnitOfWork(tags, null);
-
-            var mapper = DIHelper.InitializeMapper(typeof(NoteMappingProfile));
-
-            var userManager = DIHelper.CreateUserManager(users);
-
-            var tagManager = new TagManager(unitOfWork, mapper, userManager);
-
-            // Act
-            Action act = () =>
-            {
-                tagManager.GetTagById(7, "userName");
-            };
-
-            // Assert
-
-            act.Should().Throw<NotFoundException>().WithMessage("This tag does not exist");
         }
+        
+
+        //[Fact]
+        //public void Should_ThrowException_When_UserNameDoesNotExist_GetTagById()
+        //{
+        //    // Arrange
+        //    var users = new List<UserEntry>()
+        //    {
+        //        new UserEntry() { Email = "test@mail.com", UserName = "userName" },
+        //        new UserEntry() { Email = "test1@mail.com", UserName = "userName1" },
+        //    };
+        //    var tags = new List<TagEntry>()
+        //    {
+        //        new TagEntry() { Name = "testTag", User = users[0], Id = 4 },
+        //        new TagEntry() { Name = "testTag1", User = users[0], Id = 5 },
+        //        new TagEntry() { Name = "testTag2", User = users[1], Id = 6 },
+        //    };
+
+        //    var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+
+        //    var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+
+        //    var userManager = MockHelper.SetupUserManager(users);
+
+        //    var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+
+        //    INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
+
+        //    // Act
+        //    Action act = () =>
+        //    {
+        //        noteManager.GetTagById(tagId:4);
+        //    };
+
+        //    // Assert
+
+        //    act.Should()
+        //       .Throw<NotFoundException>()
+        //       .WithMessage("User with this name does not exist");
+        //}
+        //[Fact]
+        //public void Should_ThrowException_When_UserNameIsWrong_GetAllTagsFor()
+        //{
+        //    // Arrange
+        //    var users = new List<UserEntry>()
+        //    {
+        //        new UserEntry() { Email = "test@mail.com", UserName = "userName" },
+        //        new UserEntry() { Email = "test1@mail.com", UserName = "userName1" },
+        //    };
+        //    var tags = new List<TagEntry>()
+        //    {
+        //        new TagEntry() { Name = "testTag", User = users[0], Id = 4 },
+        //        new TagEntry() { Name = "testTag1", User = users[0], Id = 5 },
+        //        new TagEntry() { Name = "testTag2", User = users[1], Id = 6 },
+        //    };
+
+        //    var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+
+        //    var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+
+        //    var userManager = MockHelper.SetupUserManager(users);
+
+        //    var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName21312" });
+
+        //    INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
+
+        //    // Act
+        //    Action act = () =>
+        //    {
+        //        var allTags = noteManager.GetAllTags();
+        //    };
+
+        //    // Assert
+
+        //    act.Should()
+        //       .ThrowExactly<NotFoundException>()
+        //       .WithMessage("User with this name does not exist");
+        //}
+        //[Fact]
+        //public void Should_ThrowException_When_UserNameIsWrong_AddTagAsync()
+        //{
+        //    // Arrange
+        //    var users = new List<UserEntry>()
+        //    {
+        //        new UserEntry() { Email = "test@mail.com", UserName = "userName" },
+        //        new UserEntry() { Email = "test1@mail.com", UserName = "userName1" },
+        //        new UserEntry() { Email = "test2@mail.com", UserName = "userName2" },
+        //    };
+        //    var tags = new List<TagEntry>()
+        //    {
+        //        new TagEntry() { Name = "tag13231", User = users[1], Id = 0 },
+        //    };
+
+        //    var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+        //    var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+        //    var userManager = MockHelper.SetupUserManager(users);
+        //    var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "wrongUserName"});
+
+        //    INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
+
+        //    // Act
+        //    Action act = () => noteManager.AddTagAsync(new TagCreateData() { Name = "testName" }).Wait();
+
+        //    // Assert
+        //    act.Should().Throw<NotFoundException> ().WithMessage("User with this name does not exist");
+        //}
     }
 }

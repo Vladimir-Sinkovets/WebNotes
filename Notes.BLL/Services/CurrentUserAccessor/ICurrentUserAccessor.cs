@@ -9,6 +9,6 @@ namespace Notes.BLL.Services.CurrentUserAccessor
 {
     public interface ICurrentUserAccessor
     {
-        UserEntry Current { get; set; }
+        UserEntry Current { get; }
     }
 }

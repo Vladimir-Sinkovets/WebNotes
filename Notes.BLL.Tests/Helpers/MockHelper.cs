@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Notes.BLL.Tests.Helpers
 {
-    internal static class DIHelper
+    internal static class MockHelper
     {
         public static IMapper InitializeMapper(params Type[] types)
         {
@@ -30,7 +30,7 @@ namespace Notes.BLL.Tests.Helpers
             return mapper;
         }
 
-        public static UserManager<TUser> CreateUserManager<TUser>(List<TUser> users) where TUser : IdentityUser
+        public static UserManager<TUser> SetupUserManager<TUser>(List<TUser> users) where TUser : IdentityUser
         {
             var userManagerMock = new Mock<UserManager<TUser>>(Mock.Of<IUserStore<TUser>>(), null, null, null, null, null, null, null, null);
 
@@ -53,7 +53,7 @@ namespace Notes.BLL.Tests.Helpers
             return userManagerMock.Object;
         }
 
-        public static IUnitOfWork CreateUnitOfWork(List<TagEntry> tags, List<NoteEntry> notes)
+        public static IUnitOfWork SetupUnitOfWork(List<TagEntry> tags, List<NoteEntry> notes)
         {
             var unitOfWorkMock = new Mock<IUnitOfWork>();
             unitOfWorkMock.Setup(unit => unit.Tags.Create(It.IsAny<TagEntry>()))
@@ -87,7 +87,7 @@ namespace Notes.BLL.Tests.Helpers
             return unitOfWork;
         }
 
-        public static ICurrentUserAccessor CreateCurrentUserAccessor(UserEntry userEntry)
+        public static ICurrentUserAccessor SetupCurrentUserAccessor(UserEntry userEntry)
         {
             var userServiceMock = new Mock<ICurrentUserAccessor>();
 

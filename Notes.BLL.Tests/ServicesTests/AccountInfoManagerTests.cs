@@ -29,50 +29,42 @@ namespace Notes.BLL.Tests.ServicesTests
             notesManagerMock.Setup(x => x.GetAllNotes())
                 .Returns(new List<Note>() { new Note(), new Note(), new Note(), new Note(), new Note(), new Note(), new Note(), });
 
-            INoteManager notesManager = notesManagerMock.Object;
-
-            var userAccessor = DIHelper.CreateCurrentUserAccessor(users[0]);
-
-            var userManager = DIHelper.CreateUserManager(users);
+            var notesManager = notesManagerMock.Object;
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
+            var userManager = MockHelper.SetupUserManager(users);
 
             IAccountInfoManager manager = new AccountInfoManager(userManager, notesManager, userAccessor);
 
             // Act
-
             var model = manager.GetAccountInfo();
 
             // Assert
-
             model.NotesCount.Should().Be(7);
             model.Email.Should().Be("userEmail@mail.com");
         }
 
-        [Fact]
-        public void Should_ThrowException_WhenUserNameIsWrong_GetAccountInfo()
-        {
-            // Arrange
-            var users = new List<UserEntry>() { new UserEntry() { UserName = "userName", Email = "userEmail@mail.com" } };
+        //[Fact]
+        //public void Should_ThrowException_WhenUserNameIsWrong_GetAccountInfo()
+        //{
+        //    // Arrange
+        //    var users = new List<UserEntry>() { new UserEntry() { UserName = "userName", Email = "userEmail@mail.com" } };
 
-            var notesManagerMock = new Mock<INoteManager>();
+        //    var notesManagerMock = new Mock<INoteManager>();
 
-            notesManagerMock.Setup(x => x.GetAllNotes())
-                .Returns(new List<Note>() { new Note(), new Note() });
+        //    notesManagerMock.Setup(x => x.GetAllNotes())
+        //        .Returns(new List<Note>() { new Note(), new Note() });
 
-            INoteManager notesManager = notesManagerMock.Object;
+        //    var notesManager = notesManagerMock.Object;
+        //    var userManager = MockHelper.SetupUserManager(users);
+        //    var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName_sadmaslmd,;asmdlk" });
 
-            var userManager = DIHelper.CreateUserManager(users);
+        //    IAccountInfoManager manager = new AccountInfoManager(userManager, notesManager, userAccessor);
 
-            var userAccessor = DIHelper.CreateCurrentUserAccessor(new UserEntry() { UserName = "userName_sadmaslmd,;asmdlk" });
+        //    // Act
+        //    Action act = () => manager.GetAccountInfo();
 
-            IAccountInfoManager manager = new AccountInfoManager(userManager, notesManager, userAccessor);
-
-            // Act
-
-            Action act = () => manager.GetAccountInfo();
-
-            // Assert
-
-            act.Should().Throw<NotAuthorizedException>();
-        }
+        //    // Assert
+        //    act.Should().Throw<NotAuthorizedException>();
+        //}
     }
 }

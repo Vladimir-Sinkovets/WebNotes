@@ -17,14 +17,14 @@ namespace Notes.BLL.Services.NoteManagers
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<UserEntry> _userManager;
         private readonly IMapper _mapper;
-        private readonly ICurrentUserAccessor _userService;
+        private readonly ICurrentUserAccessor _userAccessor;
 
         public NoteManager(IUnitOfWork unitOfWork, UserManager<UserEntry> userManager, IMapper mapper, ICurrentUserAccessor userService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _mapper = mapper;
-            this._userService = userService;
+            this._userAccessor = userService;
         }
 
 
@@ -32,7 +32,7 @@ namespace Notes.BLL.Services.NoteManagers
         {
             var entry = _mapper.Map<NoteEntry>(note);
 
-            var userName = _userService.Current.UserName;
+            var userName = _userAccessor.Current.UserName;
 
             var user = await _userManager.FindByNameAsync(userName);
 
@@ -43,36 +43,9 @@ namespace Notes.BLL.Services.NoteManagers
             _unitOfWork.SaveChanges();
         }
 
-        public async Task UpdateNoteAsync(NoteUpdateData note)
-        {
-            //if (_unitOfWork.Notes.GetAll().FirstOrDefault(note.)) // проверить на доступ пользователя
-
-            if (note == null)
-                throw new ArgumentNullException(nameof(note));
-
-            var entry = _mapper.Map<NoteEntry>(note);
-
-            _unitOfWork.Notes.Update(entry);
-
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public Note GetNoteById(int id)
-        {
-            var userName = _userService.Current.UserName;
-
-            var entry = _unitOfWork.Notes.GetAll()
-                .FirstOrDefault(n => n.Id == id && n.User.UserName == userName)
-                ?? throw new NotFoundException("There is no such note");
-
-            var note = _mapper.Map<Note>(entry);
-
-            return note;
-        }
-
         public IEnumerable<Note> GetAllNotes()
         {
-            var userName = _userService.Current.UserName;
+            var userName = _userAccessor.Current.UserName;
 
             var noteEntries = _unitOfWork.Notes.GetAll()
                 .Where(n => n.User.UserName == userName);
@@ -82,17 +55,49 @@ namespace Notes.BLL.Services.NoteManagers
             return notes;
         }
 
+        public async Task UpdateNoteAsync(NoteUpdateData updateData)
+        {
+            //ThrowUserAccessExceptionForNotes(updateData.Id);
+
+            if (updateData == null)
+                throw new ArgumentNullException(nameof(updateData));
+
+            var entry = _mapper.Map<NoteEntry>(updateData);
+
+            _unitOfWork.Notes.Update(entry);
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public Note GetNoteById(int noteId)
+        {
+            //ThrowUserAccessExceptionForNotes(noteId);
+
+            var userName = _userAccessor.Current.UserName;
+
+            var entry = _unitOfWork.Notes.GetAll()
+                .FirstOrDefault(n => n.Id == noteId && n.User.UserName == userName)
+                ?? throw new NotFoundException("There is no such note"); // надо ли это здесь?
+
+            var note = _mapper.Map<Note>(entry);
+
+            return note;
+        }
+
         public void AddTagToNote(int noteId, int tagId)
         {
-            var userName = _userService.Current.UserName;
+            var userName = _userAccessor.Current.UserName;
 
             var tagEntry = _unitOfWork.Tags.GetAll()
-                .FirstOrDefault(t => t.Id == tagId && t.User.UserName == userName)
+                .FirstOrDefault(t => t.Id == tagId)
                 ?? throw new NotFoundException("There is no such tag");
 
             var noteEntry = _unitOfWork.Notes.GetAll()
-                .FirstOrDefault(n => n.Id == noteId && n.User.UserName == userName)
+                .FirstOrDefault(n => n.Id == noteId)
                 ?? throw new NotFoundException("There is no such note");
+
+            //ThrowUserAccessExceptionForNotes(noteId);
+            //ThrowUserAccessExceptionForTags(tagId);
 
             noteEntry.Tags
                 .Add(tagEntry);
@@ -102,15 +107,35 @@ namespace Notes.BLL.Services.NoteManagers
 
         public IEnumerable<Tag> GetNoteTagsById(int noteId)
         {
+            //ThrowUserAccessExceptionForNotes(noteId);
+
             var note = GetNoteById(noteId);
 
             return note.Tags;
         }
 
+        public async Task AddTagAsync(TagCreateData data)
+        {
+            var userName = _userAccessor.Current.UserName;
+
+            if (_unitOfWork.Tags.GetAll()
+                    .Any(t => t.Name == data.Name))
+                throw new ExistedTagNameException("Cannot add tag with already existing name");
+
+            var entry = _mapper.Map<TagEntry>(data);
+
+            var user = await _userManager.FindByNameAsync(userName);
+
+            entry.User = user ?? throw new NotFoundException("User with this name does not exist"); //-----------------------------
+
+            _unitOfWork.Tags.Create(entry);
+
+            _unitOfWork.SaveChanges();
+        }
 
         public void RemoveTagFromNote(int noteId, int tagId)
         {
-            var userName = _userService.Current.UserName;
+            var userName = _userAccessor.Current.UserName;
 
             var tagEntity = _unitOfWork.Tags.GetAll()
                 .FirstOrDefault(t => t.Id == tagId && t.User.UserName == userName)
@@ -132,9 +157,9 @@ namespace Notes.BLL.Services.NoteManagers
             _unitOfWork.SaveChanges();
         }
 
-        public IEnumerable<Tag> GetAllTagsFor()
+        public IEnumerable<Tag> GetAllTags()
         {
-            var userName = _userService.Current.UserName;
+            var userName = _userAccessor.Current.UserName;
 
             if (_userManager.FindByNameAsync(userName).Result == null)
             {
@@ -151,7 +176,7 @@ namespace Notes.BLL.Services.NoteManagers
 
         public Tag GetTagById(int tagId)
         {
-            var userName = _userService.Current.UserName;
+            var userName = _userAccessor.Current.UserName;
 
             IQueryable<TagEntry> tagEntries = _unitOfWork.Tags.GetAll();
 
@@ -173,23 +198,21 @@ namespace Notes.BLL.Services.NoteManagers
             return tag;
         }
 
-        public async Task AddTagAsync(TagCreateData data)
-        {
-            var userName = _userService.Current.UserName;
 
-            if (_unitOfWork.Tags.GetAll()
-                    .Any(t => t.Name == data.Name))
-                throw new ExistedTagNameException("Cannot add tag with already existing name");
+        //private void ThrowUserAccessExceptionForNotes(int noteId)
+        //{
+        //    if (_unitOfWork.Notes.GetAllWithoutTracking()
+        //                    .FirstOrDefault(n => n.Id == noteId)
+        //                    .User.UserName == _userAccessor.Current.UserName)
+        //        throw new UserAccessException($"User {_userAccessor.Current.UserName} have no access to this note ( noteId = {noteId} )");
+        //}
 
-            var entry = _mapper.Map<TagEntry>(data);
-
-            var user = await _userManager.FindByNameAsync(userName);
-
-            entry.User = user ?? throw new NotFoundException("User with this name does not exist");
-
-            _unitOfWork.Tags.Create(entry);
-
-            _unitOfWork.SaveChanges();
-        }
+        //private void ThrowUserAccessExceptionForTags(int tagId)
+        //{
+        //    if (_unitOfWork.Tags.GetAllWithoutTracking()
+        //                    .FirstOrDefault(t => t.Id == tagId)
+        //                    .User.UserName == _userAccessor.Current.UserName)
+        //        throw new UserAccessException($"User {_userAccessor.Current.UserName} have no access to this tag ( tagId = {tagId} )");
+        //}
     }
 }

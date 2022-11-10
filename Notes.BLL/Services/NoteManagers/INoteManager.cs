@@ -11,7 +11,7 @@ namespace Notes.BLL.Services.NoteManagers
     public interface INoteManager
     {
         Task UpdateNoteAsync(NoteUpdateData note);
-        Note GetNoteById(int id);
+        Note GetNoteById(int noteId);
         Task CreateNewNoteAsync(NoteCreateData note);
         IEnumerable<Note> GetAllNotes();
         void AddTagToNote(int noteId, int tagId);
@@ -21,6 +21,6 @@ namespace Notes.BLL.Services.NoteManagers
         Task AddTagAsync(TagCreateData data);
         Tag GetTagById(int tagId);
         void DeleteTagById(int tagId);
-        IEnumerable<Tag> GetAllTagsFor();
+        IEnumerable<Tag> GetAllTags();
     }
 }

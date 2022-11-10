@@ -8,7 +8,6 @@ namespace Notes.BLL.Services.NoteManagers.Models
 {
     public class TagCreateData
     {
-        public int Id { get; set; }
         public string Name { get; set; }
     }
 }

@@ -15,18 +15,18 @@ namespace Notes.BLL.Services.AccountInfoManagers
     {
         private readonly UserManager<UserEntry> _userManager;
         private readonly INoteManager _notesManager;
-        private readonly ICurrentUserAccessor _userService;
+        private readonly ICurrentUserAccessor _userAccessor;
 
         public AccountInfoManager(UserManager<UserEntry> userManager, INoteManager notesManager, ICurrentUserAccessor userService)
         {
             _userManager = userManager;
             _notesManager = notesManager;
-            this._userService = userService;
+            this._userAccessor = userService;
         }
 
         public AccountInfo GetAccountInfo()
         {
-            UserEntry user = _userService.Current;
+            UserEntry user = _userAccessor.Current;
 
             var accountInfo = new AccountInfo()
             {

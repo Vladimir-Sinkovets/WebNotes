@@ -18,8 +18,13 @@ namespace Notes.Web.AutoMapperProfiles
             CreateMap<Note, NoteCreateViewModel>();
             CreateMap<NoteCreateViewModel, Note>();
 
+            CreateMap<NoteCreateViewModel, NoteCreateData>();
+
+            CreateMap<NoteUpdateData, EditNoteViewModel>();
+            CreateMap<EditNoteViewModel, NoteUpdateData>();
+
             CreateMap<Note, EditNoteViewModel>();
-            CreateMap<EditNoteViewModel, Note>();
+
         }
     }
 }

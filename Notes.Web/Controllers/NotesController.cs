@@ -21,9 +21,6 @@ namespace Notes.Web.Controllers
         private readonly IMapper _mapper;
         public INoteManager _noteManager;
 
-        private string CurrentUserName { get => User.Identity.Name; } 
-
-
         public NotesController(INoteManager notesManager, IMapper mapper)
         {
             _noteManager = notesManager;
@@ -89,7 +86,7 @@ namespace Notes.Web.Controllers
 
         private IEnumerable<TagViewModel> GetAllTagsForCurrentUser()
         {
-            var allTags = _noteManager.GetAllTagsFor();
+            var allTags = _noteManager.GetAllTags();
 
             var allViewModelTags = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(allTags);
 
@@ -126,7 +123,7 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public IActionResult TagList()
         {
-            var tags = _noteManager.GetAllTagsFor();
+            var tags = _noteManager.GetAllTags();
 
             var tagViewModels = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(tags); 
                 

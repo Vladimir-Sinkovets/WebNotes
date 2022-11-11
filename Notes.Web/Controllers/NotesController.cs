@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
+using Notes.BLL.Services.CurrentUserAccessor.Exceptions;
 using Notes.BLL.Services.NoteManagers;
+using Notes.BLL.Services.NoteManagers.Exceptions;
 using Notes.BLL.Services.NoteManagers.Models;
 using Notes.DAL.Models;
 using Notes.Web.Models;
@@ -48,40 +50,93 @@ namespace Notes.Web.Controllers
         {
             var note = _mapper.Map<NoteCreateData>(model);
 
-            await _noteManager.CreateNewNoteAsync(note);
+            try
+            {
+                await _noteManager.CreateNewNoteAsync(note);
 
-            return View();
+                return View();
+            }
+            catch (NotAuthorizedException)
+            {
+                return RedirectToAction("Register", "Account");
+            }
+            catch (UserAccessException)
+            {
+                return StatusCode(403);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         [HttpGet]
         public ActionResult EditNote(int id)
         {
-            var note = _noteManager.GetNoteById(id);
+            try
+            {
+                var note = _noteManager.GetNoteById(id);
 
-            var viewModel = _mapper.Map<EditNoteViewModel>(note);
+                var viewModel = _mapper.Map<EditNoteViewModel>(note);
 
-            viewModel.AllTags = GetAllTagsForCurrentUser();
+                viewModel.AllTags = GetAllTagsForCurrentUser();
             
-            return View(viewModel);
+                return View(viewModel);
+            }
+            catch (NotAuthorizedException)
+            {
+                return RedirectToAction("Register", "Account");
+            }
+            catch (NotFoundException)
+            {
+                return StatusCode(404);
+            }
+            catch (UserAccessException)
+            {
+                return StatusCode(403);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult> EditNote(EditNoteViewModel viewModel)
         {
-            if (ModelState.IsValid == true)
+            try
             {
-                var note = _mapper.Map<NoteUpdateData>(viewModel);
+                if (ModelState.IsValid == true)
+                {
+                    var note = _mapper.Map<NoteUpdateData>(viewModel);
 
-                await _noteManager.UpdateNoteAsync(note);
-            }
+                    await _noteManager.UpdateNoteAsync(note);
+                }
 
-            var model = _noteManager.GetNoteById(viewModel.Id);
+                var model = _noteManager.GetNoteById(viewModel.Id);
 
-            viewModel = _mapper.Map<EditNoteViewModel>(model);
+                viewModel = _mapper.Map<EditNoteViewModel>(model);
             
-            viewModel.AllTags = GetAllTagsForCurrentUser();
+                viewModel.AllTags = GetAllTagsForCurrentUser();
 
-            return View(viewModel);
+                return View(viewModel);
+            }
+            catch (NotAuthorizedException)
+            {
+                return RedirectToAction("Register", "Account");
+            }
+            catch (NotFoundException)
+            {
+                return StatusCode(404);
+            }
+            catch (UserAccessException)
+            {
+                return StatusCode(403);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         private IEnumerable<TagViewModel> GetAllTagsForCurrentUser()
@@ -96,58 +151,156 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public IActionResult Read(int id)
         {
-            var note = _noteManager.GetNoteById(id);
+            try
+            {
+                var note = _noteManager.GetNoteById(id);
 
-            var viewModel = _mapper.Map<NoteViewModel>(note);
+                var viewModel = _mapper.Map<NoteViewModel>(note);
 
-            return View(viewModel);
+                return View(viewModel);
+            }
+            catch (NotAuthorizedException)
+            {
+                return RedirectToAction("Register", "Account");
+            }
+            catch (NotFoundException)
+            {
+                return StatusCode(404);
+            }
+            catch (UserAccessException)
+            {
+                return StatusCode(403);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         [HttpPost]
         public IActionResult AddTagToNote(int noteId, int tagId)
         {
-            _noteManager.AddTagToNote(noteId, tagId);
+            try
+            {
+                _noteManager.AddTagToNote(noteId, tagId);
 
-            return RedirectToActionPermanent("EditNote", new { id = noteId });
+                return RedirectToActionPermanent("EditNote", new { id = noteId });
+            }
+            catch (NotAuthorizedException)
+            {
+                return RedirectToAction("Register", "Account");
+            }
+            catch (NotFoundException)
+            {
+                return StatusCode(404);
+            }
+            catch (UserAccessException)
+            {
+                return StatusCode(403);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
         
         [HttpPost]
         public IActionResult RemoveTagFromNote(int noteId, int tagId)
         {
-            _noteManager.RemoveTagFromNote(noteId, tagId);
+            try
+            {
+                _noteManager.RemoveTagFromNote(noteId, tagId);
 
-            return RedirectToActionPermanent("EditNote", new { id = noteId });
+                return RedirectToActionPermanent("EditNote", new { id = noteId });
+            }
+            catch (NotAuthorizedException)
+            {
+                return RedirectToAction("Register", "Account");
+            }
+            catch (NotFoundException)
+            {
+                return StatusCode(404);
+            }
+            catch (UserAccessException)
+            {
+                return StatusCode(403);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
 
         [HttpGet]
         public IActionResult TagList()
         {
-            var tags = _noteManager.GetAllTags();
+            try
+            {
+                var tags = _noteManager.GetAllTags();
 
-            var tagViewModels = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(tags); 
+                var tagViewModels = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(tags); 
                 
-            var viewModel = new TagListViewModel() { AllTags = tagViewModels };
+                var viewModel = new TagListViewModel() { AllTags = tagViewModels };
 
-            return View(viewModel);
+                return View(viewModel);
+            }
+            catch (NotAuthorizedException)
+            {
+                return RedirectToAction("Register", "Account");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> AddNewTag(string tagName)
         {
-            var tag = new TagCreateData() { Name = tagName };
+            try
+            {
+                var tag = new TagCreateData() { Name = tagName };
 
-            await _noteManager.AddTagAsync(tag);
+                await _noteManager.AddTagAsync(tag);
 
-            return RedirectToActionPermanent("TagList");
+                return RedirectToActionPermanent("TagList");
+            }
+            catch (NotAuthorizedException)
+            {
+                return RedirectToAction("Register", "Account");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         [HttpPost]
         public IActionResult DeleteTag(int id)
         {
-            _noteManager.DeleteTagById(id);
+            try
+            {
+                _noteManager.DeleteTagById(id);
 
-            return RedirectToActionPermanent("TagList");
+                return RedirectToActionPermanent("TagList");
+            }
+            catch (NotAuthorizedException)
+            {
+                return RedirectToAction("Register", "Account");
+            }
+            catch (NotFoundException)
+            {
+                return StatusCode(404);
+            }
+            catch (UserAccessException)
+            {
+                return StatusCode(403);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

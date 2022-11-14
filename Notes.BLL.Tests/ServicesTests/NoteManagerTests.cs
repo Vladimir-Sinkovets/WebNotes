@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Notes.BLL.AutoMapperProfiles;
-using Notes.BLL.Services;
+﻿using Notes.BLL.AutoMapperProfiles;
 using Notes.BLL.Tests.Helpers;
 using Notes.DAL.Models;
 using FluentAssertions;
-using static System.Net.Mime.MediaTypeNames;
 using Notes.BLL.Services.NoteManagers;
 using Notes.BLL.Services.NoteManagers.Models;
 using Notes.BLL.Services.NoteManagers.Exceptions;
@@ -18,13 +11,13 @@ namespace Notes.BLL.Tests.ServicesTests
     public class NoteManagerTests
     {
         [Fact]
-        public async void Should_AddNote()
+        public async void Should_CreateNewNoteAsync()
         {
             // Arrange
             var users = CreateUserList();
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
-            var currentUser = new UserEntry() { UserName = "userName" };
+            var currentUser = users[0];
 
             INoteManager noteManager = InitializeNoteManager(users, tags, notes, currentUser);
 
@@ -43,7 +36,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
 
@@ -65,9 +58,9 @@ namespace Notes.BLL.Tests.ServicesTests
             var unitOfWork = MockHelper.SetupUnitOfWork(tags, notes);
             var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
             var userManager = MockHelper.SetupUserManager(users);
-            var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
 
-            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
+            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
 
             // Act
 
@@ -96,7 +89,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
             await noteManager.UpdateNoteAsync(new NoteUpdateData() { Id = 1, Text = "updated text", Title = "1"});
@@ -117,10 +110,10 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
-            noteManager.AddTagToNote(noteId: 1, 4);
+            noteManager.AddTagToNote(noteId: 1, tagId: 4);
 
             // Assert
             notes.FirstOrDefault(n => n.Id == 1).Tags.Should().HaveCount(2);
@@ -134,7 +127,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
             var returnedNoteTags = noteManager.GetNoteTagsById(noteId: 2);
@@ -151,7 +144,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
 
@@ -164,84 +157,174 @@ namespace Notes.BLL.Tests.ServicesTests
 
 
         [Fact]
-        public void Should_ThrowException_When_IdIsWrong_GetNoteById()
+        public async void Should_ThrowException_WhenParameterIsNull_CreateNewNoteAsync()
+        {
+            // Arrange
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
+            var currentUser = users[0];
+
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, currentUser);
+
+            // Act
+            Func<Task> func = async () => await noteManager.CreateNewNoteAsync(null);
+
+            // Assert
+            await func.Should().ThrowAsync<ArgumentNullException>();
+        }
+
+        [Fact]
+
+        public void Should_ThrowException_WhenNoteWithThisIdDoesNotExist_GetNoteById()
         {
             // Arrange
             var users = CreateUserList();
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.GetNoteById(noteId: 2222);
 
             // Assert
 
-            act.Should().Throw<NotFoundException>().WithMessage("There is no such note");
+            act.Should().Throw<NotFoundException>().WithMessage("This note does not exist");
         }
 
         [Fact]
-        public void Should_ThrowException_WhenNoteParameterIsNull_UpdateNoteAsync()
+        public void Should_ThrowException_WhenUserHaveNoAccessToNoteWithThisId_GetNoteById()
         {
             // Arrange
             var users = CreateUserList();
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+
+            // Act
+            Action act = () => noteManager.GetNoteById(noteId: 3);
+
+            // Assert
+            act.Should().Throw<UserAccessException>();
+        }
+
+
+        [Fact]
+        public async void Should_ThrowException_WhenParameterIsNull_UpdateNoteAsync()
+        {
+            // Arrange
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
+
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
             Func<Task> act = async () => await noteManager.UpdateNoteAsync(null);
 
             // Assert
-            act.Should().ThrowAsync<ArgumentNullException>();
+            await act.Should().ThrowAsync<ArgumentNullException>();
         }
 
         [Fact]
-        public void Should_ThrowException_WhenNoteIdIsWrong_AddTagToNote()
+        public void Should_ThrowException_WhenUserHaveNoAccessToNoteWithThisId_UpdateNoteAsync()
         {
             // Arrange
             var users = CreateUserList();
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
-            Action act = () => noteManager.AddTagToNote(noteId: 1111, tagId: 4);
+            Action act = () => noteManager.UpdateNoteAsync(new NoteUpdateData() { Id = 3, Tags = new List<Tag>(), Text = "", Title = "" }).Wait();
+
+            // Assert
+            act.Should().Throw<UserAccessException>();
+        }
+
+
+
+        [Fact]
+        public void Should_ThrowException_WhenUserHaveNoAccessToNoteWithThisId_AddTagToNote()
+        {
+            // Arrange
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
+
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+
+            // Act
+            Action act = () => noteManager.AddTagToNote(noteId: 3, tagId: 4);
+
+            // Assert
+            act.Should().Throw<UserAccessException>();
+        }
+
+        [Fact]
+        public void Should_ThrowException_WhenUserHaveNoAccessToTagWithThisId_AddTagToNote()
+        {
+            // Arrange
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
+
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+
+            // Act
+            Action act = () => noteManager.AddTagToNote(noteId: 3, tagId: 6);
+
+            // Assert
+            act.Should().Throw<UserAccessException>();
+        }
+
+        [Fact]
+        public void Should_ThrowException_WhenNoteWithThisIdDoesNotExist_AddTagToNote()
+        {
+            // Arrange
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
+
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+
+            // Act
+            Action act = () => noteManager.AddTagToNote(noteId: 213123, tagId: 4);
 
             // Assert
             act.Should().Throw<NotFoundException>();
         }
 
         [Fact]
-        public void Should_ThrowException_WhenTagIdIsWrong_AddTagToNote()
+        public void Should_ThrowException_WhenTagWithThisIdDoesNotExist_AddTagToNote()
         {
             // Arrange
             var users = CreateUserList();
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
-            Action act = () => noteManager.AddTagToNote(noteId: 1, tagId: 1234);
+            Action act = () => noteManager.AddTagToNote(noteId: 2, tagId: 213123);
 
             // Assert
-
             act.Should().Throw<NotFoundException>();
         }
 
+
         [Fact]
-        public void Should_ThrowException_WhenIdIsWrong_GetNoteTagsById()
+        public void Should_ThrowException_WhenNoteWithThisIdDoesNotExist_GetNoteTagsById()
         {
             // Arrange
             var users = CreateUserList();
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
 
@@ -253,14 +336,34 @@ namespace Notes.BLL.Tests.ServicesTests
         }
 
         [Fact]
-        public void Should_ThrowException_WhenNoteIdIsWrong_RemoveTagFromNote()
+        public void Should_ThrowException_WhenUserHaveNoAccessToNoteWithThisId_GetNoteTagsById()
         {
             // Arrange
             var users = CreateUserList();
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+
+            // Act
+
+            Action act = () => noteManager.GetNoteTagsById(noteId: 4);
+
+            // Assert
+
+            act.Should().Throw<UserAccessException>();
+        }
+
+
+        [Fact]
+        public void Should_ThrowException_WhenNoteWithThisIdDoesNotExist_RemoveTagFromNote()
+        {
+            // Arrange
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
+
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
 
@@ -272,18 +375,18 @@ namespace Notes.BLL.Tests.ServicesTests
         }
 
         [Fact]
-        public void Should_ThrowException_WhenTagIdIsWrong_RemoveTagFromNote()
+        public void Should_ThrowException_WhenTagWithThisIdDoesNotExist_RemoveTagFromNote()
         {
             // Arrange
             var users = CreateUserList();
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
 
-            Action act = () => noteManager.RemoveTagFromNote(noteId: 2, tagId: 4213123);
+            Action act = () => noteManager.RemoveTagFromNote(noteId: 1, tagId: 44444);
 
             // Assert
 
@@ -291,15 +394,263 @@ namespace Notes.BLL.Tests.ServicesTests
         }
 
 
+
+        [Fact]
+        public void Should_ThrowException_WhenUserHaveNoAccessToNoteWithThisId_RemoveTagFromNote()
+        {
+            // Arrange
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
+
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+
+            // Act
+            Action act = () => noteManager.RemoveTagFromNote(noteId: 4, tagId: 4);
+
+            // Assert
+            act.Should().Throw<UserAccessException>();
+        }
+
+        [Fact]
+        public void Should_ThrowException_WhenUserHaveNoAccessToTagWithThisId_RemoveTagFromNote()
+        {
+            // Arrange
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
+
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+
+            // Act
+            Action act = () => noteManager.RemoveTagFromNote(noteId: 4, tagId: 6);
+
+            // Assert
+            act.Should().Throw<UserAccessException>();
+        }
+
+
+
+        [Fact]
+        public async void Should_AddTag()
+        {
+            // Arrange
+            List<UserEntry> users = CreateUserList();
+            List<TagEntry> tags = CreateTagList(users);
+
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+
+            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+
+            // Act
+            await noteManager.AddTagAsync(new TagCreateData() { Name = "testName" });
+
+            // Assert
+            tags.Should().Contain(tag => tag.Name == "testName" && tag.User.UserName == "userName");
+        }
+
+        [Fact]
+        public void Should_DeleteTagById()
+        {
+            // Arrange
+            List<UserEntry> users = CreateUserList();
+            List<TagEntry> tags = CreateTagList(users);
+
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
+
+            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+
+            // Act
+            noteManager.DeleteTagById(tagId: 4);
+
+            // Assert
+            tags.Should().NotContain(tag => tag.Name == "testTag" && tag.User.UserName == "userName");
+        }
+
+        [Fact]
+        public void Should_ReturnAllTags()
+        {
+            // Arrange
+            List<UserEntry> users = CreateUserList();
+            List<TagEntry> tags = CreateTagList(users);
+
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
+
+            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+
+            // Act
+            var allTags = noteManager.GetAllTags();
+
+            // Assert
+            allTags.Count().Should().Be(2);
+        }
+
+        [Fact]
+        public void Should_ReturnTagById()
+        {
+            // Arrange
+            List<UserEntry> users = CreateUserList();
+            List<TagEntry> tags = CreateTagList(users);
+
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+
+            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+
+            // Act
+            var tag = noteManager.GetTagById(tagId: 5);
+
+            // Assert
+            tag.Name.Should().Be("testTag1");
+        }
+
+
+        [Fact]
+        public void Should_ThrowException_When_TagAlreadyExists_AddTagAsync()
+        {
+            // Arrange
+            List<UserEntry> users = CreateUserList();
+            var tags = new List<TagEntry>()
+            {
+                new TagEntry() { Name = "tag13231", User = users[1], Id = 0 },
+            };
+
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+
+            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+
+            // Act
+            Func<Task> act = () => noteManager.AddTagAsync(new TagCreateData() { Name = "tag13231" });
+
+            // Assert
+            act.Should().ThrowAsync<ExistedTagNameException>().WithMessage("Cannot add tag with already existing name");
+        }
+
+        [Fact]
+        public void Should_ThrowException_When_ParameterIsNull_AddTagAsync()
+        {
+            // Arrange
+            List<UserEntry> users = CreateUserList();
+            var tags = new List<TagEntry>()
+            {
+                new TagEntry() { Name = "tag13231", User = users[1], Id = 0 },
+            };
+
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+
+            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+
+            // Act
+            Func<Task> act = () => noteManager.AddTagAsync(null);
+
+            // Assert
+            act.Should().ThrowAsync<ArgumentNullException>();
+        }
+
+
+        [Fact]
+        public void Should_ThrowException_When_TagDoesNotExist_GetTagById()
+        {
+
+            // Arrange
+            List<UserEntry> users = CreateUserList();
+            List<TagEntry> tags = CreateTagList(users);
+
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+
+            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+
+            // Act
+            Action act = () => noteManager.GetTagById(tagId: 77777);
+
+            // Assert
+            act.Should().Throw<NotFoundException>().WithMessage("This tag does not exist");
+        }
+
+        [Fact]
+        public void Should_ThrowException_When_UserHaveNoAccessToTagWithThisId_GetTagById()
+        {
+            // Arrange
+            List<UserEntry> users = CreateUserList();
+            List<TagEntry> tags = CreateTagList(users);
+
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
+
+            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+
+            // Act
+            Action act = () => noteManager.GetTagById(tagId: 6);
+
+            // Assert
+            act.Should().Throw<UserAccessException>();
+        }
+
+
+        [Fact]
+        public void Should_ThrowException_When_TagDoesNotExist_DeleteTagById()
+        {
+            // Arrange
+            List<UserEntry> users = CreateUserList();
+            List<TagEntry> tags = CreateTagList(users);
+
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
+
+            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+
+            // Act
+            Action act = () => noteManager.DeleteTagById(tagId: 9874);
+
+            // Assert
+            act.Should().Throw<NotFoundException>();
+        }
+
+        [Fact]
+        public void Should_ThrowException_When_UserHaveNoAccessToTagWithThisId_DeleteTagById()
+        {
+            // Arrange
+            List<UserEntry> users = CreateUserList();
+            List<TagEntry> tags = CreateTagList(users);
+
+            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
+            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
+
+            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+
+            // Act
+            Action act = () => noteManager.DeleteTagById(tagId: 6);
+
+            // Assert
+            act.Should().Throw<UserAccessException>();
+        }
+
+
+
         private static INoteManager InitializeNoteManager(List<UserEntry> users, List<TagEntry> tags,
             List<NoteEntry> notes, UserEntry currentUser)
         {
             var unitOfWork = MockHelper.SetupUnitOfWork(tags, notes);
-            var userManager = MockHelper.SetupUserManager(users);
             var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
             var userAccessor = MockHelper.SetupCurrentUserAccessor(currentUser);
 
-            INoteManager noteManager = new NoteManager(unitOfWork, userManager, mapper, userAccessor);
+            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
 
             return noteManager;
         }
@@ -333,45 +684,5 @@ namespace Notes.BLL.Tests.ServicesTests
                 new NoteEntry() { Tags = new List<TagEntry>() { tags[2], }, Id = 4, Text = "4", Title = "4", User = users[1]},
             };
         }
-
-
-
-
-        //[Fact]
-        //public void Should_ThrowException_WhenUserNameIsWrong_GetNoteTagsByIdForUser()
-        //{
-        //    // Arrange
-        //    var users = CreateUserList();
-        //    var tags = CreateTagList(users);
-        //    var notes = CreateNoteList(users, tags);
-
-        //    INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "userName" });
-
-        //    // Act
-
-        //    Action act = () => noteManager.GetNoteTagsById(2);
-
-        //    // Assert
-
-        //    act.Should().Throw<NotFoundException>();
-        //}
-        //[Fact]
-        //public void Should_ThrowException_WhenUserNameIsWrong_AddNoteForUserAsync()
-        //{
-        //    // Arrange
-        //    var users = CreateUserList();
-        //    var tags = CreateTagList(users);
-        //    var notes = CreateNoteList(users, tags);
-
-        //    INoteManager noteManager = InitializeNoteManager(users, tags, notes, new UserEntry() { UserName = "wrongUserName" });
-
-        //    // Act
-        //    Action act = () => noteManager.CreateNewNoteAsync(
-        //        new NoteCreateData() { Text = "new text", Title = "new title" }).Wait();
-
-        //    // Assert
-
-        //    act.Should().Throw<NotFoundException>().WithMessage("User with this name does not exist");
-        //}
     }
 }

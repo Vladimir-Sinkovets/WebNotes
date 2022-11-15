@@ -114,6 +114,9 @@ namespace Notes.BLL.Services.NoteManagers
 
         public async Task AddTagAsync(TagCreateData data)
         {
+            if(data == null)
+                throw new ArgumentNullException(nameof(data));
+
             var userName = _userAccessor.Current.UserName;
 
             if (_unitOfWork.Tags.GetAll()

@@ -55,15 +55,9 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            var unitOfWork = MockHelper.SetupUnitOfWork(tags, notes);
-            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
-            var userManager = MockHelper.SetupUserManager(users);
-            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
-
-            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
-
             var note = noteManager.GetNoteById(noteId: 2);
 
             // Assert
@@ -92,7 +86,7 @@ namespace Notes.BLL.Tests.ServicesTests
             INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
-            await noteManager.UpdateNoteAsync(new NoteUpdateData() { Id = 1, Text = "updated text", Title = "1"});
+            await noteManager.UpdateNoteAsync(new NoteUpdateData() { Id = 1, Text = "updated text", Title = "1" });
 
             // Assert
             var note = notes.FirstOrDefault(n => n.Id == 1);
@@ -147,11 +141,9 @@ namespace Notes.BLL.Tests.ServicesTests
             INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
-
             noteManager.RemoveTagFromNote(noteId: 2, tagId: 4);
 
             // Assert
-
             notes.FirstOrDefault(n => n.Id == 2).Tags.Should().HaveCount(1);
         }
 
@@ -175,7 +167,6 @@ namespace Notes.BLL.Tests.ServicesTests
         }
 
         [Fact]
-
         public void Should_ThrowException_WhenNoteWithThisIdDoesNotExist_GetNoteById()
         {
             // Arrange
@@ -189,7 +180,6 @@ namespace Notes.BLL.Tests.ServicesTests
             Action act = () => noteManager.GetNoteById(noteId: 2222);
 
             // Assert
-
             act.Should().Throw<NotFoundException>().WithMessage("This note does not exist");
         }
 
@@ -229,7 +219,7 @@ namespace Notes.BLL.Tests.ServicesTests
         }
 
         [Fact]
-        public void Should_ThrowException_WhenUserHaveNoAccessToNoteWithThisId_UpdateNoteAsync()
+        public async void Should_ThrowException_WhenUserHaveNoAccessToNoteWithThisId_UpdateNoteAsync()
         {
             // Arrange
             var users = CreateUserList();
@@ -239,10 +229,10 @@ namespace Notes.BLL.Tests.ServicesTests
             INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
-            Action act = () => noteManager.UpdateNoteAsync(new NoteUpdateData() { Id = 3, Tags = new List<Tag>(), Text = "", Title = "" }).Wait();
+            Func<Task> act = async () => await noteManager.UpdateNoteAsync(new NoteUpdateData() { Id = 3, Tags = new List<Tag>(), Text = "", Title = "" });
 
             // Assert
-            act.Should().Throw<UserAccessException>();
+            await act.Should().ThrowAsync<UserAccessException>();
         }
 
 
@@ -327,11 +317,9 @@ namespace Notes.BLL.Tests.ServicesTests
             INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
-
             Action act = () => noteManager.GetNoteTagsById(noteId: 22312);
 
             // Assert
-
             act.Should().Throw<NotFoundException>();
         }
 
@@ -346,11 +334,9 @@ namespace Notes.BLL.Tests.ServicesTests
             INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
-
             Action act = () => noteManager.GetNoteTagsById(noteId: 4);
 
             // Assert
-
             act.Should().Throw<UserAccessException>();
         }
 
@@ -366,11 +352,9 @@ namespace Notes.BLL.Tests.ServicesTests
             INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
-
             Action act = () => noteManager.RemoveTagFromNote(noteId: 22212, tagId: 4);
 
             // Assert
-
             act.Should().Throw<NotFoundException>();
         }
 
@@ -385,11 +369,9 @@ namespace Notes.BLL.Tests.ServicesTests
             INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
-
             Action act = () => noteManager.RemoveTagFromNote(noteId: 1, tagId: 44444);
 
             // Assert
-
             act.Should().Throw<NotFoundException>();
         }
 
@@ -435,14 +417,11 @@ namespace Notes.BLL.Tests.ServicesTests
         public async void Should_AddTag()
         {
             // Arrange
-            List<UserEntry> users = CreateUserList();
-            List<TagEntry> tags = CreateTagList(users);
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
 
-            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
-            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
-            var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
-
-            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
             await noteManager.AddTagAsync(new TagCreateData() { Name = "testName" });
@@ -455,14 +434,11 @@ namespace Notes.BLL.Tests.ServicesTests
         public void Should_DeleteTagById()
         {
             // Arrange
-            List<UserEntry> users = CreateUserList();
-            List<TagEntry> tags = CreateTagList(users);
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
 
-            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
-            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
-            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
-
-            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
             noteManager.DeleteTagById(tagId: 4);
@@ -475,34 +451,28 @@ namespace Notes.BLL.Tests.ServicesTests
         public void Should_ReturnAllTags()
         {
             // Arrange
-            List<UserEntry> users = CreateUserList();
-            List<TagEntry> tags = CreateTagList(users);
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
 
-            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
-            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
-            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
-
-            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
             var allTags = noteManager.GetAllTags();
 
             // Assert
-            allTags.Count().Should().Be(2);
+            allTags.Should().HaveCount(2);
         }
 
         [Fact]
         public void Should_ReturnTagById()
         {
             // Arrange
-            List<UserEntry> users = CreateUserList();
-            List<TagEntry> tags = CreateTagList(users);
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
 
-            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
-            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
-            var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
-
-            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
             var tag = noteManager.GetTagById(tagId: 5);
@@ -524,7 +494,7 @@ namespace Notes.BLL.Tests.ServicesTests
 
             var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
             var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
-            var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
+            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
 
             INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
 
@@ -536,7 +506,7 @@ namespace Notes.BLL.Tests.ServicesTests
         }
 
         [Fact]
-        public void Should_ThrowException_When_ParameterIsNull_AddTagAsync()
+        public async void Should_ThrowException_When_ParameterIsNull_AddTagAsync()
         {
             // Arrange
             List<UserEntry> users = CreateUserList();
@@ -552,26 +522,22 @@ namespace Notes.BLL.Tests.ServicesTests
             INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
 
             // Act
-            Func<Task> act = () => noteManager.AddTagAsync(null);
+            Func<Task> act = async () => await noteManager.AddTagAsync(null);
 
             // Assert
-            act.Should().ThrowAsync<ArgumentNullException>();
+            await act.Should().ThrowAsync<ArgumentNullException>();
         }
 
 
         [Fact]
         public void Should_ThrowException_When_TagDoesNotExist_GetTagById()
         {
-
             // Arrange
-            List<UserEntry> users = CreateUserList();
-            List<TagEntry> tags = CreateTagList(users);
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
 
-            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
-            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
-            var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
-
-            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.GetTagById(tagId: 77777);
@@ -584,14 +550,11 @@ namespace Notes.BLL.Tests.ServicesTests
         public void Should_ThrowException_When_UserHaveNoAccessToTagWithThisId_GetTagById()
         {
             // Arrange
-            List<UserEntry> users = CreateUserList();
-            List<TagEntry> tags = CreateTagList(users);
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
 
-            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
-            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
-            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
-
-            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.GetTagById(tagId: 6);
@@ -605,14 +568,11 @@ namespace Notes.BLL.Tests.ServicesTests
         public void Should_ThrowException_When_TagDoesNotExist_DeleteTagById()
         {
             // Arrange
-            List<UserEntry> users = CreateUserList();
-            List<TagEntry> tags = CreateTagList(users);
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
 
-            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
-            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
-            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
-
-            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.DeleteTagById(tagId: 9874);
@@ -625,14 +585,11 @@ namespace Notes.BLL.Tests.ServicesTests
         public void Should_ThrowException_When_UserHaveNoAccessToTagWithThisId_DeleteTagById()
         {
             // Arrange
-            List<UserEntry> users = CreateUserList();
-            List<TagEntry> tags = CreateTagList(users);
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
 
-            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
-            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
-            var userAccessor = MockHelper.SetupCurrentUserAccessor(users[0]);
-
-            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.DeleteTagById(tagId: 6);

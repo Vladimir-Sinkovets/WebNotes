@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-s
+
 namespace Notes.Web.Models
 {
     public class ListNoteItemViewModel

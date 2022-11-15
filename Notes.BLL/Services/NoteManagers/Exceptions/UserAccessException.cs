@@ -8,6 +8,8 @@ namespace Notes.BLL.Services.NoteManagers.Exceptions
 {
     public class UserAccessException : Exception
     {
+        public UserAccessException() { }
+
         public UserAccessException(string message) : base(message) { }
     }
 }

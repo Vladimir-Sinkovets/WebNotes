@@ -1,6 +1,6 @@
 ﻿namespace Notes.Web.Models
 {
-    public class TagViewModel
+    public class TagItemViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

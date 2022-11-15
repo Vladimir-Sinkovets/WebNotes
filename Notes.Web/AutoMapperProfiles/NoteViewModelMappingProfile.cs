@@ -12,8 +12,8 @@ namespace Notes.Web.AutoMapperProfiles
     {
         public NoteViewModelMappingProfile()
         {
-            CreateMap<Note, NoteViewModel>();
-            CreateMap<NoteViewModel, Note>();
+            CreateMap<Note, ListNoteItemViewModel>();
+            CreateMap<ListNoteItemViewModel, Note>();
 
             CreateMap<Note, NoteCreateViewModel>();
             CreateMap<NoteCreateViewModel, Note>();

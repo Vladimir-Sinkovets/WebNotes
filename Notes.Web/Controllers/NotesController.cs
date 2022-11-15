@@ -34,7 +34,7 @@ namespace Notes.Web.Controllers
         {
             IEnumerable<Note> notes = _noteManager.GetAllNotes();
 
-            IEnumerable<NoteViewModel> viewModel = _mapper.Map<IEnumerable<Note>, List<NoteViewModel>>(notes);
+            IEnumerable<ListNoteItemViewModel> viewModel = _mapper.Map<IEnumerable<Note>, List<ListNoteItemViewModel>>(notes);
 
             return View(viewModel);
         }
@@ -139,11 +139,11 @@ namespace Notes.Web.Controllers
             }
         }
 
-        private IEnumerable<TagViewModel> GetAllTagsForCurrentUser()
+        private IEnumerable<TagItemViewModel> GetAllTagsForCurrentUser()
         {
             var allTags = _noteManager.GetAllTags();
 
-            var allViewModelTags = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(allTags);
+            var allViewModelTags = _mapper.Map<IEnumerable<Tag>, List<TagItemViewModel>>(allTags);
 
             return allViewModelTags;
         }
@@ -155,7 +155,7 @@ namespace Notes.Web.Controllers
             {
                 var note = _noteManager.GetNoteById(id);
 
-                var viewModel = _mapper.Map<NoteViewModel>(note);
+                var viewModel = _mapper.Map<ListNoteItemViewModel>(note);
 
                 return View(viewModel);
             }
@@ -239,7 +239,7 @@ namespace Notes.Web.Controllers
             {
                 var tags = _noteManager.GetAllTags();
 
-                var tagViewModels = _mapper.Map<IEnumerable<Tag>, List<TagViewModel>>(tags); 
+                var tagViewModels = _mapper.Map<IEnumerable<Tag>, List<TagItemViewModel>>(tags); 
                 
                 var viewModel = new TagListViewModel() { AllTags = tagViewModels };
 

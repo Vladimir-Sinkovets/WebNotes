@@ -62,6 +62,9 @@ namespace Notes.BLL.Tests.Helpers
             unitOfWorkMock.Setup(unit => unit.Tags.GetAll())
                 .Returns(() => tags.AsQueryable());
 
+            unitOfWorkMock.Setup(unit => unit.Tags.GetAllWithoutTracking())
+                .Returns(() => tags.AsQueryable());
+
             unitOfWorkMock.Setup(unit => unit.Tags.DeleteById(It.IsAny<int>()))
                 .Callback<int>(id => tags.Remove(tags.FirstOrDefault(t => t.Id == id)));
 
@@ -70,6 +73,9 @@ namespace Notes.BLL.Tests.Helpers
                 .Callback((NoteEntry n) => notes.Add(n));
 
             unitOfWorkMock.Setup(unit => unit.Notes.GetAll())
+                .Returns(() => notes.AsQueryable());
+
+            unitOfWorkMock.Setup(unit => unit.Notes.GetAllWithoutTracking())
                 .Returns(() => notes.AsQueryable());
 
             unitOfWorkMock.Setup(unit => unit.Notes.DeleteById(It.IsAny<int>()))

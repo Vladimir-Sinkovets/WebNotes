@@ -15,12 +15,16 @@ namespace Notes.DAL.Repositories
 
         public override IQueryable<TagEntry> GetAll()
         {
-            return _table.Include(t => t.Notes);
+            return _table.Include(t => t.Notes)
+                .Include(t => t.User);
         }
 
         public IQueryable<TagEntry> GetAllWithoutTracking()
         {
-            return _table.Include(t => t.Notes).AsNoTracking();
+            return _table.Include(t => t.Notes)
+                .AsNoTrackingWithIdentityResolution()
+                .Include(t => t.User)
+                .AsNoTrackingWithIdentityResolution();
         }
     }
 }

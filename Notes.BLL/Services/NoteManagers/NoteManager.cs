@@ -53,7 +53,7 @@ namespace Notes.BLL.Services.NoteManagers
 
         public async Task UpdateNoteAsync(NoteUpdateData updateData)
         {
-            var notes = _unitOfWork.Notes.GetAll();
+            var notes = _unitOfWork.Notes.GetAllWithoutTracking();
 
             if (updateData == null)
                 throw new ArgumentNullException(nameof(updateData));
@@ -71,7 +71,7 @@ namespace Notes.BLL.Services.NoteManagers
         {
             var userName = _userAccessor.Current.UserName;
 
-            var notes = _unitOfWork.Notes.GetAll();
+            var notes = _unitOfWork.Notes.GetAllWithoutTracking();
             
             ThrowNotFoundExceptionForNotes(notes, noteId);
             ThrowUserAccessExceptionForNotes(notes, noteId);
@@ -137,16 +137,16 @@ namespace Notes.BLL.Services.NoteManagers
         {
             var userName = _userAccessor.Current.UserName;
 
-            var tags = _unitOfWork.Tags.GetAll();
-            var notes = _unitOfWork.Notes.GetAll();
+            var tags = _unitOfWork.Tags.GetAllWithoutTracking();
+            var notes = _unitOfWork.Notes.GetAllWithoutTracking();
 
             ThrowNotFoundExceptionForTags(tags, tagId);
             ThrowNotFoundExceptionForNotes(notes, noteId);
             ThrowUserAccessExceptionForNotes(notes, noteId);
             ThrowUserAccessExceptionForTags(tags, tagId);
 
-            var tagEntity = tags.FirstOrDefault(t => t.Id == tagId);
-            var noteEntity = notes.FirstOrDefault(n => n.Id == noteId);
+            var tagEntity = _unitOfWork.Tags.GetAll().FirstOrDefault(t => t.Id == tagId);
+            var noteEntity = _unitOfWork.Notes.GetAll().FirstOrDefault(n => n.Id == noteId);
 
             noteEntity.Tags.Remove(tagEntity);
 
@@ -155,7 +155,7 @@ namespace Notes.BLL.Services.NoteManagers
 
         public void DeleteTagById(int tagId)
         {
-            var tags = _unitOfWork.Tags.GetAll();
+            var tags = _unitOfWork.Tags.GetAllWithoutTracking();
 
             ThrowNotFoundExceptionForTags(tags, tagId);
             ThrowUserAccessExceptionForTags(tags, tagId);

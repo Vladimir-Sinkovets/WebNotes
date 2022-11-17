@@ -26,35 +26,22 @@ namespace Notes.BLL.Services.MarkdownRendererService
             return new HtmlString(htmlResult);
         }
 
-        private IEnumerable<string> SetHeaders(IEnumerable<string> lines)
+        private static IEnumerable<string> SetHeaders(IEnumerable<string> lines)
         {
             for (int i = 0; i < lines.Count(); i++)
             {
                 var line = lines.ElementAt(i);
-                if (line.StartsWith("# "))
+                
+                for (int j = 1; j < 7; j++)
                 {
-                    line = CreateHtmlHeader(line, 1);
+                    string markdownHeader = new(Enumerable.Range(0, j).Select(x => '#').ToArray());
+
+                    if (line.StartsWith($"{markdownHeader} "))
+                    {
+                        line = CreateHtmlHeader(line, j);
+                    }
                 }
-                else if (line.StartsWith("## "))
-                {
-                    line = CreateHtmlHeader(line, 2);
-                }
-                else if (line.StartsWith("### "))
-                {
-                    line = CreateHtmlHeader(line, 3);
-                }
-                else if (line.StartsWith("#### "))
-                {
-                    line = CreateHtmlHeader(line, 4);
-                }
-                else if (line.StartsWith("##### "))
-                {
-                    line = CreateHtmlHeader(line, 5);
-                }
-                else if (line.StartsWith("###### "))
-                {
-                    line = CreateHtmlHeader(line, 6);
-                }
+                
                 yield return line;
             }
         }
@@ -92,11 +79,6 @@ namespace Notes.BLL.Services.MarkdownRendererService
             newLines.Add("</p>");
 
             return newLines;
-        }
-
-        private static string Bracket(string text, string tagName)
-        {
-            return $"<{tagName}>\n{text}\n</{tagName}>\n";
         }
     }
 }

@@ -56,5 +56,22 @@ namespace Notes.BLL.Tests.ServicesTests
                 .And
                 .Contain($"<h{headerValue}>good approach to do this</h{headerValue}>");
         }
+
+        [Fact]
+        public void Should_NotRenderHeaderTags_WhenMarkdownHeaderHaveNoSpace()
+        {
+            // Arrange
+            IMarkdownRenderer renderer = new MarkdownRenderer();
+            string text = "##The formatting of the " + 
+                "#output is not important\r\n" + 
+                "\r\n" +
+                "good approach to do this";
+
+            // Act
+            string htmlText = renderer.RenderFromMarkdownToHTML(text).ToString();
+
+            // Assert
+            htmlText.Should().Be("<p>##The formatting of the #output is not important</p><p>good approach to do this</p>");
+        }
     }
 }

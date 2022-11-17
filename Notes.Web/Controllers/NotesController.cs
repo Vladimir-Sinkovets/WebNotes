@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
 using Notes.BLL.Services.CurrentUserAccessor.Exceptions;
+using Notes.BLL.Services.MarkdownRendererService;
 using Notes.BLL.Services.NoteManagers;
 using Notes.BLL.Services.NoteManagers.Exceptions;
 using Notes.BLL.Services.NoteManagers.Models;
@@ -21,12 +23,14 @@ namespace Notes.Web.Controllers
     public class NotesController : Controller
     {
         private readonly IMapper _mapper;
-        public INoteManager _noteManager;
+        private readonly IMarkdownRenderer _markdownRenderer;
+        private readonly INoteManager _noteManager;
 
-        public NotesController(INoteManager notesManager, IMapper mapper)
+        public NotesController(INoteManager notesManager, IMapper mapper, IMarkdownRenderer markdownRenderer)
         {
             _noteManager = notesManager;
             _mapper = mapper;
+            _markdownRenderer = markdownRenderer;
         }
 
         [HttpGet]
@@ -111,6 +115,8 @@ namespace Notes.Web.Controllers
                     var note = _mapper.Map<NoteUpdateData>(viewModel);
 
                     await _noteManager.UpdateNoteAsync(note);
+
+                    return RedirectToAction(nameof(Read), new { id = viewModel.Id });
                 }
 
                 var model = _noteManager.GetNoteById(viewModel.Id);
@@ -156,6 +162,10 @@ namespace Notes.Web.Controllers
                 var note = _noteManager.GetNoteById(id);
 
                 var viewModel = _mapper.Map<ListNoteItemViewModel>(note);
+
+                var html = _markdownRenderer.RenderFromMarkdownToHTML(note.Text);
+
+                viewModel.HtmlText = html;
 
                 return View(viewModel);
             }

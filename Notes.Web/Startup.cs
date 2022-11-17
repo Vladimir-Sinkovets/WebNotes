@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Server.IISIntegration;
 using Microsoft.EntityFrameworkCore;
@@ -11,16 +9,13 @@ using Microsoft.Extensions.Hosting;
 using Notes.BLL.AutoMapperProfiles;
 using Notes.BLL.Services.AccountInfoManagers;
 using Notes.BLL.Services.CurrentUserAccessor;
+using Notes.BLL.Services.MarkdownRendererService;
 using Notes.BLL.Services.NoteManagers;
 using Notes.DAL.Models;
 using Notes.DAL.Repositories;
 using Notes.DAL.Repositories.Interfaces;
 using Notes.Web.AutoMapperProfiles;
 using Notes.Web.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Notes.Web
 {
@@ -58,6 +53,7 @@ namespace Notes.Web
             services.AddAuthentication(IISDefaults.AuthenticationScheme);
 
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IMarkdownRenderer, MarkdownRenderer>();
             services.AddTransient<ICurrentUserAccessor, CurrentUserAccessor>();
             services.AddTransient<INoteManager, NoteManager>();
             services.AddTransient<IAccountInfoManager, AccountInfoManager>();

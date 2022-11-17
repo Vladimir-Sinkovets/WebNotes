@@ -12,18 +12,13 @@ namespace Notes.BLL.Services.MarkdownRendererService
     {
         public IHtmlContent RenderFromMarkdownToHTML(string markdownText)
         {
-            var htmlResult = string.Empty;
-
             IEnumerable<string> lines = markdownText.Split(Environment.NewLine);
 
             lines = SetParagraphs(lines);
 
             lines = SetHeaders(lines);
-                
-            foreach (var line in lines)
-                htmlResult += line;
 
-            return new HtmlString(htmlResult);
+            return new HtmlString(string.Join("", lines));
         }
 
         private static IEnumerable<string> SetHeaders(IEnumerable<string> lines)

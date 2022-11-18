@@ -12,8 +12,6 @@ namespace Notes.BLL.Services.MarkdownRendererService
         {
             IEnumerable<string> lines = markdownText.Split(Environment.NewLine);
 
-            lines = SetLineBreakes(lines);
-
             lines = SetParagraphs(lines);
 
             lines = SetHeaders(lines);

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Notes.BLL.Services.AccountInfoManagers;
 using Notes.BLL.Services.AccountInfoManagers.Models;
 using Notes.DAL.Models;
-using Notes.Web.Models;
+using Notes.Web.Models.Account;
 using System.Threading.Tasks;
 
 namespace Notes.Web.Controllers

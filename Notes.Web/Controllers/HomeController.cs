@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Notes.Web.Models;
+using Notes.Web.Models.Home;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

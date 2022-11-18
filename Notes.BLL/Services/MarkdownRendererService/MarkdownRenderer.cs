@@ -2,9 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Notes.BLL.Services.MarkdownRendererService
 {
@@ -18,7 +16,41 @@ namespace Notes.BLL.Services.MarkdownRendererService
 
             lines = SetHeaders(lines);
 
+            lines = SetStrong(lines);
+
             return new HtmlString(string.Join("", lines));
+        }
+
+        private static IEnumerable<string> SetStrong(IEnumerable<string> lines)
+        {
+            Regex regex = new(@"\*\*.+\*\*");
+
+            for (int i = 0; i < lines.Count(); i++)
+            {
+                string line = lines.ElementAt(i);
+
+                var matches = regex.Matches(line);
+
+                foreach (Match match in matches)
+                {
+                    line = line.Replace(match.Value, $"<strong>{match.Value.Replace("**", "")}</strong>");
+                }
+
+                yield return line;
+            }
+        }
+
+        private static IEnumerable<string> SetLineBreakes(IEnumerable<string> lines)
+        {
+            for (int i = 0; i < lines.Count() - 2; i++)
+            {
+                string line = lines.ElementAt(i);
+
+                if (string.IsNullOrEmpty(line) == false)
+                {
+                    yield return line + "<br/>";
+                }
+            }
         }
 
         private static IEnumerable<string> SetHeaders(IEnumerable<string> lines)
@@ -54,26 +86,22 @@ namespace Notes.BLL.Services.MarkdownRendererService
 
         private static IEnumerable<string> SetParagraphs(IEnumerable<string> lines)
         {
-            var newLines = new List<string>();
-
-            newLines.Add("<p>");
+            yield return "<p>";
 
             for (int i = 0; i < lines.Count(); i++)
             {
                 if (lines.ElementAt(i) == "")
                 {
-                    newLines.Add("</p>");
-                    newLines.Add("<p>");
+                    yield return "</p>";
+                    yield return "<p>";
                 }
                 else
                 {
-                    newLines.Add(lines.ElementAt(i));
+                    yield return lines.ElementAt(i);
                 }
             }
 
-            newLines.Add("</p>");
-
-            return newLines;
+            yield return "</p>";
         }
     }
 }

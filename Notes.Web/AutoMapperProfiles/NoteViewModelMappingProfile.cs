@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Notes.BLL.Services.NoteManagers.Models;
-using Notes.Web.Models;
+using Notes.Web.Models.Note;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +12,8 @@ namespace Notes.Web.AutoMapperProfiles
     {
         public NoteViewModelMappingProfile()
         {
-            CreateMap<Note, ListNoteItemViewModel>();
-            CreateMap<ListNoteItemViewModel, Note>();
+            CreateMap<Note, ReadNoteViewModel>();
+            CreateMap<ReadNoteViewModel, Note>();
 
             CreateMap<Note, NoteCreateViewModel>();
             CreateMap<NoteCreateViewModel, Note>();

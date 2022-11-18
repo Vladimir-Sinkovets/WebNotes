@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Notes.Web.Models
+namespace Notes.Web.Models.Note
 {
     public class TagListViewModel
     {

@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Html;
 using System.Collections.Generic;
 
-namespace Notes.Web.Models
+namespace Notes.Web.Models.Note
 {
-    public class ListNoteItemViewModel
+    public class ReadNoteViewModel
     {
         public int Id { get; set; }
         public string Title { get; set; }

@@ -1,20 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
 using Notes.BLL.Services.CurrentUserAccessor.Exceptions;
 using Notes.BLL.Services.MarkdownRendererService;
 using Notes.BLL.Services.NoteManagers;
 using Notes.BLL.Services.NoteManagers.Exceptions;
 using Notes.BLL.Services.NoteManagers.Models;
-using Notes.DAL.Models;
-using Notes.Web.Models;
+using Notes.Web.Models.Note;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Notes.Web.Controllers
@@ -38,7 +32,7 @@ namespace Notes.Web.Controllers
         {
             IEnumerable<Note> notes = _noteManager.GetAllNotes();
 
-            IEnumerable<ListNoteItemViewModel> viewModel = _mapper.Map<IEnumerable<Note>, List<ListNoteItemViewModel>>(notes);
+            IEnumerable<ReadNoteViewModel> viewModel = _mapper.Map<IEnumerable<Note>, List<ReadNoteViewModel>>(notes);
 
             return View(viewModel);
         }
@@ -145,6 +139,7 @@ namespace Notes.Web.Controllers
             }
         }
 
+        [HttpGet]
         private IEnumerable<TagItemViewModel> GetAllTagsForCurrentUser()
         {
             var allTags = _noteManager.GetAllTags();
@@ -161,7 +156,7 @@ namespace Notes.Web.Controllers
             {
                 var note = _noteManager.GetNoteById(id);
 
-                var viewModel = _mapper.Map<ListNoteItemViewModel>(note);
+                var viewModel = _mapper.Map<ReadNoteViewModel>(note);
 
                 var html = _markdownRenderer.RenderFromMarkdownToHTML(note.Text);
 

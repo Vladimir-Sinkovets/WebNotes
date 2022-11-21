@@ -23,11 +23,7 @@ namespace Notes.Web.AutoMapperProfiles
             CreateMap<NoteUpdateData, EditNoteViewModel>();
             CreateMap<EditNoteViewModel, NoteUpdateData>();
 
-            CreateMap<Note, EditNoteViewModel>();
-
-            CreateMap<IEnumerable<Note>, NoteListViewModel>()
-                .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src));
-
+            CreateMap<Note, EditNoteViewModel>(); 
         }
     }
 }

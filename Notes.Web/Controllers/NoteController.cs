@@ -38,10 +38,12 @@ namespace Notes.Web.Controllers
             var notesForPage = notes.Skip((page - 1) * NotesInPage)
                 .Take(NotesInPage);
 
-            var viewModel = _mapper.Map<IEnumerable<Note>, NoteListViewModel>(notesForPage);
-
-            viewModel.CurrentPage = page;
-            viewModel.LastPage = (int) Math.Ceiling((float) notes.Count() / NotesInPage);
+            var viewModel = new NoteListViewModel()
+            {
+                Notes = _mapper.Map<List<ReadNoteViewModel>>(notesForPage),
+                CurrentPage = page,
+                LastPage = (int)Math.Ceiling((float)notes.Count() / NotesInPage),
+            };
 
             return View(viewModel);
         }

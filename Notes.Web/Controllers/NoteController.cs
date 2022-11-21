@@ -9,18 +9,19 @@ using Notes.BLL.Services.NoteManagers.Models;
 using Notes.Web.Models.Note;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Notes.Web.Controllers
 {
     [Authorize]
-    public class NotesController : Controller
+    public class NoteController : Controller
     {
         private readonly IMapper _mapper;
         private readonly IMarkdownRenderer _markdownRenderer;
         private readonly INoteManager _noteManager;
 
-        public NotesController(INoteManager notesManager, IMapper mapper, IMarkdownRenderer markdownRenderer)
+        public NoteController(INoteManager notesManager, IMapper mapper, IMarkdownRenderer markdownRenderer)
         {
             _noteManager = notesManager;
             _mapper = mapper;
@@ -28,11 +29,21 @@ namespace Notes.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult NoteList()
+        public ActionResult NoteList(int page = 1)
         {
+            const int NotesInPage = 10;
+
             IEnumerable<Note> notes = _noteManager.GetAllNotes();
 
-            IEnumerable<ReadNoteViewModel> viewModel = _mapper.Map<IEnumerable<Note>, List<ReadNoteViewModel>>(notes);
+            var notesForPage = notes.Skip((page - 1) * NotesInPage)
+                .Take(NotesInPage);
+
+            var viewModel = new NoteListViewModel()
+            {
+                Notes = _mapper.Map<List<ReadNoteViewModel>>(notesForPage),
+                CurrentPage = page,
+                LastPage = (int)Math.Ceiling((float)notes.Count() / NotesInPage),
+            };
 
             return View(viewModel);
         }

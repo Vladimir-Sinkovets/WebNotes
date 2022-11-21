@@ -2,7 +2,7 @@
 
 <div class="m-1">
     <div class="flex-wrap row gy-5">
-        <form asp-controller="Notes" asp-action="DeleteTag" method="post">
+        <form asp-controller="Note" asp-action="DeleteTag" method="post">
             @foreach (var tag in Model.AllTags)
             {
                 <div class="p-1 m-2 d-inline card">
@@ -18,7 +18,7 @@
     </div>
 
 
-    <form asp-controller="Notes" asp-action="AddNewTag" method="post">
+    <form asp-controller="Note" asp-action="AddNewTag" method="post">
         <div class="m-1">
             <label>Tag name:</label>
         </div>

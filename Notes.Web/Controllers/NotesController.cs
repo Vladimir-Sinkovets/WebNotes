@@ -9,6 +9,7 @@ using Notes.BLL.Services.NoteManagers.Models;
 using Notes.Web.Models.Note;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Notes.Web.Controllers
@@ -28,11 +29,19 @@ namespace Notes.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult NoteList()
+        public ActionResult NoteList(int page = 1)
         {
+            const int NotesInPage = 2;
+
             IEnumerable<Note> notes = _noteManager.GetAllNotes();
 
-            IEnumerable<ReadNoteViewModel> viewModel = _mapper.Map<IEnumerable<Note>, List<ReadNoteViewModel>>(notes);
+            var notesForPage = notes.Skip((page - 1) * NotesInPage)
+                .Take(NotesInPage);
+
+            var viewModel = _mapper.Map<IEnumerable<Note>, NoteListViewModel>(notesForPage);
+
+            viewModel.CurrentPage = page;
+            viewModel.LastPage = (int) Math.Ceiling((float) notes.Count() / NotesInPage);
 
             return View(viewModel);
         }

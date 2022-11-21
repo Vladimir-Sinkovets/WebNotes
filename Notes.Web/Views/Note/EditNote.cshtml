@@ -1,6 +1,6 @@
 ﻿@model EditNoteViewModel
 
-<form method="post" asp-controller="Notes" asp-action="AddTagToNote">
+<form method="post" asp-controller="Note" asp-action="AddTagToNote">
     <div class="form-group">
         <select class="form-select" name="tagId">
             @foreach (var tag in Model.AllTags)
@@ -10,7 +10,7 @@
                 </option>
             }
         </select>
-        <a class="btn btn-success" asp-action="TagList" asp-controller="Notes">Create more tags</a>
+        <a class="btn btn-success" asp-action="TagList" asp-controller="Note">Create more tags</a>
 
     </div>
 
@@ -26,7 +26,7 @@
 <div class="flex-wrap row gy-5">
     @foreach (var tag in Model.Tags)
     {
-        <form asp-controller="Notes" asp-action="RemoveTagFromNote" method="post">
+        <form asp-controller="Note" asp-action="RemoveTagFromNote" method="post">
             <div class="m-3 d-inline card">
                 #@tag.Name
                 <button>
@@ -40,7 +40,7 @@
     }
 </div>
 
-<form asp-controller="Notes" asp-action="EditNote" method="post">
+<form asp-controller="Note" asp-action="EditNote" method="post">
     <div class="form-group">
         <label>Title</label>
         <input class="form-control" type="text" asp-for="Title"/>

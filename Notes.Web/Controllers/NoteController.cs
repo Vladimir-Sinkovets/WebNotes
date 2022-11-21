@@ -15,13 +15,13 @@ using System.Threading.Tasks;
 namespace Notes.Web.Controllers
 {
     [Authorize]
-    public class NotesController : Controller
+    public class NoteController : Controller
     {
         private readonly IMapper _mapper;
         private readonly IMarkdownRenderer _markdownRenderer;
         private readonly INoteManager _noteManager;
 
-        public NotesController(INoteManager notesManager, IMapper mapper, IMarkdownRenderer markdownRenderer)
+        public NoteController(INoteManager notesManager, IMapper mapper, IMarkdownRenderer markdownRenderer)
         {
             _noteManager = notesManager;
             _mapper = mapper;

@@ -28,4 +28,8 @@
     <ProjectReference Include="..\Notes.Web\Notes.Web.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ControllersTests\" />
+  </ItemGroup>
+
 </Project>

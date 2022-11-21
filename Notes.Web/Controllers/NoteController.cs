@@ -31,7 +31,7 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public ActionResult NoteList(int page = 1)
         {
-            const int NotesInPage = 2;
+            const int NotesInPage = 10;
 
             IEnumerable<Note> notes = _noteManager.GetAllNotes();
 

@@ -2,7 +2,16 @@
 
 @{
     const int offset = 3;
+
+    Func<int, string> SetPageItemClassByPageNumber = (int i) =>
+    {
+        if (Model.CurrentPage == i)
+            return "page-item active";
+        else
+            return "page-item";
+    };
 }
+
 
 <ul>
     @foreach (var note in Model.Notes)
@@ -19,8 +28,8 @@
 </ul>
 
 <ul class="pagination">
-    <li class="page-item">
-        <a class="page-link" asp-action="NoteList" asp-controller="Note" asp-route-page="1" >
+    <li class="@SetPageItemClassByPageNumber(1)">
+        <a class="page-link" asp-action="NoteList" asp-controller="Note" asp-route-page="1">
             1
         </a>
     </li>
@@ -39,7 +48,7 @@
         @if (i <= 1 || i >= Model.LastPage)
             continue;
 
-        <li class="page-item">
+        <li class="@SetPageItemClassByPageNumber(i)">
             <a class="page-link" asp-action="NoteList" asp-controller="Note" asp-route-page="@i">
                 @i
             </a>
@@ -55,7 +64,7 @@
         </li>
     }
 
-    <li class="page-item">
+    <li class="@SetPageItemClassByPageNumber(Model.LastPage)">
         <a class="page-link" asp-action="NoteList" asp-controller="Note" asp-route-page="@Model.LastPage">
             @Model.LastPage
         </a>

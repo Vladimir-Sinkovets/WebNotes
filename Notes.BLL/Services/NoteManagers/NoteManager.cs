@@ -69,14 +69,7 @@ namespace Notes.BLL.Services.NoteManagers
 
         public Note GetNoteById(int noteId)
         {
-            var userName = _userAccessor.Current.UserName;
-
-            var notes = _unitOfWork.Notes.GetAllWithoutTracking();
-            
-            ThrowNotFoundExceptionForNotes(notes, noteId);
-            ThrowUserAccessExceptionForNotes(notes, noteId);
-
-            var entry = notes.FirstOrDefault(n => n.Id == noteId);
+            var entry = GetNoteEntryById(noteId);
 
             var note = _mapper.Map<Note>(entry);
 
@@ -109,6 +102,29 @@ namespace Notes.BLL.Services.NoteManagers
             var note = GetNoteById(noteId);
 
             return note.Tags;
+        }
+
+        public async Task SetNoteImportanceAsync(int noteId, bool isImportant)
+        {
+            var note = GetNoteEntryById(noteId);
+
+            note.IsImportant = isImportant;
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        private NoteEntry GetNoteEntryById(int noteId)
+        {
+            var userName = _userAccessor.Current.UserName;
+
+            var notes = _unitOfWork.Notes.GetAllWithoutTracking();
+
+            ThrowNotFoundExceptionForNotes(notes, noteId);
+            ThrowUserAccessExceptionForNotes(notes, noteId);
+
+            var entry = notes.FirstOrDefault(n => n.Id == noteId);
+
+            return entry;
         }
 
         public async Task AddTagAsync(TagCreateData data)

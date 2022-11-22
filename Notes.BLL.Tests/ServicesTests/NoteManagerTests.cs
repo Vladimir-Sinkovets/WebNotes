@@ -147,6 +147,57 @@ namespace Notes.BLL.Tests.ServicesTests
             notes.FirstOrDefault(n => n.Id == 2).Tags.Should().HaveCount(1);
         }
 
+        [Fact]
+        public async void Should_SetNoteImportance()
+        {
+            // Arrange
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
+
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+
+            // Act
+            await noteManager.SetNoteImportanceAsync(1, true);
+
+            // Assert
+            notes.FirstOrDefault(n => n.Id == 1).IsImportant.Should().Be(true);
+        }
+
+
+
+        [Fact]
+        public async void Should_ThrowException_When_UserHaveNoAccessToNote_SetNoteImportance()
+        {
+            // Arrange
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
+
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+
+            // Act
+            Func<Task> act = async () => await noteManager.SetNoteImportanceAsync(4, true);
+
+            // Assert
+            await act.Should().ThrowAsync<UserAccessException>();
+        }
+        [Fact]
+        public async void Should_ThrowException_When_NoteDoesNotExist_SetNoteImportance()
+        {
+            // Arrange
+            var users = CreateUserList();
+            var tags = CreateTagList(users);
+            var notes = CreateNoteList(users, tags);
+
+            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+
+            // Act
+            Func<Task> act = async () => await noteManager.SetNoteImportanceAsync(4444, true);
+
+            // Assert
+            await act.Should().ThrowAsync<NotFoundException>();
+        }
 
         [Fact]
         public async void Should_ThrowException_WhenParameterIsNull_CreateNewNoteAsync()
@@ -635,10 +686,10 @@ namespace Notes.BLL.Tests.ServicesTests
         {
             return new List<NoteEntry>()
             {
-                new NoteEntry() { Tags = new List<TagEntry>() { tags[0], }, Id = 1, Text = "1", Title = "1", User = users[0]},
-                new NoteEntry() { Tags = new List<TagEntry>() { tags[0], tags[1] }, Id = 2, Text = "2", Title = "2", User = users[0]},
-                new NoteEntry() { Tags = new List<TagEntry>() { tags[2], }, Id = 3, Text = "3", Title = "3", User = users[1]},
-                new NoteEntry() { Tags = new List<TagEntry>() { tags[2], }, Id = 4, Text = "4", Title = "4", User = users[1]},
+                new NoteEntry() { Tags = new List<TagEntry>() { tags[0], }, Id = 1, Text = "1", Title = "1", User = users[0], IsImportant = false,},
+                new NoteEntry() { Tags = new List<TagEntry>() { tags[0], tags[1] }, Id = 2, Text = "2", Title = "2", User = users[0], IsImportant = false,},
+                new NoteEntry() { Tags = new List<TagEntry>() { tags[2], }, Id = 3, Text = "3", Title = "3", User = users[1], IsImportant = false,},
+                new NoteEntry() { Tags = new List<TagEntry>() { tags[2], }, Id = 4, Text = "4", Title = "4", User = users[1], IsImportant = false,},
             };
         }
     }

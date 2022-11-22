@@ -17,6 +17,7 @@ namespace Notes.BLL.Services.NoteManagers
         Task CreateNewNoteAsync(NoteCreateData note);
         IEnumerable<Tag> GetNoteTagsById(int noteId);
         void RemoveTagFromNote(int noteId, int tagId);
+        Task SetNoteImportanceAsync(int noteId, bool important);
 
         Tag GetTagById(int tagId);
         IEnumerable<Tag> GetAllTags();

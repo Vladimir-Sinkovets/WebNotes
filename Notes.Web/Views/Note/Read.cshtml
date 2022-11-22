@@ -1,5 +1,7 @@
 ﻿@model ReadNoteViewModel
 
+@{ Html.RenderPartial("_StarForNote", "s"); }
+
 <div class="flex-wrap row gy-5">
     @foreach (var tag in Model.Tags)
     {

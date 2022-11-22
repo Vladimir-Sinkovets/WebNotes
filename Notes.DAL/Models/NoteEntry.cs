@@ -14,5 +14,6 @@ namespace Notes.DAL.Models
         public string Text { get; set; }
         public UserEntry User { get; set; }
         public ICollection<TagEntry> Tags { get; set; }
+        public bool IsImportant { get; set; }
     }
 }

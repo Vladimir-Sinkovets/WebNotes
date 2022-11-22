@@ -53,7 +53,7 @@ namespace Notes.Web
             services.AddAuthentication(IISDefaults.AuthenticationScheme);
 
             services.AddTransient<IUnitOfWork, UnitOfWork>();
-            services.AddTransient<IMarkdownRenderer, MarkdownAdapter>();
+            services.AddTransient<IMarkdownRenderer, MarkdownSharpAdapter>();
             services.AddTransient<ICurrentUserAccessor, CurrentUserAccessor>();
             services.AddTransient<INoteManager, NoteManager>();
             services.AddTransient<IAccountInfoManager, AccountInfoManager>();

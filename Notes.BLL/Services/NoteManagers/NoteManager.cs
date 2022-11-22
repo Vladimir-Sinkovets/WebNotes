@@ -106,9 +106,13 @@ namespace Notes.BLL.Services.NoteManagers
 
         public async Task SetNoteImportanceAsync(int noteId, bool isImportant)
         {
-            var note = GetNoteEntryById(noteId);
+            var entry = GetNoteEntryById(noteId);
 
-            note.IsImportant = isImportant;
+            entry.IsImportant = isImportant;
+            entry.User = _userAccessor.Current;
+            entry.Tags = null;
+
+            _unitOfWork.Notes.Update(entry);
 
             await _unitOfWork.SaveChangesAsync();
         }

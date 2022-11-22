@@ -319,10 +319,9 @@ namespace Notes.Web.Controllers
             }
         }
 
-        [HttpPost]
         public async Task<IActionResult> StarNote(int id, bool isImportant, string returnUrl)
         {
-            await _noteManager.SetNoteImportanceAsync(id, isImportant);
+            await _noteManager.SetNoteImportanceAsync(id, !isImportant);
 
             return Redirect(returnUrl);
         }

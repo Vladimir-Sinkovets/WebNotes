@@ -236,5 +236,17 @@ namespace Notes.BLL.Services.NoteManagers
             if (tags.FirstOrDefault(t => t.Id == tagId).User.UserName != _userAccessor.Current.UserName)
                 throw new UserAccessException($"User {_userAccessor.Current.UserName} have no access to this tag ( tagId = {tagId} )");
         }
+
+        public IEnumerable<Note> GetAllImportantNotes()
+        {
+            var userName = _userAccessor.Current.UserName;
+
+            var noteEntries = _unitOfWork.Notes.GetAll()
+                .Where(n => n.User.UserName == userName && n.IsImportant);
+
+            var notes = _mapper.Map<IEnumerable<NoteEntry>, List<Note>>(noteEntries);
+
+            return notes;
+        }
     }
 }

@@ -10,7 +10,6 @@
         else
             return "page-item";
     };
-    var a = Context.Request.QueryString.Value;
 }
 
 
@@ -39,7 +38,7 @@
 
 <ul class="pagination">
     <li class="@SetPageItemClassByPageNumber(1)">
-        <a class="page-link" asp-action="NoteList" asp-controller="Note" asp-route-page="1">
+        <a class="page-link" asp-action="ImportantNoteList" asp-controller="Note" asp-route-page="1">
             1
         </a>
     </li>
@@ -59,7 +58,7 @@
             continue;
 
         <li class="@SetPageItemClassByPageNumber(i)">
-            <a class="page-link" asp-action="NoteList" asp-controller="Note" asp-route-page="@i">
+            <a class="page-link" asp-action="ImportantNoteList" asp-controller="Note" asp-route-page="@i">
                 @i
             </a>
         </li>
@@ -73,11 +72,10 @@
             </a>
         </li>
     }
-
     @if (Model.LastPage != 1)
     {
         <li class="@SetPageItemClassByPageNumber(Model.LastPage)">
-            <a class="page-link" asp-action="NoteList" asp-controller="Note" asp-route-page="@Model.LastPage">
+            <a class="page-link" asp-action="ImportantNoteList" asp-controller="Note" asp-route-page="@Model.LastPage">
                 @Model.LastPage
             </a>
         </li>

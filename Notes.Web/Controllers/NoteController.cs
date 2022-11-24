@@ -319,7 +319,7 @@ namespace Notes.Web.Controllers
             }
         }
 
-        public async Task<IActionResult> StarNote(int id, bool isImportant, string returnUrl)
+        public async Task<IActionResult> StarNote(int id, bool isImportant, string returnUrl) // добавить параметр с типом object для перехода на любую страницу
         {
             await _noteManager.SetNoteImportanceAsync(id, !isImportant);
 

@@ -1,6 +1,6 @@
 ﻿@model ReadNoteViewModel
 
-@await Html.PartialAsync("_StarForNote", new PartialStarViewModel()
+@await Html.PartialAsync("_Star", new PartialStarViewModel()
 { 
     Id = Model.Id, 
     ReturnURL = Context.Request.Path,

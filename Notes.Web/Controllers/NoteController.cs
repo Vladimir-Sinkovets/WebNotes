@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Notes.BLL.Services.CurrentUserAccessor.Exceptions;
 using Notes.BLL.Services.MarkdownRendererService;
 using Notes.BLL.Services.NoteManagers;
@@ -35,14 +36,18 @@ namespace Notes.Web.Controllers
 
             IEnumerable<Note> notes = _noteManager.GetAllNotes();
 
-            var notesForPage = notes.Skip((page - 1) * NotesInPage)
+            int lastPage = (int)Math.Ceiling((float)notes.Count() / NotesInPage);
+
+            int currentPage = page <= lastPage ? page : lastPage;
+
+            var notesForPage = notes.Skip((currentPage - 1) * NotesInPage)
                 .Take(NotesInPage);
 
             var viewModel = new NoteListViewModel()
             {
                 Notes = _mapper.Map<List<ReadNoteViewModel>>(notesForPage),
-                CurrentPage = page,
-                LastPage = (int)Math.Ceiling((float)notes.Count() / NotesInPage),
+                CurrentPage = currentPage,
+                LastPage = lastPage,
             };
 
             return View(viewModel);
@@ -317,6 +322,37 @@ namespace Notes.Web.Controllers
             {
                 throw;
             }
+        }
+
+        public async Task<IActionResult> StarNote(int id, bool isImportant, string returnUrl)
+        {
+            await _noteManager.SetNoteImportanceAsync(id, !isImportant);
+
+            return Redirect(returnUrl);
+        }
+
+        [HttpGet]
+        public IActionResult ImportantNoteList(int page = 1)
+        {
+            const int NotesInPage = 10;
+
+            IEnumerable<Note> notes = _noteManager.GetAllImportantNotes();
+
+            int lastPage = (int)Math.Ceiling((float)notes.Count() / NotesInPage);
+
+            int currentPage = page <= lastPage ? page : lastPage;
+
+            var notesForPage = notes.Skip((currentPage - 1) * NotesInPage)
+                .Take(NotesInPage);
+
+            var viewModel = new NoteListViewModel()
+            {
+                Notes = _mapper.Map<List<ReadNoteViewModel>>(notesForPage),
+                CurrentPage = currentPage,
+                LastPage = lastPage,
+            };
+
+            return View(viewModel);
         }
     }
 }

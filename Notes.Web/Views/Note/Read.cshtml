@@ -1,5 +1,12 @@
 ﻿@model ReadNoteViewModel
 
+@await Html.PartialAsync("_Star", new PartialStarViewModel()
+{ 
+    Id = Model.Id, 
+    ReturnURL = Context.Request.Path,
+    IsImportant = Model.IsImportant, 
+})
+
 <div class="flex-wrap row gy-5">
     @foreach (var tag in Model.Tags)
     {

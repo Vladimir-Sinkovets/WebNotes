@@ -69,14 +69,7 @@ namespace Notes.BLL.Services.NoteManagers
 
         public Note GetNoteById(int noteId)
         {
-            var userName = _userAccessor.Current.UserName;
-
-            var notes = _unitOfWork.Notes.GetAllWithoutTracking();
-            
-            ThrowNotFoundExceptionForNotes(notes, noteId);
-            ThrowUserAccessExceptionForNotes(notes, noteId);
-
-            var entry = notes.FirstOrDefault(n => n.Id == noteId);
+            var entry = GetNoteEntryById(noteId);
 
             var note = _mapper.Map<Note>(entry);
 
@@ -109,6 +102,33 @@ namespace Notes.BLL.Services.NoteManagers
             var note = GetNoteById(noteId);
 
             return note.Tags;
+        }
+
+        public async Task SetNoteImportanceAsync(int noteId, bool isImportant)
+        {
+            var entry = GetNoteEntryById(noteId);
+
+            entry.IsImportant = isImportant;
+            entry.User = _userAccessor.Current;
+            entry.Tags = null;
+
+            _unitOfWork.Notes.Update(entry);
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        private NoteEntry GetNoteEntryById(int noteId)
+        {
+            var userName = _userAccessor.Current.UserName;
+
+            var notes = _unitOfWork.Notes.GetAllWithoutTracking();
+
+            ThrowNotFoundExceptionForNotes(notes, noteId);
+            ThrowUserAccessExceptionForNotes(notes, noteId);
+
+            var entry = notes.FirstOrDefault(n => n.Id == noteId);
+
+            return entry;
         }
 
         public async Task AddTagAsync(TagCreateData data)
@@ -215,6 +235,18 @@ namespace Notes.BLL.Services.NoteManagers
         {
             if (tags.FirstOrDefault(t => t.Id == tagId).User.UserName != _userAccessor.Current.UserName)
                 throw new UserAccessException($"User {_userAccessor.Current.UserName} have no access to this tag ( tagId = {tagId} )");
+        }
+
+        public IEnumerable<Note> GetAllImportantNotes()
+        {
+            var userName = _userAccessor.Current.UserName;
+
+            var noteEntries = _unitOfWork.Notes.GetAll()
+                .Where(n => n.User.UserName == userName && n.IsImportant);
+
+            var notes = _mapper.Map<IEnumerable<NoteEntry>, List<Note>>(noteEntries);
+
+            return notes;
         }
     }
 }

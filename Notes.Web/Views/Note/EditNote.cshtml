@@ -1,5 +1,12 @@
 ﻿@model EditNoteViewModel
 
+@await Html.PartialAsync("_Star", new PartialStarViewModel()
+{ 
+    Id = Model.Id, 
+    ReturnURL = Context.Request.Path,
+    IsImportant = Model.IsImportant
+})
+
 <form method="post" asp-controller="Note" asp-action="AddTagToNote">
     <div class="form-group">
         <select class="form-select" name="tagId">

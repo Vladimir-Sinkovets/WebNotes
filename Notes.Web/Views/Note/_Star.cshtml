@@ -1,0 +1,16 @@
+﻿@model PartialStarViewModel
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<a asp-action="StarNote" asp-controller="Note"
+    asp-route-id="@Model.Id" asp-route-returnUrl="@Model.ReturnURL" asp-route-isImportant="@Model.IsImportant" 
+    type="button" class="btn btn-none">
+    @if (Model.IsImportant == true)
+    {
+        <span class="fa fa-star w3-large" style="color: yellow"></span>
+    }
+    else
+    {
+        <span class="fa fa-star w3-large"></span>
+    }
+</a>

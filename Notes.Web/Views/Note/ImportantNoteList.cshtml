@@ -1,7 +1,7 @@
 ﻿@model NoteListViewModel
 
 @{
-    const int offset = 3;
+    const int paginationOffset = 3;
 
     Func<int, string> SetPageItemClassByPageNumber = (int i) =>
     {
@@ -23,14 +23,6 @@
                 <strong style="color:black">@note.Title</strong>
 
             </a>
-            <span class="">
-                @await Html.PartialAsync("_Star", new PartialStarViewModel()
-                {
-                    Id = note.Id,
-                    IsImportant = note.IsImportant,
-                    ReturnURL = $"{Context.Request.Path}?page={Model.CurrentPage}",
-                })
-            </span>
         </div>
     </li>
     }
@@ -42,7 +34,7 @@
             1
         </a>
     </li>
-    @if (Model.CurrentPage - offset > 2)
+    @if (Model.CurrentPage - paginationOffset > 2)
     {
         <li class="page-item disabled">
             <a class="page-link" href="#">
@@ -52,7 +44,7 @@
             
     }
 
-    @for (int i = Model.CurrentPage - offset; i < Model.CurrentPage + (offset + 1) && i <= Model.LastPage; i++)
+    @for (int i = Model.CurrentPage - paginationOffset; i < Model.CurrentPage + (paginationOffset + 1) && i <= Model.LastPage; i++)
     {
         @if (i <= 1 || i >= Model.LastPage)
             continue;
@@ -64,7 +56,7 @@
         </li>
     }
 
-    @if (Model.CurrentPage + (offset + 1) < Model.LastPage)
+    @if (Model.CurrentPage + (paginationOffset + 1) < Model.LastPage)
     {
         <li class="page-item disabled">
             <a class="page-link" href="#">

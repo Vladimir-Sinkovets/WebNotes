@@ -10,7 +10,6 @@
         else
             return "page-item";
     };
-    var a = Context.Request.QueryString.Value;
 }
 
 
@@ -24,14 +23,6 @@
                 <strong style="color:black">@note.Title</strong>
 
             </a>
-            <span class="">
-                @await Html.PartialAsync("_Star", new PartialStarViewModel()
-                {
-                    Id = note.Id,
-                    IsImportant = note.IsImportant,
-                    ReturnURL = $"{Context.Request.Path}?page={Model.CurrentPage}",
-                })
-            </span>
         </div>
     </li>
     }

@@ -35,6 +35,7 @@ namespace Notes.Web.Controllers
             const int NotesInPage = 10;
 
             IEnumerable<Note> notes = _noteManager.GetAllNotes();
+            IEnumerable<Tag> tags = _noteManager.GetAllTags();
 
             int lastPage = (int)Math.Ceiling((float)notes.Count() / NotesInPage);
 
@@ -48,6 +49,7 @@ namespace Notes.Web.Controllers
                 Notes = _mapper.Map<List<ReadNoteViewModel>>(notesForPage),
                 CurrentPage = currentPage,
                 LastPage = lastPage,
+                AllTags = _mapper.Map<List<string>>(tags)
             };
 
             return View(viewModel);

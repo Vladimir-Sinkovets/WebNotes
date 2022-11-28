@@ -12,6 +12,29 @@
     };
 }
 
+<div class="container">
+    <form>
+        <label>Name</label> <input type="text" asp-for="FilterSettings.Name"/>
+        <label>Text</label> <input type="text" asp-for="FilterSettings.Text"/>
+
+        <select multiple asp-for="FilterSettings.Tags">
+        @for (int i = 0; i < Model.AllTags.Count(); i++)
+        {
+            <option>@Model.AllTags.ElementAt(i)</option>
+        }
+        </select>
+
+        Length:
+        <lable>Min : </lable> <input type="number" asp-for="FilterSettings.MinLength"/>
+        <lable>Max : </lable> <input type="number" asp-for="FilterSettings.MaxLength"/>
+        <lable>Important : </lable> <input type="checkbox" asp-for="FilterSettings.IsImportant"/>
+
+
+        <button>
+            submit
+        </button>
+    </form>
+</div>
 
 <ul>
     @foreach (var note in Model.Notes)

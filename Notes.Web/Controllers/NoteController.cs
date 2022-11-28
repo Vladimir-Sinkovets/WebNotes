@@ -30,8 +30,10 @@ namespace Notes.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult NoteList(int page = 1)
+        public ActionResult NoteList(NoteListViewModel model)
         {
+            int page = model.CurrentPage;
+
             const int NotesInPage = 10;
 
             IEnumerable<Note> notes = _noteManager.GetAllNotes();

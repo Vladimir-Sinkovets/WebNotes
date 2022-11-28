@@ -3,7 +3,7 @@
 @{
     const int offset = 3;
 
-    Func<int, string> SetPageItemClassByPageNumber = (int i) =>
+    Func<int, string> GetPageItemClassByPageNumber = (int i) =>
     {
         if (Model.CurrentPage == i)
             return "page-item active";
@@ -52,7 +52,7 @@
 </ul>
 
 <ul class="pagination">
-    <li class="@SetPageItemClassByPageNumber(1)">
+    <li class="@GetPageItemClassByPageNumber(1)">
         <a class="page-link" asp-action="NoteList" asp-controller="Note" asp-route-page="1">
             1
         </a>
@@ -72,7 +72,7 @@
         @if (i <= 1 || i >= Model.LastPage)
             continue;
 
-        <li class="@SetPageItemClassByPageNumber(i)">
+        <li class="@GetPageItemClassByPageNumber(i)">
             <a class="page-link" asp-action="NoteList" asp-controller="Note" asp-route-page="@i">
                 @i
             </a>
@@ -90,7 +90,7 @@
 
     @if (Model.LastPage != 1)
     {
-        <li class="@SetPageItemClassByPageNumber(Model.LastPage)">
+        <li class="@GetPageItemClassByPageNumber(Model.LastPage)">
             <a class="page-link" asp-action="NoteList" asp-controller="Note" asp-route-page="@Model.LastPage">
                 @Model.LastPage
             </a>

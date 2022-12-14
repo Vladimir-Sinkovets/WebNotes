@@ -10,6 +10,6 @@ namespace Notes.Web.Models.Note
         public IEnumerable<ReadNoteViewModel> Notes { get; set; }
         public IEnumerable<string> AllTags { get; set; }
 
-        public FilterSettings FilterSettings { get; set; }
+        public SearchFilterViewModel SearchFilter { get; set; }
     }
 }

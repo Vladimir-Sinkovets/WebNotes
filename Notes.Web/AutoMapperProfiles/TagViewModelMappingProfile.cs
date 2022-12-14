@@ -11,6 +11,9 @@ namespace Notes.Web.AutoMapperProfiles
             CreateMap<TagItemViewModel, Tag>();
             CreateMap<Tag, TagItemViewModel>()
                 .ForMember(dest => dest.NotesCount, opt => opt.MapFrom(src => src.Notes.Count));
+
+            CreateMap<Tag, string>()
+                .ConstructUsing((src, contex) => src.Name);
         }
     }
 }

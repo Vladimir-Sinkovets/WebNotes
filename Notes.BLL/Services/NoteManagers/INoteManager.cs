@@ -19,7 +19,7 @@ namespace Notes.BLL.Services.NoteManagers
         IEnumerable<Tag> GetNoteTagsById(int noteId);
         void RemoveTagFromNote(int noteId, int tagId);
         Task SetNoteImportanceAsync(int noteId, bool important);
-
+        IEnumerable<Note> GetAllByFilter(SearchFilter filter);
         Tag GetTagById(int tagId);
         IEnumerable<Tag> GetAllTags();
         void DeleteTagById(int tagId);

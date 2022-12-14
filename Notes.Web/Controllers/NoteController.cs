@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Notes.BLL.Services.CurrentUserAccessor.Exceptions;
 using Notes.BLL.Services.MarkdownRendererService;
 using Notes.BLL.Services.NoteManagers;
@@ -32,13 +31,26 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public ActionResult NoteList(NoteListViewModel model)
         {
-            int page = model.CurrentPage;
-
             const int NotesInPage = 10;
 
-            IEnumerable<Note> notes = _noteManager.GetAllNotes();
-            IEnumerable<Tag> tags = _noteManager.GetAllTags();
+            IEnumerable<Note> notes;
 
+            if (model.SearchFilter == null)
+            {
+                notes = _noteManager.GetAllNotes();
+            }
+            else
+            {
+                var filter = _mapper.Map<SearchFilter>(model.SearchFilter);
+
+                notes = _noteManager.GetAllByFilter(filter);
+            }
+
+            var tags = _noteManager.GetAllTags();
+
+
+            int page = model.CurrentPage;
+            
             int lastPage = (int)Math.Ceiling((float)notes.Count() / NotesInPage);
 
             int currentPage = page <= lastPage ? page : lastPage;
@@ -51,11 +63,13 @@ namespace Notes.Web.Controllers
                 Notes = _mapper.Map<List<ReadNoteViewModel>>(notesForPage),
                 CurrentPage = currentPage,
                 LastPage = lastPage,
-                AllTags = _mapper.Map<List<string>>(tags)
+                AllTags = _mapper.Map<List<string>>(tags),
+                SearchFilter = model.SearchFilter,
             };
 
             return View(viewModel);
         }
+
 
         [HttpGet]
         public ActionResult Create()

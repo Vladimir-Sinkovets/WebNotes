@@ -26,7 +26,8 @@ namespace Notes.Web.AutoMapperProfiles
                         Title = src.Title,
                         MaxLength = src.MaxLength,
                         MinLength = src.MinLength,
-                        UseLength = src.MaxLength == 0 && src.MinLength == 0 ? false : true,
+                        UseMinLength = src.UseMinLength,
+                        UseMaxLength = src.UseMaxLength,
                         Tags = src.Tags ?? new List<string>(),
                     };
                 });

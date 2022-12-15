@@ -249,11 +249,17 @@ namespace Notes.BLL.Services.NoteManagers
                     filter.Tags.Except(n.Tags.Select(t => t.Name))
                         .Any() == false);
 
-            if (filter.UseLength == true)
+            if (filter.UseMinLength == true)
                 noteEntries = noteEntries.Where(
                     n => n.Text != null && 
-                    n.Text.Length >= filter.MinLength && 
+                    n.Text.Length >= filter.MinLength);
+
+            if (filter.UseMaxLength == true)
+                noteEntries = noteEntries.Where(
+                    n => n.Text != null &&
                     n.Text.Length <= filter.MaxLength);
+
+             
 
             if (filter.Importance != ImportanceFilterUsing.None)
             {

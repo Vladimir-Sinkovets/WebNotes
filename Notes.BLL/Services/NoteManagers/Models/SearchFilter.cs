@@ -13,7 +13,8 @@ namespace Notes.BLL.Services.NoteManagers.Models
         public string Text { get; set; }
         public IEnumerable<string> Tags { get; set; }
 
-        public bool UseLength { get; set; }
+        public bool UseMinLength { get; set; }
+        public bool UseMaxLength { get; set; }
 
         public int MinLength { get; set; }
         public int MaxLength { get; set; }

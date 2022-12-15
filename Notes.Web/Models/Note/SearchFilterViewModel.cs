@@ -8,6 +8,8 @@ namespace Notes.Web.Models.Note
         public string Title { get; set; }
         public string Text { get; set; }
         public IEnumerable<string> Tags { get; set; }
+        public bool UseMinLength { get; set; }
+        public bool UseMaxLength { get; set; }
         public int MinLength { get; set; }
         public int MaxLength { get; set; }
         public Importance Importance { get; set; }

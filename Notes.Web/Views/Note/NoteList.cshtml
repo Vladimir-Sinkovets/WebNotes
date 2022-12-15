@@ -52,12 +52,22 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="addon-wrapping">Min length: </span>
                         </div>
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" asp-for="SearchFilter.UseMinLength">
+                            </div>
+                        </div>
                         <input class="form-control" type="number" asp-for="SearchFilter.MinLength" />
                     </div>
 
                     <div class="input-group flex-nowrap p-1">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="addon-wrapping">Max length: </span>
+                        </div>
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" asp-for="SearchFilter.UseMaxLength">
+                            </div>
                         </div>
                         <input class="form-control" type="number" asp-for="SearchFilter.MaxLength" />
                     </div>

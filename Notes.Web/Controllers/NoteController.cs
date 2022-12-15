@@ -53,7 +53,7 @@ namespace Notes.Web.Controllers
 
             int lastPage = (int)Math.Ceiling((float)notes.Count() / NotesInPage);
 
-            int currentPage = page <= lastPage || lastPage <= 0 ? page : lastPage; // terrible
+            int currentPage = page <= lastPage || lastPage <= 0 ? page : lastPage;
 
             var notesForCurrentPage = notes.Skip((currentPage - 1) * NotesInPage)
                 .Take(NotesInPage);

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Notes.BLL.Services.CurrentUserAccessor.Exceptions;
 using Notes.BLL.Services.MarkdownRendererService;
 using Notes.BLL.Services.NoteManagers;
+using Notes.BLL.Services.NoteManagers.Enums;
 using Notes.BLL.Services.NoteManagers.Exceptions;
 using Notes.BLL.Services.NoteManagers.Models;
 using Notes.Web.Models.Note;
@@ -354,7 +355,7 @@ namespace Notes.Web.Controllers
         {
             const int NotesInPage = 10;
 
-            IEnumerable<Note> notes = _noteManager.GetAllImportantNotes();
+            IEnumerable<Note> notes = _noteManager.GetAllByFilter(new SearchFilter() { Importance = ImportanceFilterUsing.Important });
 
             int lastPage = (int)Math.Ceiling((float)notes.Count() / NotesInPage);
 

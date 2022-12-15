@@ -214,18 +214,6 @@ namespace Notes.BLL.Services.NoteManagers
             return tag;
         }
 
-        public IEnumerable<Note> GetAllImportantNotes()
-        {
-            var userName = _userAccessor.Current.UserName;
-
-            var noteEntries = _unitOfWork.Notes.GetAll()
-                .Where(n => n.User.UserName == userName && n.IsImportant);
-
-            var notes = _mapper.Map<IEnumerable<NoteEntry>, List<Note>>(noteEntries);
-
-            return notes;
-        }
-
         public IEnumerable<Note> GetAllByFilter(SearchFilter filter)
         {
             var noteEntries = _unitOfWork.Notes.GetAllWithoutTracking().AsEnumerable();

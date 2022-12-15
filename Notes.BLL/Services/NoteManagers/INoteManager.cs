@@ -12,7 +12,6 @@ namespace Notes.BLL.Services.NoteManagers
     {
         Note GetNoteById(int noteId);
         IEnumerable<Note> GetAllNotes();
-        IEnumerable<Note> GetAllImportantNotes();
         void AddTagToNote(int noteId, int tagId);
         Task UpdateNoteAsync(NoteUpdateData note);
         Task CreateNewNoteAsync(NoteCreateData note);

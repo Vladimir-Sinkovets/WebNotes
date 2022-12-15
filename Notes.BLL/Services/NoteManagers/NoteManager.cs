@@ -259,8 +259,6 @@ namespace Notes.BLL.Services.NoteManagers
                     n => n.Text != null &&
                     n.Text.Length <= filter.MaxLength);
 
-             
-
             if (filter.Importance != ImportanceFilterUsing.None)
             {
                 bool isImportant = filter.Importance switch
@@ -273,8 +271,6 @@ namespace Notes.BLL.Services.NoteManagers
 
                 noteEntries = noteEntries.Where(n => n.IsImportant == isImportant);
             }
-
-            var test = noteEntries.ToList();
 
             var notes = _mapper.Map<IEnumerable<NoteEntry>, List<Note>>(noteEntries);
 

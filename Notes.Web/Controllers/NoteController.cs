@@ -49,18 +49,18 @@ namespace Notes.Web.Controllers
             var tags = _noteManager.GetAllTags();
 
 
-            int page = model.CurrentPage;
-            
+            int page = model.CurrentPage <= 0 ? 1 : model.CurrentPage;
+
             int lastPage = (int)Math.Ceiling((float)notes.Count() / NotesInPage);
 
-            int currentPage = page <= lastPage ? page : lastPage;
+            int currentPage = page <= lastPage || lastPage <= 0 ? page : lastPage; // terrible
 
-            var notesForPage = notes.Skip((currentPage - 1) * NotesInPage)
+            var notesForCurrentPage = notes.Skip((currentPage - 1) * NotesInPage)
                 .Take(NotesInPage);
 
             var viewModel = new NoteListViewModel()
             {
-                Notes = _mapper.Map<List<ReadNoteViewModel>>(notesForPage),
+                Notes = _mapper.Map<List<ReadNoteViewModel>>(notesForCurrentPage),
                 CurrentPage = currentPage,
                 LastPage = lastPage,
                 AllTags = _mapper.Map<List<string>>(tags),

@@ -169,7 +169,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var filteredNotes = noteManager.GetAllByFilter(new SearchFilter()
             {
                 Title = "title",
-                IsImportant = ImportanceFilterUsing.None,
+                Importance = ImportanceFilterUsing.None,
                 MaxLength = 0,
                 MinLength = 0,
                 Tags = new List<string>(),
@@ -206,7 +206,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var filteredNotes = noteManager.GetAllByFilter(new SearchFilter()
             {
                 Title = null,
-                IsImportant = ImportanceFilterUsing.None,
+                Importance = ImportanceFilterUsing.None,
                 UseLength = false,
                 MaxLength = 0,
                 MinLength = 0,
@@ -245,7 +245,7 @@ namespace Notes.BLL.Tests.ServicesTests
             {
                 Title = null,
                 Text = null,
-                IsImportant = ImportanceFilterUsing.None,
+                Importance = ImportanceFilterUsing.None,
                 Tags = new List<string>() { "testTag", "testTag1" },
                 UseLength = false,
                 MaxLength = 0,
@@ -283,7 +283,7 @@ namespace Notes.BLL.Tests.ServicesTests
             {
                 Title = null,
                 Text = null,
-                IsImportant = ImportanceFilterUsing.None,
+                Importance = ImportanceFilterUsing.None,
                 Tags = new List<string>(),
                 UseLength = true,
                 MinLength = 2,
@@ -321,7 +321,7 @@ namespace Notes.BLL.Tests.ServicesTests
             {
                 Title = null,
                 Text = null,
-                IsImportant = ImportanceFilterUsing.Important,
+                Importance = ImportanceFilterUsing.Important,
                 Tags = new List<string>(),
                 UseLength = false,
                 MinLength = 0,
@@ -331,6 +331,7 @@ namespace Notes.BLL.Tests.ServicesTests
             // Assert
             filteredNotes.Should().HaveCount(3);
         }
+
         [Fact]
         public void Should_ReturnNotesByFilter()
         {
@@ -358,7 +359,7 @@ namespace Notes.BLL.Tests.ServicesTests
             {
                 Title = null,
                 Text = "text",
-                IsImportant = ImportanceFilterUsing.Unimportant,
+                Importance = ImportanceFilterUsing.Unimportant,
                 Tags = new List<string>() { "testTag" },
                 UseLength = true,
                 MinLength = 4,

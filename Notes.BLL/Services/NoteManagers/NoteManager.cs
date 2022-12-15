@@ -230,13 +230,19 @@ namespace Notes.BLL.Services.NoteManagers
         {
             var noteEntries = _unitOfWork.Notes.GetAllWithoutTracking().AsEnumerable();
 
-            noteEntries = noteEntries.Where(n => n.User.Id == _userAccessor.Current.Id);
+            var userId = _userAccessor.Current.Id;
+
+            noteEntries = noteEntries.Where(n => n.User.Id == userId);
 
             if (string.IsNullOrEmpty(filter.Title) == false)
-                noteEntries = noteEntries.Where(n => n.Title.Contains(filter.Title, StringComparison.CurrentCultureIgnoreCase));
+                noteEntries = noteEntries.Where(
+                    n => n.Title != null && 
+                    n.Title.Contains(filter.Title, StringComparison.CurrentCultureIgnoreCase));
 
             if (string.IsNullOrEmpty(filter.Text) == false)
-                noteEntries = noteEntries.Where(n => n.Text.Contains(filter.Text, StringComparison.CurrentCultureIgnoreCase));
+                noteEntries = noteEntries.Where(
+                    n => n.Text != null && 
+                    n.Text.Contains(filter.Text, StringComparison.CurrentCultureIgnoreCase));
 
             if (filter.Tags.Any() == true)
                 noteEntries = noteEntries.Where(n => 
@@ -244,20 +250,25 @@ namespace Notes.BLL.Services.NoteManagers
                         .Any() == false);
 
             if (filter.UseLength == true)
-                noteEntries = noteEntries.Where(n => n.Text.Length >= filter.MinLength && n.Text.Length <= filter.MaxLength);
+                noteEntries = noteEntries.Where(
+                    n => n.Text != null && 
+                    n.Text.Length >= filter.MinLength && 
+                    n.Text.Length <= filter.MaxLength);
 
-            if (filter.IsImportant != ImportanceFilterUsing.None)
+            if (filter.Importance != ImportanceFilterUsing.None)
             {
-                bool isImportant = filter.IsImportant switch
+                bool isImportant = filter.Importance switch
                 {
                     ImportanceFilterUsing.Important => true,
                     ImportanceFilterUsing.Unimportant => false,
                     ImportanceFilterUsing.None => false,
+                    _ => throw new NotImplementedException(),
                 };
 
                 noteEntries = noteEntries.Where(n => n.IsImportant == isImportant);
             }
 
+            var test = noteEntries.ToList();
 
             var notes = _mapper.Map<IEnumerable<NoteEntry>, List<Note>>(noteEntries);
 

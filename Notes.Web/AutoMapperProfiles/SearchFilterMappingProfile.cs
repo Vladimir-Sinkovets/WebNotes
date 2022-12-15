@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Notes.BLL.Services.NoteManagers.Enums;
 using Notes.BLL.Services.NoteManagers.Models;
+using Notes.Web.Enums;
 using Notes.Web.Models.Note;
 using System.Collections.Generic;
 
@@ -15,7 +16,12 @@ namespace Notes.Web.AutoMapperProfiles
                 {
                     return new SearchFilter
                     {
-                        IsImportant = ImportanceFilterUsing.None, // fix
+                        Importance = src.Importance switch
+                        {
+                            Importance.Important => ImportanceFilterUsing.Important,
+                            Importance.Unimportant => ImportanceFilterUsing.Unimportant,
+                            Importance.None => ImportanceFilterUsing.None,
+                        },
                         Text = src.Text,
                         Title = src.Title,
                         MaxLength = src.MaxLength,

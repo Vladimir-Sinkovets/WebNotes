@@ -17,6 +17,6 @@ namespace Notes.BLL.Services.NoteManagers.Models
 
         public int MinLength { get; set; }
         public int MaxLength { get; set; }
-        public ImportanceFilterUsing IsImportant { get; set; }
+        public ImportanceFilterUsing Importance { get; set; }
     }
 }

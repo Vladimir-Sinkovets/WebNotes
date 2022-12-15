@@ -46,7 +46,8 @@ namespace Notes.Web
                 typeof(NoteMappingProfile),
                 typeof(NoteViewModelMappingProfile),
                 typeof(AccountInfoViewModelMappingProfile),
-                typeof(TagViewModelMappingProfile)
+                typeof(TagViewModelMappingProfile),
+                typeof(SearchFilterMappingProfile)
                 );
 
             services.AddHttpContextAccessor();

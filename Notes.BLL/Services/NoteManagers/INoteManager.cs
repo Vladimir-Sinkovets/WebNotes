@@ -12,14 +12,13 @@ namespace Notes.BLL.Services.NoteManagers
     {
         Note GetNoteById(int noteId);
         IEnumerable<Note> GetAllNotes();
-        IEnumerable<Note> GetAllImportantNotes();
         void AddTagToNote(int noteId, int tagId);
         Task UpdateNoteAsync(NoteUpdateData note);
         Task CreateNewNoteAsync(NoteCreateData note);
         IEnumerable<Tag> GetNoteTagsById(int noteId);
         void RemoveTagFromNote(int noteId, int tagId);
         Task SetNoteImportanceAsync(int noteId, bool important);
-
+        IEnumerable<Note> GetAllByFilter(SearchFilter filter);
         Tag GetTagById(int tagId);
         IEnumerable<Tag> GetAllTags();
         void DeleteTagById(int tagId);

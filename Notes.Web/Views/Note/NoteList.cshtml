@@ -1,9 +1,10 @@
-﻿@model NoteListViewModel
+﻿@using Notes.Web.Enums;
+@model NoteListViewModel
 
 @{
     const int offset = 3;
 
-    Func<int, string> SetPageItemClassByPageNumber = (int i) =>
+    Func<int, string> GetPageItemClassByPageNumber = (int i) =>
     {
         if (Model.CurrentPage == i)
             return "page-item active";
@@ -12,65 +13,138 @@
     };
 }
 
+<div class="container">
+    <form>
+        <div class="card">
+            <div class="row">
+                <div class="col-sm">
+                    <div class="input-group flex-nowrap p-1">
+                         <div class="input-group-prepend">
+                            <span class="input-group-text" id="addon-wrapping">Name</span>
+                         </div>
+                        <input class="form-control" id="titleInput" type="text" asp-for="SearchFilter.Title" />
+                    </div>
 
-<ul>
-    @foreach (var note in Model.Notes)
-    {
-    <li class="list-group">
-        <div class="d-flex">
-             <a class="flex-grow-1 list-group-item list-group-item-action mt-1"
-                asp-controller="Note" asp-action="Read" asp-route-id="@note.Id">
-                <strong style="color:black">@note.Title</strong>
+                    <div class="input-group flex-nowrap p-1">
+                         <div class="input-group-prepend">
+                            <span class="input-group-text" id="addon-wrapping">Text</span>
+                         </div>
+                        <input class="form-control" type="text" asp-for="SearchFilter.Text" />
+                    </div>
 
-            </a>
+                    <div class="input-group mb-3 p-1">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text">Tags</label>
+                    </div>
+                    <div class="m-1">
+                        <select class="custom-select" multiple asp-for="SearchFilter.Tags">
+                        @for (int i = 0; i < Model.AllTags.Count(); i++)
+                        {
+                            <option>@Model.AllTags.ElementAt(i)</option>
+                        }
+                        </select>
+                    </div>
+                </div>
+                </div>
+
+                <div class="col-sm">
+                    <div class="input-group flex-nowrap p-1">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="addon-wrapping">Min length: </span>
+                        </div>
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" asp-for="SearchFilter.UseMinLength">
+                            </div>
+                        </div>
+                        <input class="form-control" type="number" asp-for="SearchFilter.MinLength" />
+                    </div>
+
+                    <div class="input-group flex-nowrap p-1">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="addon-wrapping">Max length: </span>
+                        </div>
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" asp-for="SearchFilter.UseMaxLength">
+                            </div>
+                        </div>
+                        <input class="form-control" type="number" asp-for="SearchFilter.MaxLength" />
+                    </div>
+
+                    <div class="input-group mb-3 p-1">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="inputGroupSelect01">Importance: </label>
+                    </div>
+                    <select class="custom-select" asp-for="SearchFilter.Importance" asp-items="Html.GetEnumSelectList<Importance>()">
+                    </select>
+                </div>
+                    
+                    <a class="btn btn-danger m-1 btn-sm" asp-action="NoteList" asp-controller="Note">Clear</a>
+                </div>
+            </div>
+
+            <button class="btn btn-primary m-1">
+                    submit
+                </button>
         </div>
-    </li>
-    }
-</ul>
 
-<ul class="pagination">
-    <li class="@SetPageItemClassByPageNumber(1)">
-        <a class="page-link" asp-action="NoteList" asp-controller="Note" asp-route-page="1">
-            1
-        </a>
-    </li>
-    @if (Model.CurrentPage - offset > 2)
-    {
-        <li class="page-item disabled">
-            <a class="page-link" href="#">
-                ...
-            </a>
-        </li>
+        <ul>
+            @foreach (var note in Model.Notes)
+            {
+            <li class="list-group">
+                <div class="d-flex">
+                        <a class="flex-grow-1 list-group-item list-group-item-action mt-1"
+                        asp-controller="Note" asp-action="Read" asp-route-id="@note.Id">
+                        <strong style="color:black">@note.Title</strong>
+
+                    </a>
+                </div>
+            </li>
+            }
+        </ul>
+
+        <ul class="pagination">
+                <li class="@GetPageItemClassByPageNumber(1)">
+                    <input class="page-link" type="submit" asp-for="CurrentPage" value="1">
+                
+                </li>
+                @if (Model.CurrentPage - offset > 2)
+                {
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">
+                            ...
+                        </a>
+                    </li>
             
-    }
+                }
 
-    @for (int i = Model.CurrentPage - offset; i < Model.CurrentPage + (offset + 1) && i <= Model.LastPage; i++)
-    {
-        @if (i <= 1 || i >= Model.LastPage)
-            continue;
+                @for (int i = Model.CurrentPage - offset; i < Model.CurrentPage + (offset + 1) && i <= Model.LastPage; i++)
+                {
+                    @if (i <= 1 || i >= Model.LastPage)
+                        continue;
 
-        <li class="@SetPageItemClassByPageNumber(i)">
-            <a class="page-link" asp-action="NoteList" asp-controller="Note" asp-route-page="@i">
-                @i
-            </a>
-        </li>
-    }
+                    <li class="@GetPageItemClassByPageNumber(i)">
+                        <input class="page-link" type="submit" asp-for="CurrentPage" value="@i">
+                    </li>
+                }
 
-    @if (Model.CurrentPage + (offset + 1) < Model.LastPage)
-    {
-        <li class="page-item disabled">
-            <a class="page-link" href="#">
-                ...
-            </a>
-        </li>
-    }
+                @if (Model.CurrentPage + (offset + 1) < Model.LastPage)
+                {
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">
+                            ...
+                        </a>
+                    </li>
+                }
 
-    @if (Model.LastPage != 1)
-    {
-        <li class="@SetPageItemClassByPageNumber(Model.LastPage)">
-            <a class="page-link" asp-action="NoteList" asp-controller="Note" asp-route-page="@Model.LastPage">
-                @Model.LastPage
-            </a>
-        </li>
-    }
-</ul>
+                @if (Model.LastPage > 1)
+                {
+                    <li class="@GetPageItemClassByPageNumber(Model.LastPage)">
+                        <input class="page-link" type="submit" asp-for="CurrentPage" value="@Model.LastPage">
+
+                    </li>
+                }
+            </ul>
+    </form>
+</div>

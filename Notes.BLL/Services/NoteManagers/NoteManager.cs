@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Notes.BLL.Services.CurrentUserAccessor;
+using Notes.BLL.Services.NoteManagers.Enums;
 using Notes.BLL.Services.NoteManagers.Exceptions;
 using Notes.BLL.Services.NoteManagers.Models;
 using Notes.DAL.Models;
@@ -213,6 +214,58 @@ namespace Notes.BLL.Services.NoteManagers
             return tag;
         }
 
+        public IEnumerable<Note> GetAllByFilter(SearchFilter filter)
+        {
+            var noteEntries = _unitOfWork.Notes.GetAllWithoutTracking().AsEnumerable();
+
+            var userId = _userAccessor.Current.Id;
+
+            noteEntries = noteEntries.Where(n => n.User.Id == userId);
+
+            if (string.IsNullOrEmpty(filter.Title) == false)
+                noteEntries = noteEntries.Where(
+                    n => n.Title != null && 
+                    n.Title.Contains(filter.Title, StringComparison.CurrentCultureIgnoreCase));
+
+            if (string.IsNullOrEmpty(filter.Text) == false)
+                noteEntries = noteEntries.Where(
+                    n => n.Text != null && 
+                    n.Text.Contains(filter.Text, StringComparison.CurrentCultureIgnoreCase));
+
+            if (filter.Tags.Any() == true)
+                noteEntries = noteEntries.Where(n => 
+                    filter.Tags.Except(n.Tags.Select(t => t.Name))
+                        .Any() == false);
+
+            if (filter.UseMinLength == true)
+                noteEntries = noteEntries.Where(
+                    n => n.Text != null && 
+                    n.Text.Length >= filter.MinLength);
+
+            if (filter.UseMaxLength == true)
+                noteEntries = noteEntries.Where(
+                    n => n.Text != null &&
+                    n.Text.Length <= filter.MaxLength);
+
+            if (filter.Importance != ImportanceFilterUsing.None)
+            {
+                bool isImportant = filter.Importance switch
+                {
+                    ImportanceFilterUsing.Important => true,
+                    ImportanceFilterUsing.Unimportant => false,
+                    ImportanceFilterUsing.None => false,
+                    _ => throw new NotImplementedException(),
+                };
+
+                noteEntries = noteEntries.Where(n => n.IsImportant == isImportant);
+            }
+
+            var notes = _mapper.Map<IEnumerable<NoteEntry>, List<Note>>(noteEntries);
+
+            return notes;
+        }
+
+
         private static void ThrowNotFoundExceptionForNotes(IQueryable<NoteEntry> notes, int noteId)
         {
             var noteEntity = notes.FirstOrDefault(n => n.Id == noteId)
@@ -235,18 +288,6 @@ namespace Notes.BLL.Services.NoteManagers
         {
             if (tags.FirstOrDefault(t => t.Id == tagId).User.UserName != _userAccessor.Current.UserName)
                 throw new UserAccessException($"User {_userAccessor.Current.UserName} have no access to this tag ( tagId = {tagId} )");
-        }
-
-        public IEnumerable<Note> GetAllImportantNotes()
-        {
-            var userName = _userAccessor.Current.UserName;
-
-            var noteEntries = _unitOfWork.Notes.GetAll()
-                .Where(n => n.User.UserName == userName && n.IsImportant);
-
-            var notes = _mapper.Map<IEnumerable<NoteEntry>, List<Note>>(noteEntries);
-
-            return notes;
         }
     }
 }

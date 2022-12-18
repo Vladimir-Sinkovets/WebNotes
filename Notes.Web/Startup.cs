@@ -10,6 +10,7 @@ using Notes.BLL.AutoMapperProfiles;
 using Notes.BLL.Services.AccountInfoManagers;
 using Notes.BLL.Services.CurrentUserAccessor;
 using Notes.BLL.Services.MarkdownRendererService;
+using Notes.BLL.Services.MarkdownRendererService.Options;
 using Notes.BLL.Services.NoteManagers;
 using Notes.DAL.Models;
 using Notes.DAL.Repositories;
@@ -41,6 +42,8 @@ namespace Notes.Web
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddControllersWithViews();
+
+            services.Configure<MarkdownSharpOptions>(Configuration.GetSection("MarkdownSharpOptions"));
 
             services.AddAutoMapper(
                 typeof(NoteMappingProfile),

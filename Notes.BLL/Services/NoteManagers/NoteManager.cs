@@ -74,6 +74,10 @@ namespace Notes.BLL.Services.NoteManagers
 
             var note = _mapper.Map<Note>(entry);
 
+            note.Length = note.Text.Length;
+
+            note.LineCount = note.Text.Split('\n').Length;
+
             return note;
         }
 

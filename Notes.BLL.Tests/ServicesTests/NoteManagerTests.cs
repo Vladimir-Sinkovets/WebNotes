@@ -207,7 +207,8 @@ namespace Notes.BLL.Tests.ServicesTests
             {
                 Title = null,
                 Importance = ImportanceFilterUsing.None,
-                UseLength = false,
+                UseMaxLength = false,
+                UseMinLength = false,
                 MaxLength = 0,
                 MinLength = 0,
                 Tags = new List<string>(),
@@ -247,7 +248,8 @@ namespace Notes.BLL.Tests.ServicesTests
                 Text = null,
                 Importance = ImportanceFilterUsing.None,
                 Tags = new List<string>() { "testTag", "testTag1" },
-                UseLength = false,
+                UseMaxLength = false,
+                UseMinLength = false,
                 MaxLength = 0,
                 MinLength = 0,
             });
@@ -285,7 +287,8 @@ namespace Notes.BLL.Tests.ServicesTests
                 Text = null,
                 Importance = ImportanceFilterUsing.None,
                 Tags = new List<string>(),
-                UseLength = true,
+                UseMaxLength = true,
+                UseMinLength = true,
                 MinLength = 2,
                 MaxLength = 4,
             });
@@ -323,7 +326,8 @@ namespace Notes.BLL.Tests.ServicesTests
                 Text = null,
                 Importance = ImportanceFilterUsing.Important,
                 Tags = new List<string>(),
-                UseLength = false,
+                UseMaxLength = false,
+                UseMinLength = false,
                 MinLength = 0,
                 MaxLength = 0,
             });
@@ -361,7 +365,8 @@ namespace Notes.BLL.Tests.ServicesTests
                 Text = "text",
                 Importance = ImportanceFilterUsing.Unimportant,
                 Tags = new List<string>() { "testTag" },
-                UseLength = true,
+                UseMaxLength = true,
+                UseMinLength = true,
                 MinLength = 4,
                 MaxLength = 8,
             });

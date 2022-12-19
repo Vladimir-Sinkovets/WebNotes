@@ -8,8 +8,6 @@ namespace Notes.BLL.Services.NoteManagers.Models
         public int Id { get; set; }
         public string Title { get; set; }
         public string Text { get; set; }
-        public int Length { get; set; }
-        public int LineCount { get; set; }
         public ICollection<Tag> Tags { get; set; }
         public bool IsImportant { get; set; }
         public DateTime? CreatedDate { get; set; }

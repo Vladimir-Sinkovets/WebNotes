@@ -57,33 +57,42 @@ namespace Notes.Web.Controllers
 
             int currentPage = page <= lastPage || lastPage <= 0 ? page : lastPage;
 
-            var notesForCurrentPage = notes.Skip((currentPage - 1) * NotesInPage)
+            IEnumerable<ReadNoteViewModel> notesForCurrentPage = _mapper.Map<List<ReadNoteViewModel>>(notes);
+
+            switch (model.Ordering)
+            {
+                case NotesOrdering.None:
+                    break;
+                case NotesOrdering.ByTitleAlphabetically:
+                    notesForCurrentPage = notesForCurrentPage.OrderBy(n => n.Title);
+                    break;
+                case NotesOrdering.ByCreatedDate:
+                    notesForCurrentPage = notesForCurrentPage.OrderBy(n => n.CreatedDate);
+                    break;
+                case NotesOrdering.ByTitleReverseAlphabetically:
+                    notesForCurrentPage = notesForCurrentPage.OrderByDescending(n => n.Title);
+                    break;
+                case NotesOrdering.ByCreatedDateReverse:
+                    notesForCurrentPage = notesForCurrentPage.OrderByDescending(n => n.CreatedDate);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            notesForCurrentPage = notesForCurrentPage.Skip((currentPage - 1) * NotesInPage)
                 .Take(NotesInPage);
 
             var viewModel = new NoteListViewModel()
             {
-                Notes = _mapper.Map<List<ReadNoteViewModel>>(notesForCurrentPage),
+                Notes = notesForCurrentPage,
                 CurrentPage = currentPage,
                 LastPage = lastPage,
                 AllTags = _mapper.Map<List<string>>(tags),
                 SearchFilter = model.SearchFilter,
             };
 
-            if(model != null)
-                switch (model.Ordering)
-                {
-                    case NotesOrdering.None:
-                        break;
-                    case NotesOrdering.ByTitleAlphabetically:
-                        viewModel.Notes = viewModel.Notes.OrderBy(n => n.Title);
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-
             return View(viewModel);
         }
-
 
         [HttpGet]
         public ActionResult Create()

@@ -35,6 +35,8 @@ namespace Notes.BLL.Services.NoteManagers
 
             entry.User = _userAccessor.Current;
 
+            entry.CreatedDate = DateTime.Now;
+
             _unitOfWork.Notes.Create(entry);
 
             await _unitOfWork.SaveChangesAsync();

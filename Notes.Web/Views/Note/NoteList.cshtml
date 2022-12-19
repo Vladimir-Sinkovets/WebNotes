@@ -81,6 +81,11 @@
                 </div>
                     
                     <a class="btn btn-danger m-1 btn-sm" asp-action="NoteList" asp-controller="Note">Clear</a>
+                    <div class="m-1">
+                        <select class="custom-select" asp-for="Ordering"
+                            asp-items="@Html.GetEnumSelectList<NotesOrdering>()">
+                        </select>
+                    </div>
                 </div>
             </div>
 

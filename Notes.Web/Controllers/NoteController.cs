@@ -7,6 +7,7 @@ using Notes.BLL.Services.NoteManagers;
 using Notes.BLL.Services.NoteManagers.Enums;
 using Notes.BLL.Services.NoteManagers.Exceptions;
 using Notes.BLL.Services.NoteManagers.Models;
+using Notes.Web.Enums;
 using Notes.Web.Models.Note;
 using System;
 using System.Collections.Generic;
@@ -67,6 +68,18 @@ namespace Notes.Web.Controllers
                 AllTags = _mapper.Map<List<string>>(tags),
                 SearchFilter = model.SearchFilter,
             };
+
+            if(model != null)
+                switch (model.Ordering)
+                {
+                    case NotesOrdering.None:
+                        break;
+                    case NotesOrdering.ByTitleAlphabetically:
+                        viewModel.Notes = viewModel.Notes.OrderBy(n => n.Title);
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
 
             return View(viewModel);
         }

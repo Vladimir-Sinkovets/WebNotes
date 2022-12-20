@@ -43,7 +43,7 @@ namespace Notes.Web
 
             services.AddControllersWithViews();
 
-            services.Configure<MarkdownSharpOptions>(Configuration.GetSection("MarkdownSharpOptions"));
+            services.Configure<MarkdownRendererOptions>(Configuration.GetSection("MarkdownSharpOptions"));
 
             services.AddAutoMapper(
                 typeof(NoteMappingProfile),
@@ -57,7 +57,7 @@ namespace Notes.Web
             services.AddAuthentication(IISDefaults.AuthenticationScheme);
 
             services.AddTransient<IUnitOfWork, UnitOfWork>();
-            services.AddTransient<IMarkdownRenderer, MarkdownSharpAdapter>();
+            services.AddTransient<IMarkdownRenderer, MarkdownRenderer>();
             services.AddTransient<ICurrentUserAccessor, CurrentUserAccessor>();
             services.AddTransient<INoteManager, NoteManager>();
             services.AddTransient<IAccountInfoManager, AccountInfoManager>();

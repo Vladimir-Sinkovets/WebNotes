@@ -1,6 +1,6 @@
 ﻿namespace Notes.BLL.Services.MarkdownRendererService.Options
 {
-    public class MarkdownSharpOptions
+    public class MarkdownRendererOptions
     {
         public bool AllowTargetBlank { get; set; }
         public bool AllowEmptyLinkText { get; set; } = true;

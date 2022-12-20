@@ -1,107 +1,71 @@
 ﻿using Microsoft.AspNetCore.Html;
+using HeyRed.MarkdownSharp;
+using Microsoft.Extensions.Options;
+using Notes.BLL.Services.MarkdownRendererService.Options;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
+using Notes.DAL.Repositories;
+using Notes.BLL.Services.NoteManagers;
+using System.Linq;
 
 namespace Notes.BLL.Services.MarkdownRendererService
 {
     public class MarkdownRenderer : IMarkdownRenderer
     {
+        private readonly MarkdownRendererOptions _options;
+        private readonly INoteManager _noteManager;
+
+        public MarkdownRenderer(IOptions<MarkdownRendererOptions> options, INoteManager noteManager)
+        {
+            _options = options.Value;
+
+            _noteManager = noteManager;
+        }
+
         public IHtmlContent RenderFromMarkdownToHTML(string markdownText)
         {
-            IEnumerable<string> lines = markdownText.Split(Environment.NewLine);
-
-            lines = SetParagraphs(lines);
-
-            lines = SetHeaders(lines);
-
-            lines = SetStrong(lines);
-
-            return new HtmlString(string.Join("", lines));
-        }
-
-        private static IEnumerable<string> SetStrong(IEnumerable<string> lines)
-        {
-            Regex regex = new(@"\*\*.+\*\*");
-
-            for (int i = 0; i < lines.Count(); i++)
+            var options = new MarkdownOptions()
             {
-                string line = lines.ElementAt(i);
+                AutoHyperlink = _options.AutoHyperlink,
+                AutoNewLines = _options.AutoNewLines,
+                LinkEmails = _options.LinkEmails,
+                QuoteSingleLine = _options.QuoteSingleLine,
+                StrictBoldItalic = _options.StrictBoldItalic,
+                AllowTargetBlank = _options.AllowTargetBlank,
+                AllowEmptyLinkText = _options.AllowEmptyLinkText,
+                DisableImages = _options.DisableImages,
+                AsteriskIntraWordEmphasis = _options.AsteriskIntraWordEmphasis,
+                LinkEmailsWithoutAngleBrackets = _options.LinkEmailsWithoutAngleBrackets,
+            };
 
-                var matches = regex.Matches(line);
+            var markdown = new Markdown(options);
 
-                foreach (Match match in matches)
-                {
-                    line = line.Replace(match.Value, $"<strong>{match.Value.Replace("**", "")}</strong>");
-                }
+            var html = markdown.Transform(markdownText);
 
-                yield return line;
-            }
+            var htmlWithLinks = RenderLinks(html);
+
+            return new HtmlString(htmlWithLinks);
         }
 
-        private static IEnumerable<string> SetLineBreakes(IEnumerable<string> lines)
+        private string RenderLinks(string html)
         {
-            for (int i = 0; i < lines.Count() - 2; i++)
+            var linkRgx = new Regex(@"\[\[(/?[^>]+?)]\]");
+
+            var matches = linkRgx.Matches(html);
+
+            foreach (Match match in matches)
             {
-                string line = lines.ElementAt(i);
+                var noteTitle = match.Value[2..^2];
 
-                if (string.IsNullOrEmpty(line) == false)
-                {
-                    yield return line + "<br/>";
-                }
-            }
-        }
+                var note = _noteManager.GetAllNotes()
+                    .FirstOrDefault(n => n.Title == noteTitle);
 
-        private static IEnumerable<string> SetHeaders(IEnumerable<string> lines)
-        {
-            for (int i = 0; i < lines.Count(); i++)
-            {
-                var line = lines.ElementAt(i);
-                
-                for (int j = 1; j < 7; j++)
-                {
-                    string markdownHeader = new(Enumerable.Range(0, j).Select(x => '#').ToArray());
+                var href = note != null ? $"/Note/Read/{note?.Id}" : "";
 
-                    if (line.StartsWith($"{markdownHeader} "))
-                    {
-                        line = CreateHtmlHeader(line, j);
-                    }
-                }
-                
-                yield return line;
-            }
-        }
-
-        private static string CreateHtmlHeader(string line, int value)
-        {
-            line = line.Remove(0, value + 1);
-            line = line.Insert(0, $"<h{value}>");
-
-            int length = line.Length;
-
-            line = line.Insert(length, $"</h{value}>");
-            return line;
-        }
-
-        private static IEnumerable<string> SetParagraphs(IEnumerable<string> lines)
-        {
-            yield return "<p>";
-
-            for (int i = 0; i < lines.Count(); i++)
-            {
-                if (lines.ElementAt(i) == "")
-                {
-                    yield return "</p>";
-                    yield return "<p>";
-                }
-                else
-                {
-                    yield return lines.ElementAt(i);
-                }
+                html = html.Replace(match.Value, $"<a href=\"{href}\">{noteTitle}</a>");
             }
 
-            yield return "</p>";
+            return html;
         }
     }
 }

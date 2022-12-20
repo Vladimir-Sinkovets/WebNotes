@@ -457,8 +457,6 @@ namespace Notes.BLL.Tests.ServicesTests
                 Id = 2,
                 Text = "2",
                 Title = "2",
-                LineCount = 1,
-                Length = 1,
             });
         }
 

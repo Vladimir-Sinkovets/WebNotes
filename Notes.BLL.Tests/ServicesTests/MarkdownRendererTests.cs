@@ -1,5 +1,7 @@
 ﻿using FluentAssertions;
+using Microsoft.Extensions.Options;
 using Notes.BLL.Services.MarkdownRendererService;
+using Notes.BLL.Services.MarkdownRendererService.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +12,13 @@ namespace Notes.BLL.Tests.ServicesTests
 {
     public class MarkdownRendererTests
     {
+        private IOptions<MarkdownRendererOptions> _options = Options.Create(new MarkdownRendererOptions());
+
         [Fact]
         public void Should_RenderParagraphs()
         {
             // Arrange
-            IMarkdownRenderer renderer = new MarkdownRenderer();
+            IMarkdownRenderer renderer = new MarkdownRenderer(_options, null);
             string text = "The formatting of the output is not important\r\n" +
                           "\r\n" +
                           "good approach to do this";
@@ -46,7 +50,7 @@ namespace Notes.BLL.Tests.ServicesTests
                           "good approach to do this\r\n" +
                           $"{markdownHeader} good approach to do this";
 
-            IMarkdownRenderer renderer = new MarkdownRenderer();
+            IMarkdownRenderer renderer = new MarkdownRenderer(_options, null);
 
             // Act
             string htmlText = renderer.RenderFromMarkdownToHTML(text).ToString();
@@ -58,27 +62,10 @@ namespace Notes.BLL.Tests.ServicesTests
         }
 
         [Fact]
-        public void Should_NotRenderHeaderTags_WhenMarkdownHeaderHaveNoSpace()
-        {
-            // Arrange
-            IMarkdownRenderer renderer = new MarkdownRenderer();
-            string text = "##The formatting of the " + 
-                "#output is not important\r\n" + 
-                "\r\n" +
-                "good approach to do this";
-
-            // Act
-            string htmlText = renderer.RenderFromMarkdownToHTML(text).ToString();
-
-            // Assert
-            htmlText.Should().Be("<p>##The formatting of the #output is not important</p><p>good approach to do this</p>");
-        }
-
-        [Fact]
         public void Should_RenderStrongText()
         {
             // Arrange
-            IMarkdownRenderer renderer = new MarkdownRenderer();
+            IMarkdownRenderer renderer = new MarkdownRenderer(_options, null);
             string text = "The **formatting** of the output is not important\r\n" +
                           "\r\n" +
                           "good approach to do this";

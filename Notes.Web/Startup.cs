@@ -31,11 +31,12 @@ namespace Notes.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            string connection = Configuration.GetConnectionString("DefaultConnection");
+            string connection = Configuration.GetConnectionString(/*"DefaultConnection"*/"PostgreSQLConnection");
 
             services.AddDbContext<ApplicationDbContext>(opt =>
             {
-                opt.UseSqlServer(connection);
+                //opt.UseSqlServer(connection);
+                opt.UseNpgsql(connection);
             });
 
             services.AddIdentity<UserEntry, IdentityRole>()

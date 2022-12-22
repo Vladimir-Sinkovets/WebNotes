@@ -6,6 +6,7 @@ using Notes.BLL.Services.AccountInfoManagers;
 using Notes.BLL.Services.AccountInfoManagers.Models;
 using Notes.DAL.Models;
 using Notes.Web.Models.Account;
+using System;
 using System.Threading.Tasks;
 
 namespace Notes.Web.Controllers
@@ -39,7 +40,10 @@ namespace Notes.Web.Controllers
             {
                 UserEntry user = new UserEntry { Email = model.Email, UserName = model.Email, Nickname = model.Nickname };
 
-                var result = await _userManager.CreateAsync(user, model.Password);
+                if (model.Email == null || model.Password == null)
+                    throw new ArgumentException("Email and Password can't be null");
+
+                var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
@@ -58,7 +62,7 @@ namespace Notes.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login(string returnUrl = null)
+        public IActionResult Login(string? returnUrl = null)
         {
             return View(new LoginViewModel { ReturnUrl = returnUrl });
         }
@@ -69,6 +73,9 @@ namespace Notes.Web.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (model.Email == null || model.Password == null)
+                    throw new ArgumentException("Email and Password can't be null");
+
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
 
                 if (result.Succeeded)

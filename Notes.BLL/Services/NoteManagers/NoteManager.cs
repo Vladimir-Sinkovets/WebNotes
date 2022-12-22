@@ -94,8 +94,9 @@ namespace Notes.BLL.Services.NoteManagers
             var tagEntry = tags.FirstOrDefault(t => t.Id == tagId);
             var noteEntry = notes.FirstOrDefault(n => n.Id == noteId);
 
-            noteEntry.Tags
-                .Add(tagEntry);
+            if (tagEntry != null)
+                noteEntry?.Tags?
+                    .Add(tagEntry);
 
             _unitOfWork.SaveChanges();
         }
@@ -274,7 +275,7 @@ namespace Notes.BLL.Services.NoteManagers
                 ?? throw new NotFoundException("This note does not exist");
         }
 
-        private void ThrowNotFoundExceptionForTags(IQueryable<TagEntry> tags, int tagId)
+        private static void ThrowNotFoundExceptionForTags(IQueryable<TagEntry> tags, int tagId)
         {
             if (tags.FirstOrDefault(tag => tag.Id == tagId) == null)
                 throw new NotFoundException("This tag does not exist");

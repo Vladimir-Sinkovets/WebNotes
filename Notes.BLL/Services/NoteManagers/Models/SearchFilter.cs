@@ -1,9 +1,5 @@
 ﻿using Notes.BLL.Services.NoteManagers.Enums;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Notes.BLL.Services.NoteManagers.Models
 {
@@ -18,9 +14,9 @@ namespace Notes.BLL.Services.NoteManagers.Models
             UseMinLength = false;
         }
 
-        public string Title { get; set; }
-        public string Text { get; set; }
-        public IEnumerable<string> Tags { get; set; } 
+        public string? Title { get; set; }
+        public string? Text { get; set; }
+        public IEnumerable<string>? Tags { get; set; } 
 
         public bool UseMinLength { get; set; }
         public bool UseMaxLength { get; set; }

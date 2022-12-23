@@ -105,7 +105,7 @@ namespace Notes.BLL.Services.NoteManagers
         {
             var note = GetNoteById(noteId);
 
-            return note.Tags ?? new List<Tag>();
+            return note.Tags!;
         }
 
         public async Task SetNoteImportanceAsync(int noteId, bool isImportant)

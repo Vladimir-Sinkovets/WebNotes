@@ -47,7 +47,7 @@ namespace Notes.BLL.Services.NoteManagers
             var userName = _userAccessor.Current.UserName;
 
             var noteEntries = _unitOfWork.Notes.GetAll()
-                .Where(n => n.User.UserName == userName);
+                .Where(n => n.User!.UserName == userName);
 
             var notes = _mapper.Map<IEnumerable<NoteEntry>, List<Note>>(noteEntries);
 
@@ -94,8 +94,9 @@ namespace Notes.BLL.Services.NoteManagers
             var tagEntry = tags.FirstOrDefault(t => t.Id == tagId);
             var noteEntry = notes.FirstOrDefault(n => n.Id == noteId);
 
-            noteEntry.Tags
-                .Add(tagEntry);
+            if (tagEntry != null)
+                noteEntry?.Tags?
+                    .Add(tagEntry);
 
             _unitOfWork.SaveChanges();
         }
@@ -104,7 +105,7 @@ namespace Notes.BLL.Services.NoteManagers
         {
             var note = GetNoteById(noteId);
 
-            return note.Tags;
+            return note.Tags!;
         }
 
         public async Task SetNoteImportanceAsync(int noteId, bool isImportant)
@@ -129,14 +130,14 @@ namespace Notes.BLL.Services.NoteManagers
             ThrowNotFoundExceptionForNotes(notes, noteId);
             ThrowUserAccessExceptionForNotes(notes, noteId);
 
-            var entry = notes.FirstOrDefault(n => n.Id == noteId);
+            var entry = notes.First(n => n.Id == noteId);
 
             return entry;
         }
 
         public async Task AddTagAsync(TagCreateData data)
         {
-            if(data == null)
+            if (data == null)
                 throw new ArgumentNullException(nameof(data));
 
             var userName = _userAccessor.Current.UserName;
@@ -168,10 +169,13 @@ namespace Notes.BLL.Services.NoteManagers
             ThrowUserAccessExceptionForNotes(notes, noteId);
             ThrowUserAccessExceptionForTags(tags, tagId);
 
-            var tagEntity = _unitOfWork.Tags.GetAll().FirstOrDefault(t => t.Id == tagId);
-            var noteEntity = _unitOfWork.Notes.GetAll().FirstOrDefault(n => n.Id == noteId);
+            var tagEntity = _unitOfWork.Tags.GetAll()
+                .First(t => t.Id == tagId);
 
-            noteEntity.Tags.Remove(tagEntity);
+            var noteEntity = _unitOfWork.Notes.GetAll()
+                .First(n => n.Id == noteId);
+
+            noteEntity.Tags?.Remove(tagEntity);
 
             _unitOfWork.SaveChanges();
         }
@@ -193,7 +197,7 @@ namespace Notes.BLL.Services.NoteManagers
             var userName = _userAccessor.Current.UserName;
 
             var tagsEntry = _unitOfWork.Tags.GetAll()
-                .Where(t => t.User.UserName == userName);
+                .Where(t => t.User!.UserName == userName);
 
             var tags = _mapper.Map<IEnumerable<TagEntry>, List<Tag>>(tagsEntry);
 
@@ -209,7 +213,7 @@ namespace Notes.BLL.Services.NoteManagers
             ThrowNotFoundExceptionForTags(tags, tagId);
             ThrowUserAccessExceptionForTags(tags, tagId);
 
-            var entry = tags.FirstOrDefault(t => t.Id == tagId && t.User.UserName == userName);
+            var entry = tags.First(t => t.Id == tagId && t.User!.UserName == userName);
 
             var tag = _mapper.Map<Tag>(entry);
 
@@ -222,26 +226,26 @@ namespace Notes.BLL.Services.NoteManagers
 
             var userId = _userAccessor.Current.Id;
 
-            noteEntries = noteEntries.Where(n => n.User.Id == userId);
+            noteEntries = noteEntries.Where(n => n.User!.Id == userId);
 
             if (string.IsNullOrEmpty(filter.Title) == false)
                 noteEntries = noteEntries.Where(
-                    n => n.Title != null && 
+                    n => n.Title != null &&
                     n.Title.Contains(filter.Title, StringComparison.CurrentCultureIgnoreCase));
 
             if (string.IsNullOrEmpty(filter.Text) == false)
                 noteEntries = noteEntries.Where(
-                    n => n.Text != null && 
+                    n => n.Text != null &&
                     n.Text.Contains(filter.Text, StringComparison.CurrentCultureIgnoreCase));
 
-            if (filter.Tags.Any() == true)
-                noteEntries = noteEntries.Where(n => 
-                    filter.Tags.Except(n.Tags.Select(t => t.Name))
+            if (filter.Tags?.Any() == true)
+                noteEntries = noteEntries.Where(n =>
+                    filter.Tags?.Except(n.Tags!.Select(t => t.Name))
                         .Any() == false);
 
             if (filter.UseMinLength == true)
                 noteEntries = noteEntries.Where(
-                    n => n.Text != null && 
+                    n => n.Text != null &&
                     n.Text.Length >= filter.MinLength);
 
             if (filter.UseMaxLength == true)
@@ -274,7 +278,7 @@ namespace Notes.BLL.Services.NoteManagers
                 ?? throw new NotFoundException("This note does not exist");
         }
 
-        private void ThrowNotFoundExceptionForTags(IQueryable<TagEntry> tags, int tagId)
+        private static void ThrowNotFoundExceptionForTags(IQueryable<TagEntry> tags, int tagId)
         {
             if (tags.FirstOrDefault(tag => tag.Id == tagId) == null)
                 throw new NotFoundException("This tag does not exist");
@@ -282,13 +286,13 @@ namespace Notes.BLL.Services.NoteManagers
 
         private void ThrowUserAccessExceptionForNotes(IQueryable<NoteEntry> notes, int noteId)
         {
-            if (notes.FirstOrDefault(n => n.Id == noteId).User.UserName != _userAccessor.Current.UserName)
+            if (notes.FirstOrDefault(n => n.Id == noteId)?.User?.UserName != _userAccessor.Current.UserName)
                 throw new UserAccessException();
         }
 
         private void ThrowUserAccessExceptionForTags(IQueryable<TagEntry> tags, int tagId)
         {
-            if (tags.FirstOrDefault(t => t.Id == tagId).User.UserName != _userAccessor.Current.UserName)
+            if (tags.FirstOrDefault(t => t.Id == tagId)?.User?.UserName != _userAccessor.Current.UserName)
                 throw new UserAccessException($"User {_userAccessor.Current.UserName} have no access to this tag ( tagId = {tagId} )");
         }
     }

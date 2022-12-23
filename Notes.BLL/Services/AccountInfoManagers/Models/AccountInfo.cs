@@ -9,6 +9,6 @@ namespace Notes.BLL.Services.AccountInfoManagers.Models
     public class AccountInfo
     {
         public int NotesCount { get; set; }
-        public string Email { get; set; }
+        public string? Email { get; set; }
     }
 }

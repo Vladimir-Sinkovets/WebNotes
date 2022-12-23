@@ -8,9 +8,9 @@ namespace Notes.DAL.Repositories
 {
     public class ApplicationDbContext : IdentityDbContext<UserEntry>
     {
-        public DbSet<NoteEntry> Notes { get; set; }
+        public DbSet<NoteEntry>? Notes { get; set; }
 
-        public DbSet<TagEntry> Tags { get; set; }
+        public DbSet<TagEntry>? Tags { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
     }

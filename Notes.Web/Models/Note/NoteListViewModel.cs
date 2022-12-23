@@ -10,12 +10,12 @@ namespace Notes.Web.Models.Note
 
         public int LastPage { get; set; }
 
-        public IEnumerable<ReadNoteViewModel> Notes { get; set; }
+        public IEnumerable<ReadNoteViewModel>? Notes { get; set; }
 
-        public IEnumerable<string> AllTags { get; set; }
+        public IEnumerable<string>? AllTags { get; set; }
 
         public NotesOrdering Ordering { get; set; }
 
-        public SearchFilterViewModel SearchFilter { get; set; }
+        public SearchFilterViewModel? SearchFilter { get; set; }
     }
 }

@@ -21,6 +21,7 @@ namespace Notes.Web.AutoMapperProfiles
                             Importance.Important => ImportanceFilterUsing.Important,
                             Importance.Unimportant => ImportanceFilterUsing.Unimportant,
                             Importance.None => ImportanceFilterUsing.None,
+                            _ => throw new System.NotImplementedException(),
                         },
                         Text = src.Text,
                         Title = src.Title,

@@ -21,10 +21,9 @@ namespace Notes.DAL.Repositories
 
         public IQueryable<TagEntry> GetAllWithoutTracking()
         {
-            return _table.Include(t => t.Notes)
-                .AsNoTrackingWithIdentityResolution()
-                .Include(t => t.User)
-                .AsNoTrackingWithIdentityResolution();
+            return _table.AsNoTrackingWithIdentityResolution()
+                .Include(t => t.Notes)
+                .Include(t => t.User);
         }
     }
 }

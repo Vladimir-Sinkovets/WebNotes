@@ -17,10 +17,9 @@ namespace Notes.DAL.Repositories
 
         public IQueryable<NoteEntry> GetAllWithoutTracking()
         {
-            return _table.Include(n => n.Tags)
-                .AsNoTrackingWithIdentityResolution()
-                .Include(n => n.User)
-                .AsNoTrackingWithIdentityResolution();
+            return _table.AsNoTrackingWithIdentityResolution()
+                .Include(n => n.Tags)
+                .Include(n => n.User);
         }
     }
 }

@@ -476,7 +476,7 @@ namespace Notes.BLL.Tests.ServicesTests
             noteManager.AddTagToNote(noteId: 1, tagId: 4);
 
             // Assert
-            notes.FirstOrDefault(n => n.Id == 1).Tags.Should().HaveCount(2);
+            _ = notes.FirstOrDefault(n => n.Id == 1).Tags.Should().HaveCount(2);
         }
 
         [Fact]
@@ -605,7 +605,7 @@ namespace Notes.BLL.Tests.ServicesTests
             noteManager.RemoveTagFromNote(noteId: 2, tagId: 4);
 
             // Assert
-            notes.FirstOrDefault(n => n.Id == 2).Tags.Should().HaveCount(1);
+            _ = notes.FirstOrDefault(n => n.Id == 2).Tags.Should().HaveCount(1);
         }
 
         [Fact]
@@ -699,7 +699,7 @@ namespace Notes.BLL.Tests.ServicesTests
             await noteManager.SetNoteImportanceAsync(1, true);
 
             // Assert
-            notes.FirstOrDefault(n => n.Id == 1).IsImportant.Should().Be(true);
+            _ = notes.FirstOrDefault(n => n.Id == 1).IsImportant.Should().Be(true);
         }
 
         [Fact]

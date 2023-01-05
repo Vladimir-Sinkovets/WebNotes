@@ -21,7 +21,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var notes = CreateNoteList(users, tags);
             var currentUser = users[0];
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, currentUser);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, currentUser);
 
             // Act
             await noteManager.CreateNewNoteAsync(new NoteCreateData() { Text = "new text", Title = "new title" });
@@ -29,24 +29,6 @@ namespace Notes.BLL.Tests.ServicesTests
             // Assert
             notes.Should().Contain(n => n.Text == "new text" && n.Title == "new title");
         }
-        [Fact]
-        public async void Should_ThrowException_WhenParameterIsNull_CreateNewNoteAsync()
-        {
-            // Arrange
-            var users = CreateUserList();
-            var tags = CreateTagList(users);
-            var notes = CreateNoteList(users, tags);
-            var currentUser = users[0];
-
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, currentUser);
-
-            // Act
-            Func<Task> func = async () => await noteManager.CreateNewNoteAsync(null);
-
-            // Assert
-            await func.Should().ThrowAsync<ArgumentNullException>();
-        }
-
         #endregion
 
         #region GetAllNotes
@@ -58,7 +40,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
 
@@ -79,7 +61,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.GetNoteTagsById(noteId: 22312);
@@ -96,13 +78,13 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.GetNoteTagsById(noteId: 4);
 
             // Assert
-            act.Should().Throw<UserAccessException>();
+            act.Should().Throw<NotFoundException>();
         }
         
         [Fact]
@@ -113,7 +95,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             var returnedNoteTags = noteManager.GetNoteTagsById(noteId: 2);
@@ -132,7 +114,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             var tag = noteManager.GetTagById(tagId: 5);
@@ -163,7 +145,7 @@ namespace Notes.BLL.Tests.ServicesTests
                 new NoteEntry() { Tags = new List<TagEntry>() { tags[2], }, Id = 10, Text = "3", Title = "3", User = users[1], IsImportant = false,},
             };
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             var filteredNotes = noteManager.GetAllByFilter(new SearchFilter()
@@ -200,7 +182,7 @@ namespace Notes.BLL.Tests.ServicesTests
                 new NoteEntry() { Tags = new List<TagEntry>() { tags[2],         }, Id =10, Text = "text", Title = "3", User = users[1], IsImportant = false,},
             };
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             var filteredNotes = noteManager.GetAllByFilter(new SearchFilter()
@@ -239,7 +221,7 @@ namespace Notes.BLL.Tests.ServicesTests
                 new NoteEntry() { Tags = new List<TagEntry>() { tags[2],         }, Id =10, Text = "text", Title = "3", User = users[1], IsImportant = false,},
             };
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             var filteredNotes = noteManager.GetAllByFilter(new SearchFilter()
@@ -278,7 +260,7 @@ namespace Notes.BLL.Tests.ServicesTests
                 new NoteEntry() { Tags = new List<TagEntry>() { tags[2],         }, Id =10, Text = "666666", Title = "3", User = users[1], IsImportant = false,},
             };
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[1]);
+            INoteManager noteManager = InitializeNoteManager( tags, notes, users[1]);
 
             // Act
             var filteredNotes = noteManager.GetAllByFilter(new SearchFilter()
@@ -317,7 +299,7 @@ namespace Notes.BLL.Tests.ServicesTests
                 new NoteEntry() { Tags = new List<TagEntry>() { tags[2],         }, Id =10, Text = "666666", Title = "3", User = users[1],   IsImportant = false,},
             };
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             var filteredNotes = noteManager.GetAllByFilter(new SearchFilter()
@@ -356,7 +338,7 @@ namespace Notes.BLL.Tests.ServicesTests
                 new NoteEntry() { Tags = new List<TagEntry>() { tags[2],         }, Id =10, Text = "666666", Title = "3", User = users[1],   IsImportant = false,},
             };
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             var filteredNotes = noteManager.GetAllByFilter(new SearchFilter()
@@ -385,30 +367,13 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.GetTagById(tagId: 77777);
 
             // Assert
             act.Should().Throw<NotFoundException>().WithMessage("This tag does not exist");
-        }
-
-        [Fact]
-        public void Should_ThrowException_When_UserHaveNoAccessToTagWithThisId_GetTagById()
-        {
-            // Arrange
-            var users = CreateUserList();
-            var tags = CreateTagList(users);
-            var notes = CreateNoteList(users, tags);
-
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
-
-            // Act
-            Action act = () => noteManager.GetTagById(tagId: 6);
-
-            // Assert
-            act.Should().Throw<UserAccessException>();
         }
         #endregion
 
@@ -421,7 +386,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             var allTags = noteManager.GetAllTags();
@@ -440,7 +405,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             var note = noteManager.GetNoteById(noteId: 2);
@@ -468,7 +433,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.GetNoteById(noteId: 2222);
@@ -485,13 +450,13 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.GetNoteById(noteId: 3);
 
             // Assert
-            act.Should().Throw<UserAccessException>();
+            act.Should().Throw<NotFoundException>();
         }
         #endregion
 
@@ -505,7 +470,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             noteManager.AddTagToNote(noteId: 1, tagId: 4);
@@ -522,13 +487,13 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.AddTagToNote(noteId: 3, tagId: 4);
 
             // Assert
-            act.Should().Throw<UserAccessException>();
+            act.Should().Throw<NotFoundException>();
         }
 
         [Fact]
@@ -539,13 +504,13 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.AddTagToNote(noteId: 3, tagId: 6);
 
             // Assert
-            act.Should().Throw<UserAccessException>();
+            act.Should().Throw<NotFoundException>();
         }
 
         [Fact]
@@ -556,7 +521,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.AddTagToNote(noteId: 213123, tagId: 4);
@@ -573,7 +538,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.AddTagToNote(noteId: 2, tagId: 213123);
@@ -592,7 +557,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             await noteManager.AddTagAsync(new TagCreateData() { Name = "testName" });
@@ -623,29 +588,6 @@ namespace Notes.BLL.Tests.ServicesTests
             // Assert
             act.Should().ThrowAsync<ExistedTagNameException>().WithMessage("Cannot add tag with already existing name");
         }
-
-        [Fact]
-        public async void Should_ThrowException_When_ParameterIsNull_AddTagAsync()
-        {
-            // Arrange
-            List<UserEntry> users = CreateUserList();
-            var tags = new List<TagEntry>()
-            {
-                new TagEntry() { Name = "tag13231", User = users[1], Id = 0 },
-            };
-
-            var unitOfWork = MockHelper.SetupUnitOfWork(tags, null);
-            var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));
-            var userAccessor = MockHelper.SetupCurrentUserAccessor(new UserEntry() { UserName = "userName" });
-
-            INoteManager noteManager = new NoteManager(unitOfWork, mapper, userAccessor);
-
-            // Act
-            Func<Task> act = async () => await noteManager.AddTagAsync(null);
-
-            // Assert
-            await act.Should().ThrowAsync<ArgumentNullException>();
-        }
         #endregion
 
         #region RemoveTagFromNote
@@ -657,7 +599,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             noteManager.RemoveTagFromNote(noteId: 2, tagId: 4);
@@ -674,7 +616,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.RemoveTagFromNote(noteId: 22212, tagId: 4);
@@ -691,7 +633,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.RemoveTagFromNote(noteId: 1, tagId: 44444);
@@ -699,60 +641,9 @@ namespace Notes.BLL.Tests.ServicesTests
             // Assert
             act.Should().Throw<NotFoundException>();
         }
-
-
-        [Fact]
-        public void Should_ThrowException_WhenUserHaveNoAccessToNoteWithThisId_RemoveTagFromNote()
-        {
-            // Arrange
-            var users = CreateUserList();
-            var tags = CreateTagList(users);
-            var notes = CreateNoteList(users, tags);
-
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
-
-            // Act
-            Action act = () => noteManager.RemoveTagFromNote(noteId: 4, tagId: 4);
-
-            // Assert
-            act.Should().Throw<UserAccessException>();
-        }
-
-        [Fact]
-        public void Should_ThrowException_WhenUserHaveNoAccessToTagWithThisId_RemoveTagFromNote()
-        {
-            // Arrange
-            var users = CreateUserList();
-            var tags = CreateTagList(users);
-            var notes = CreateNoteList(users, tags);
-
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
-
-            // Act
-            Action act = () => noteManager.RemoveTagFromNote(noteId: 4, tagId: 6);
-
-            // Assert
-            act.Should().Throw<UserAccessException>();
-        }
         #endregion
 
         #region UpdateNoteAsync
-        [Fact]
-        public async void Should_ThrowException_WhenParameterIsNull_UpdateNoteAsync()
-        {
-            // Arrange
-            var users = CreateUserList();
-            var tags = CreateTagList(users);
-            var notes = CreateNoteList(users, tags);
-
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
-
-            // Act
-            Func<Task> act = async () => await noteManager.UpdateNoteAsync(null);
-
-            // Assert
-            await act.Should().ThrowAsync<ArgumentNullException>();
-        }
 
         [Fact]
         public async void Should_ThrowException_WhenUserHaveNoAccessToNoteWithThisId_UpdateNoteAsync()
@@ -762,7 +653,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             Func<Task> act = async () => await noteManager.UpdateNoteAsync(new NoteUpdateData() { Id = 3, Tags = new List<Tag>(), Text = "", Title = "" });
@@ -779,7 +670,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             await noteManager.UpdateNoteAsync(new NoteUpdateData() { Id = 1, Text = "updated text", Title = "1" });
@@ -801,8 +692,8 @@ namespace Notes.BLL.Tests.ServicesTests
             var users = CreateUserList();
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
-
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             await noteManager.SetNoteImportanceAsync(1, true);
@@ -819,13 +710,13 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             Func<Task> act = async () => await noteManager.SetNoteImportanceAsync(4, true);
 
             // Assert
-            await act.Should().ThrowAsync<UserAccessException>();
+            await act.Should().ThrowAsync<NotFoundException>();
         }
 
         [Fact]
@@ -836,7 +727,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             Func<Task> act = async () => await noteManager.SetNoteImportanceAsync(4444, true);
@@ -855,7 +746,7 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             noteManager.DeleteTagById(tagId: 4);
@@ -872,36 +763,18 @@ namespace Notes.BLL.Tests.ServicesTests
             var tags = CreateTagList(users);
             var notes = CreateNoteList(users, tags);
 
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
+            INoteManager noteManager = InitializeNoteManager(tags, notes, users[0]);
 
             // Act
             Action act = () => noteManager.DeleteTagById(tagId: 9874);
 
             // Assert
-            act.Should().Throw<NotFoundException>();
-        }
-
-        [Fact]
-        public void Should_ThrowException_When_UserHaveNoAccessToTagWithThisId_DeleteTagById()
-        {
-            // Arrange
-            var users = CreateUserList();
-            var tags = CreateTagList(users);
-            var notes = CreateNoteList(users, tags);
-
-            INoteManager noteManager = InitializeNoteManager(users, tags, notes, users[0]);
-
-            // Act
-            Action act = () => noteManager.DeleteTagById(tagId: 6);
-
-            // Assert
-            act.Should().Throw<UserAccessException>();
+            act.Should().Throw<NotFoundException>().WithMessage("This tag does not exist");
         }
         #endregion
 
         #region initialization methods
-        private static INoteManager InitializeNoteManager(List<UserEntry> users/*remove*/, List<TagEntry> tags,
-            List<NoteEntry> notes, UserEntry currentUser)
+        private static INoteManager InitializeNoteManager(List<TagEntry> tags, List<NoteEntry> notes, UserEntry currentUser)
         {
             var unitOfWork = MockHelper.SetupUnitOfWork(tags, notes);
             var mapper = MockHelper.InitializeMapper(typeof(NoteMappingProfile));

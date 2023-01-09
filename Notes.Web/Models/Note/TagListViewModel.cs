@@ -4,6 +4,6 @@ namespace Notes.Web.Models.Note
 {
     public class TagListViewModel
     {
-        public IEnumerable<TagItemViewModel> AllTags { get; set; }
+        public IEnumerable<TagItemViewModel>? AllTags { get; set; }
     }
 }

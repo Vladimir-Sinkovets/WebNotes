@@ -17,11 +17,11 @@ namespace Notes.Web.Models.Note
         }
         
         public int Id { get; set; }
-        public string Title { get; set; }
-        public string Text { get; set; }
+        public string? Title { get; set; }
+        public string? Text { get; set; }
         public bool IsImportant { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public IHtmlContent HtmlText { get; set; }
-        public IEnumerable<TagItemViewModel> Tags { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public IHtmlContent? HtmlText { get; set; }
+        public IEnumerable<TagItemViewModel>? Tags { get; set; }
     }
 }

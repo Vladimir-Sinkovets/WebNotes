@@ -5,9 +5,9 @@ namespace Notes.Web.Models.Note
 {
     public class SearchFilterViewModel
     {
-        public string Title { get; set; }
-        public string Text { get; set; }
-        public IEnumerable<string> Tags { get; set; }
+        public string? Title { get; set; }
+        public string? Text { get; set; }
+        public IEnumerable<string>? Tags { get; set; }
         public bool UseMinLength { get; set; } = false;
         public bool UseMaxLength { get; set; } = false;
         public int MinLength { get; set; }

@@ -1,5 +1,4 @@
 ﻿using Notes.Web.Enums;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Notes.Web.Models.Note

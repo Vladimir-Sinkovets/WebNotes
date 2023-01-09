@@ -7,10 +7,10 @@ namespace Notes.Web.Models.Note
     {
         [Required]
         public int Id { get; set; }
-        public string Title { get; set; }
-        public string Text { get; set; }
+        public string? Title { get; set; }
+        public string? Text { get; set; }
         public bool IsImportant { get; set; }
-        public IEnumerable<TagItemViewModel> AllTags { get; set; }
-        public IEnumerable<TagItemViewModel> Tags { get; set; }
+        public IEnumerable<TagItemViewModel>? AllTags { get; set; }
+        public IEnumerable<TagItemViewModel>? Tags { get; set; }
     }
 }

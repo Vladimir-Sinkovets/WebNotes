@@ -34,7 +34,7 @@ namespace Notes.BLL.Services.NoteManagers
 
             entry.CreatedDate = DateTime.Now;
 
-            _unitOfWork.Notes.Create(entry);
+            _unitOfWork.NotesRepository.Create(entry);
 
             await _unitOfWork.SaveChangesAsync();
         }
@@ -43,7 +43,7 @@ namespace Notes.BLL.Services.NoteManagers
         {
             var userName = _userAccessor.Current.UserName;
 
-            var noteEntries = _unitOfWork.Notes.GetAllWithoutTracking()
+            var noteEntries = _unitOfWork.NotesRepository.GetAllWithoutTracking()
                 .Where(n => n.User!.UserName == userName);
 
             var notes = _mapper.Map<IEnumerable<NoteEntry>, List<Note>>(noteEntries);
@@ -53,13 +53,13 @@ namespace Notes.BLL.Services.NoteManagers
 
         public async Task UpdateNoteAsync(NoteUpdateData updateData)
         {
-            var notes = _unitOfWork.Notes.GetAllWithoutTracking();
+            var notes = _unitOfWork.NotesRepository.GetAllWithoutTracking();
 
             ThrowUserAccessExceptionForNotes(notes, updateData.Id);
 
             var entry = _mapper.Map<NoteEntry>(updateData);
 
-            _unitOfWork.Notes.Update(entry);
+            _unitOfWork.NotesRepository.Update(entry);
 
             await _unitOfWork.SaveChangesAsync();
         }
@@ -96,7 +96,7 @@ namespace Notes.BLL.Services.NoteManagers
 
             entry.IsImportant = isImportant;
 
-            _unitOfWork.Notes.Update(entry);
+            _unitOfWork.NotesRepository.Update(entry);
 
             await _unitOfWork.SaveChangesAsync();
         }
@@ -104,7 +104,7 @@ namespace Notes.BLL.Services.NoteManagers
 
         public async Task AddTagAsync(TagCreateData tag)
         {
-            if (_unitOfWork.Tags.GetAll()
+            if (_unitOfWork.TagsRepository.GetAll()
                     .Any(t => t.Name == tag.Name))
                 throw new ExistedTagNameException("Cannot add tag with already existing name");
 
@@ -112,7 +112,7 @@ namespace Notes.BLL.Services.NoteManagers
 
             entry.User = _userAccessor.Current;
 
-            _unitOfWork.Tags.Create(entry);
+            _unitOfWork.TagsRepository.Create(entry);
 
             await _unitOfWork.SaveChangesAsync();
         }
@@ -130,11 +130,11 @@ namespace Notes.BLL.Services.NoteManagers
 
         public void DeleteTagById(int tagId)
         {
-            var tags = _unitOfWork.Tags.GetAllWithoutTracking();
+            var tags = _unitOfWork.TagsRepository.GetAllWithoutTracking();
 
             ThrowUserAccessExceptionForTags(tags, tagId);
 
-            _unitOfWork.Tags.DeleteById(tagId);
+            _unitOfWork.TagsRepository.DeleteById(tagId);
 
             _unitOfWork.SaveChanges();
         }
@@ -143,7 +143,7 @@ namespace Notes.BLL.Services.NoteManagers
         {
             var userName = _userAccessor.Current.UserName;
 
-            var tagsEntry = _unitOfWork.Tags.GetAll()
+            var tagsEntry = _unitOfWork.TagsRepository.GetAll()
                 .Where(t => t.User!.UserName == userName);
 
             var tags = _mapper.Map<IEnumerable<TagEntry>, List<Tag>>(tagsEntry);
@@ -164,7 +164,7 @@ namespace Notes.BLL.Services.NoteManagers
         {
             var userId = _userAccessor.Current.Id;
 
-            var noteEntries = _unitOfWork.Notes.GetAllWithoutTracking()
+            var noteEntries = _unitOfWork.NotesRepository.GetAllWithoutTracking()
                 .Where(n => n.User!.Id == userId)
                 .AsEnumerable();
 
@@ -215,7 +215,7 @@ namespace Notes.BLL.Services.NoteManagers
         {
             var userName = _userAccessor.Current.UserName;
 
-            var tags = _unitOfWork.Tags.GetAll();
+            var tags = _unitOfWork.TagsRepository.GetAll();
 
             var entry = tags.FirstOrDefault(t => t.Id == tagId && t.User!.UserName == userName);
 
@@ -229,7 +229,7 @@ namespace Notes.BLL.Services.NoteManagers
         {
             var userName = _userAccessor.Current.UserName;
 
-            var notes = _unitOfWork.Notes.GetAll();
+            var notes = _unitOfWork.NotesRepository.GetAll();
 
             var entry = notes.FirstOrDefault(n => n.Id == noteId && n.User!.UserName == userName);
 

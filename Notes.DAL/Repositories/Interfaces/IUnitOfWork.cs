@@ -8,8 +8,8 @@ namespace Notes.DAL.Repositories.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
-        INoteRepository Notes { get; }
-        ITagRepository Tags { get; }
+        INoteRepository NotesRepository { get; }
+        ITagRepository TagsRepository { get; }
 
         void SaveChanges();
         Task SaveChangesAsync();

@@ -56,32 +56,32 @@ namespace Notes.BLL.Tests.Helpers
         public static IUnitOfWork SetupUnitOfWork(List<TagEntry> tags, List<NoteEntry> notes)
         {
             var unitOfWorkMock = new Mock<IUnitOfWork>();
-            unitOfWorkMock.Setup(unit => unit.Tags.Create(It.IsAny<TagEntry>()))
+            unitOfWorkMock.Setup(unit => unit.TagsRepository.Create(It.IsAny<TagEntry>()))
                 .Callback((TagEntry t) => tags.Add(t));
 
-            unitOfWorkMock.Setup(unit => unit.Tags.GetAll())
+            unitOfWorkMock.Setup(unit => unit.TagsRepository.GetAll())
                 .Returns(() => tags.AsQueryable());
 
-            unitOfWorkMock.Setup(unit => unit.Tags.GetAllWithoutTracking())
+            unitOfWorkMock.Setup(unit => unit.TagsRepository.GetAllWithoutTracking())
                 .Returns(() => tags.AsQueryable());
 
-            unitOfWorkMock.Setup(unit => unit.Tags.DeleteById(It.IsAny<int>()))
+            unitOfWorkMock.Setup(unit => unit.TagsRepository.DeleteById(It.IsAny<int>()))
                 .Callback<int>(id => tags.Remove(tags.FirstOrDefault(t => t.Id == id)));
 
 
-            unitOfWorkMock.Setup(unit => unit.Notes.Create(It.IsAny<NoteEntry>()))
+            unitOfWorkMock.Setup(unit => unit.NotesRepository.Create(It.IsAny<NoteEntry>()))
                 .Callback((NoteEntry n) => notes.Add(n));
 
-            unitOfWorkMock.Setup(unit => unit.Notes.GetAll())
+            unitOfWorkMock.Setup(unit => unit.NotesRepository.GetAll())
                 .Returns(() => notes.AsQueryable());
 
-            unitOfWorkMock.Setup(unit => unit.Notes.GetAllWithoutTracking())
+            unitOfWorkMock.Setup(unit => unit.NotesRepository.GetAllWithoutTracking())
                 .Returns(() => notes.AsQueryable());
 
-            unitOfWorkMock.Setup(unit => unit.Notes.DeleteById(It.IsAny<int>()))
+            unitOfWorkMock.Setup(unit => unit.NotesRepository.DeleteById(It.IsAny<int>()))
                 .Callback<int>(id => notes.Remove(notes.FirstOrDefault(n => n.Id == id)));
 
-            unitOfWorkMock.Setup(unit => unit.Notes.Update(It.IsAny<NoteEntry>()))
+            unitOfWorkMock.Setup(unit => unit.NotesRepository.Update(It.IsAny<NoteEntry>()))
                 .Callback<NoteEntry>(noteEntry => 
                 {
                     notes.Remove(notes.FirstOrDefault(n => n.Id == noteEntry.Id));

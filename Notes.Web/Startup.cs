@@ -56,7 +56,7 @@ namespace Notes.Web
             services.AddHttpContextAccessor();
             services.AddAuthentication(IISDefaults.AuthenticationScheme);
 
-            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IUnitOfWork, ApplicationDbContext>();
             services.AddTransient<IMarkdownRenderer, MarkdownRenderer>();
             services.AddTransient<ICurrentUserAccessor, CurrentUserAccessor>();
             services.AddTransient<INoteManager, NoteManager>();

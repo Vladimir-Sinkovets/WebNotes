@@ -21,17 +21,23 @@ namespace Notes.Web.Controllers
 
         public IActionResult Index()
         {
+            _logger.LogDebug($"\"Index\" action method called");
+
             return View();
         }
 
         public IActionResult Privacy()
         {
+            _logger.LogDebug($"\"Privacy\" action method called");
+
             return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
+            _logger.LogDebug($"\"Error\" action method called");
+
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }

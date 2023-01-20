@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Notes.BLL.Services.CurrentUserAccessor;
 using Notes.BLL.Services.NoteManagers.Enums;
 using Notes.BLL.Services.NoteManagers.Exceptions;
@@ -17,12 +18,14 @@ namespace Notes.BLL.Services.NoteManagers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ICurrentUserAccessor _userAccessor;
+        private readonly ILogger<NoteManager> _logger;
 
-        public NoteManager(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserAccessor userService)
+        public NoteManager(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserAccessor userService, ILogger<NoteManager> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userAccessor = userService;
+            _logger = logger;
         }
 
 
@@ -37,6 +40,8 @@ namespace Notes.BLL.Services.NoteManagers
             _unitOfWork.NotesRepository.Create(entry);
 
             await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogDebug($"New note created with title {entry.Title}");
         }
 
         public IEnumerable<Note> GetAllNotes()
@@ -62,6 +67,8 @@ namespace Notes.BLL.Services.NoteManagers
             _unitOfWork.NotesRepository.Update(entry);
 
             await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogDebug($"Note updated, note title: {entry.Title}");
         }
 
         public Note GetNoteById(int noteId)
@@ -81,6 +88,8 @@ namespace Notes.BLL.Services.NoteManagers
             noteEntry.Tags?.Add(tagEntry);
 
             _unitOfWork.SaveChanges();
+
+            _logger.LogDebug($"Tag added to note, tag id: {tagEntry.Id}, note id: {noteEntry.Id}");
         }
 
         public IEnumerable<Tag> GetNoteTagsById(int noteId)
@@ -99,6 +108,8 @@ namespace Notes.BLL.Services.NoteManagers
             _unitOfWork.NotesRepository.Update(entry);
 
             await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogDebug($"Note updated with {entry.Title}");
         }
 
 
@@ -115,6 +126,8 @@ namespace Notes.BLL.Services.NoteManagers
             _unitOfWork.TagsRepository.Create(entry);
 
             await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogDebug($"Tag \"{entry.Name}\" added");
         }
 
         public void RemoveTagFromNote(int noteId, int tagId)
@@ -126,6 +139,8 @@ namespace Notes.BLL.Services.NoteManagers
             noteEntity.Tags?.Remove(tagEntity);
 
             _unitOfWork.SaveChanges();
+
+            _logger.LogDebug($"Remove tag from note, note id: {noteId}");
         }
 
         public void DeleteTagById(int tagId)
@@ -137,6 +152,8 @@ namespace Notes.BLL.Services.NoteManagers
             _unitOfWork.TagsRepository.DeleteById(tagId);
 
             _unitOfWork.SaveChanges();
+
+            _logger.LogDebug($"Tag deleted");
         }
 
         public IEnumerable<Tag> GetAllTags()
@@ -245,7 +262,11 @@ namespace Notes.BLL.Services.NoteManagers
             var currentUserName = _userAccessor.Current.UserName;
 
             if (notes.FirstOrDefault(n => n.Id == noteId && n.User!.UserName == currentUserName) == null)
+            {
+                _logger.LogDebug($"User {_userAccessor.Current.UserName} have no access to this note ( noteId = {noteId} )");
+
                 throw new UserAccessException($"User {_userAccessor.Current.UserName} have no access to this note ( noteId = {noteId} )");
+            }
         }
 
         private void ThrowUserAccessExceptionForTags(IQueryable<TagEntry> tags, int tagId)
@@ -253,7 +274,11 @@ namespace Notes.BLL.Services.NoteManagers
             var currentUserName = _userAccessor.Current.UserName;
 
             if (tags.FirstOrDefault(t => t.Id == tagId && t.User!.UserName == currentUserName) == null)
-                throw new NotFoundException("This tag does not exist");
+            {
+                _logger.LogDebug($"");
+
+                throw new NotFoundException("This tag does not exist" + $"Tag (id = {tagId}) does not exist, user: {currentUserName}");
+            }
         }
     }
 }

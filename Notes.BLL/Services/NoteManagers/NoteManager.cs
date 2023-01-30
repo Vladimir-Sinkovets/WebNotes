@@ -263,7 +263,7 @@ namespace Notes.BLL.Services.NoteManagers
 
             if (notes.FirstOrDefault(n => n.Id == noteId && n.User!.UserName == currentUserName) == null)
             {
-                _logger.LogDebug($"User {_userAccessor.Current.UserName} have no access to this note ( noteId = {noteId} )");
+                _logger.LogError($"User {_userAccessor.Current.UserName} have no access to this note ( noteId = {noteId} )");
 
                 throw new UserAccessException($"User {_userAccessor.Current.UserName} have no access to this note ( noteId = {noteId} )");
             }
@@ -275,7 +275,7 @@ namespace Notes.BLL.Services.NoteManagers
 
             if (tags.FirstOrDefault(t => t.Id == tagId && t.User!.UserName == currentUserName) == null)
             {
-                _logger.LogDebug($"");
+                _logger.LogError($"This tag does not exist" + $"Tag (id = {tagId}) does not exist, user: {currentUserName}");
 
                 throw new NotFoundException("This tag does not exist" + $"Tag (id = {tagId}) does not exist, user: {currentUserName}");
             }

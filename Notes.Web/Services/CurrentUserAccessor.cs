@@ -9,7 +9,7 @@ namespace Notes.Web.Services
 {
     public class CurrentUserAccessor : ICurrentUserAccessor
     {
-        private UserEntry _current;
+        private UserEntry? _current;
         public UserEntry Current { get => _current ??= GetCurrentUser(); }
 
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -23,7 +23,7 @@ namespace Notes.Web.Services
 
         private UserEntry GetCurrentUser()
         {
-            string userName = _httpContextAccessor.HttpContext.User.Identity.Name;
+            string? userName = _httpContextAccessor.HttpContext.User.Identity.Name;
 
             var currentUser = _userManager.Users.FirstOrDefault(u => u.UserName == userName)
                 ?? throw new NotAuthorizedException("User is not authorized");

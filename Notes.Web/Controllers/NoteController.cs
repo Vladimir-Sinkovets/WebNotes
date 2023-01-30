@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Notes.BLL.Services.CurrentUserAccessor.Exceptions;
 using Notes.BLL.Services.MarkdownRendererService;
 using Notes.BLL.Services.NoteManagers;
@@ -22,17 +23,21 @@ namespace Notes.Web.Controllers
         private readonly IMapper _mapper;
         private readonly IMarkdownRenderer _markdownRenderer;
         private readonly INoteManager _noteManager;
+        private readonly ILogger<NoteController> _logger;
 
-        public NoteController(INoteManager notesManager, IMapper mapper, IMarkdownRenderer markdownRenderer)
+        public NoteController(INoteManager notesManager, IMapper mapper, IMarkdownRenderer markdownRenderer, ILogger<NoteController> logger)
         {
             _noteManager = notesManager;
             _mapper = mapper;
             _markdownRenderer = markdownRenderer;
+            _logger = logger;
         }
 
         [HttpGet]
         public ActionResult NoteList(NoteListViewModel model)
         {
+            _logger.LogDebug($"\"NoteList\" action method called");
+
             const int NotesInPage = 10;
 
             IEnumerable<Note> notes;
@@ -97,12 +102,16 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public ActionResult Create()
         {
+            _logger.LogDebug($"\"Create\" action method called");
+
             return View();
         }
 
         [HttpPost]
         public async Task<ActionResult> Create(NoteCreateViewModel model)
         {
+            _logger.LogDebug($"\"Create\" action method called");
+
             var note = _mapper.Map<NoteCreateData>(model);
 
             try
@@ -128,6 +137,8 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public ActionResult EditNote(int id)
         {
+            _logger.LogDebug($"\"EditNote\" action method called");
+
             try
             {
                 var note = _noteManager.GetNoteById(id);
@@ -159,6 +170,8 @@ namespace Notes.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> EditNote(EditNoteViewModel viewModel)
         {
+            _logger.LogDebug($"\"EditNote\" action method called");
+
             try
             {
                 if (ModelState.IsValid == true)
@@ -199,6 +212,8 @@ namespace Notes.Web.Controllers
         [HttpGet]
         private IEnumerable<TagItemViewModel> GetAllTagsForCurrentUser()
         {
+            _logger.LogDebug($"\"GetAllTagsForCurrentUser\" action method called");
+
             var allTags = _noteManager.GetAllTags();
 
             var allViewModelTags = _mapper.Map<IEnumerable<Tag>, List<TagItemViewModel>>(allTags);
@@ -209,6 +224,8 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public IActionResult Read(int id)
         {
+            _logger.LogDebug($"\"Read\" action method called");
+
             try
             {
                 var note = _noteManager.GetNoteById(id);
@@ -242,6 +259,8 @@ namespace Notes.Web.Controllers
         [HttpPost]
         public IActionResult AddTagToNote(int noteId, int tagId)
         {
+            _logger.LogDebug($"\"AddTagToNote\" action method called");
+
             try
             {
                 _noteManager.AddTagToNote(noteId, tagId);
@@ -269,6 +288,8 @@ namespace Notes.Web.Controllers
         [HttpPost]
         public IActionResult RemoveTagFromNote(int noteId, int tagId)
         {
+            _logger.LogDebug($"\"RemoveTagFromNote\" action method called");
+
             try
             {
                 _noteManager.RemoveTagFromNote(noteId, tagId);
@@ -297,6 +318,8 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public IActionResult TagList()
         {
+            _logger.LogDebug($"\"TagList\" action method called");
+
             try
             {
                 var tags = _noteManager.GetAllTags();
@@ -320,6 +343,8 @@ namespace Notes.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddNewTag(string tagName)
         {
+            _logger.LogDebug($"\"AddNewTag\" action method called");
+
             try
             {
                 var tag = new TagCreateData() { Name = tagName };
@@ -341,6 +366,8 @@ namespace Notes.Web.Controllers
         [HttpPost]
         public IActionResult DeleteTag(int id)
         {
+            _logger.LogDebug($"\"DeleteTag\" action method called");
+
             try
             {
                 _noteManager.DeleteTagById(id);
@@ -367,6 +394,8 @@ namespace Notes.Web.Controllers
 
         public async Task<IActionResult> StarNote(int id, bool isImportant, string returnUrl)
         {
+            _logger.LogDebug($"\"StarNote\" action method called");
+
             await _noteManager.SetNoteImportanceAsync(id, !isImportant);
 
             return Redirect(returnUrl);
@@ -375,6 +404,8 @@ namespace Notes.Web.Controllers
         [HttpGet]
         public IActionResult ImportantNoteList(int page = 1)
         {
+            _logger.LogDebug($"\"ImportantNoteList\" action method called");
+
             const int NotesInPage = 10;
 
             IEnumerable<Note> notes = _noteManager.GetAllByFilter(new SearchFilter() { Importance = ImportanceFilterUsing.Important });

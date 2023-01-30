@@ -21,7 +21,7 @@ namespace Notes.BLL.Services.AccountInfoManagers
         {
             _userManager = userManager;
             _notesManager = notesManager;
-            this._userAccessor = userService;
+            _userAccessor = userService;
         }
 
         public AccountInfo GetAccountInfo()

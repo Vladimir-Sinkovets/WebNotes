@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Notes.DAL.Repositories;
 using Notes.BLL.Services.NoteManagers;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace Notes.BLL.Services.MarkdownRendererService
 {
@@ -14,12 +15,15 @@ namespace Notes.BLL.Services.MarkdownRendererService
     {
         private readonly MarkdownRendererOptions _options;
         private readonly INoteManager _noteManager;
+        private readonly ILogger<MarkdownRenderer> _logger;
 
-        public MarkdownRenderer(IOptions<MarkdownRendererOptions> options, INoteManager noteManager)
+        public MarkdownRenderer(IOptions<MarkdownRendererOptions> options, INoteManager noteManager, ILogger<MarkdownRenderer> logger)
         {
             _options = options.Value;
 
             _noteManager = noteManager;
+
+            _logger = logger;
         }
 
         public IHtmlContent RenderFromMarkdownToHTML(string markdownText)
@@ -64,6 +68,8 @@ namespace Notes.BLL.Services.MarkdownRendererService
 
                 html = html.Replace(match.Value, $"<a href=\"{href}\">{noteTitle}</a>");
             }
+
+            _logger.LogDebug($"{matches.Count} links were rendered");
 
             return html;
         }
